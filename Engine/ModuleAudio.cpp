@@ -5,7 +5,7 @@
 #include "SDL_mixer/include/SDL_mixer.h"
 #pragma comment( lib, "SDL_mixer/lib/x86/SDL2_mixer.lib" )
 
-ModuleAudio::ModuleAudio(Application* app, bool start_enabled) : Module(app, start_enabled), music(NULL)
+ModuleAudio::ModuleAudio(Application* app, bool start_enabled) : Module(app, start_enabled)//, music(NULL)
 {}
 
 // Destructor
@@ -17,7 +17,7 @@ bool ModuleAudio::Init()
 {
 	LOG("Loading Audio Mixer");
 	bool ret = true;
-	SDL_Init(0);
+	/*SDL_Init(0);
 
 	if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 	{
@@ -41,14 +41,14 @@ bool ModuleAudio::Init()
 		LOG("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
 		ret = false;
 	}
-
+	*/
 	return ret;
 }
 
 // Called before quitting
 bool ModuleAudio::CleanUp()
 {
-	LOG("Freeing sound FX, closing Mixer and Audio subsystem");
+	/*LOG("Freeing sound FX, closing Mixer and Audio subsystem");
 
 	if(music != NULL)
 	{
@@ -65,7 +65,7 @@ bool ModuleAudio::CleanUp()
 	fx.clear();
 	Mix_CloseAudio();
 	Mix_Quit();
-	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);*/
 	return true;
 }
 
@@ -73,7 +73,7 @@ bool ModuleAudio::CleanUp()
 bool ModuleAudio::PlayMusic(const char* path, float fade_time)
 {
 	bool ret = true;
-	
+	/*
 	if(music != NULL)
 	{
 		if(fade_time > 0.0f)
@@ -116,7 +116,7 @@ bool ModuleAudio::PlayMusic(const char* path, float fade_time)
 		}
 	}
 
-	LOG("Successfully playing %s", path);
+	LOG("Successfully playing %s", path);*/
 	return ret;
 }
 
@@ -124,7 +124,7 @@ bool ModuleAudio::PlayMusic(const char* path, float fade_time)
 unsigned int ModuleAudio::LoadFx(const char* path)
 {
 	unsigned int ret = 0;
-
+/*
 	Mix_Chunk* chunk = Mix_LoadWAV(path);
 
 	if(chunk == NULL)
@@ -136,7 +136,7 @@ unsigned int ModuleAudio::LoadFx(const char* path)
 		fx.add(chunk);
 		ret = fx.count();
 	}
-
+	*/
 	return ret;
 }
 
@@ -144,7 +144,7 @@ unsigned int ModuleAudio::LoadFx(const char* path)
 bool ModuleAudio::PlayFx(unsigned int id, int repeat)
 {
 	bool ret = false;
-
+	/*
 	Mix_Chunk* chunk = NULL;
 	
 	if(fx.at(id-1, chunk) == true)
@@ -152,6 +152,6 @@ bool ModuleAudio::PlayFx(unsigned int id, int repeat)
 		Mix_PlayChannel(-1, chunk, repeat);
 		ret = true;
 	}
-
+	*/
 	return ret;
 }
