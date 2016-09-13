@@ -16,6 +16,9 @@
     <Filter Include="Sources\Helpers">
       <UniqueIdentifier>{121f8e6b-df36-4ab0-be0d-601ddfc9e503}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\imGUI">
+      <UniqueIdentifier>{cae16563-5e13-4a52-bf1b-fc8167dfcc1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -72,6 +75,27 @@
     <ClInclude Include="PhysBody3D.h">
       <Filter>Sources\Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="imGUI\imconfig.h">
+      <Filter>Sources\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imGUI\imgui.h">
+      <Filter>Sources\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imGUI\imgui_internal.h">
+      <Filter>Sources\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imGUI\stb_rect_pack.h">
+      <Filter>Sources\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imGUI\stb_textedit.h">
+      <Filter>Sources\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imGUI\stb_truetype.h">
+      <Filter>Sources\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleUI.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -118,6 +142,18 @@
     </ClCompile>
     <ClCompile Include="PhysBody3D.cpp">
       <Filter>Sources\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui.cpp">
+      <Filter>Sources\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui_demo.cpp">
+      <Filter>Sources\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui_draw.cpp">
+      <Filter>Sources\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleUI.cpp">
+      <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
