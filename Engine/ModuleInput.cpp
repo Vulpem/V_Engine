@@ -24,7 +24,7 @@ bool ModuleInput::Init()
 	bool ret = true;
 	SDL_Init(0);
 
-	SDL_ShowCursor(0);
+	//SDL_ShowCursor(0);
 
 	if(SDL_InitSubSystem(SDL_INIT_EVENTS) < 0)
 	{
@@ -116,7 +116,7 @@ update_status ModuleInput::PreUpdate(float dt)
 		}
 	}
 
-	SDL_WarpMouseInWindow(NULL, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	//SDL_WarpMouseInWindow(NULL, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	SDL_PollEvent(&e);
 
 	if(quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
