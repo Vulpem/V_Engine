@@ -1,4 +1,4 @@
-#include "PhysBody3D.h"
+/*#include "PhysBody3D.h"
 #include "glmath.h"
 #include "Bullet\src\btBulletDynamicsCommon.h"
 
@@ -86,4 +86,4 @@ bool PhysBody3D::isResting()
 void PhysBody3D::SetInactive()
 {
 	body->setActivationState(WANTS_DEACTIVATION);
-}
+}*/

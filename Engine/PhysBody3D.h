@@ -1,4 +1,4 @@
-#ifndef __PhysBody3D_H__
+/*#ifndef __PhysBody3D_H__
 #define __PhysBody3D_H__
 
 #include "p2List.h"
@@ -32,4 +32,4 @@ public:
 	p2List<Module*> collision_listeners;
 };
 
-#endif // __PhysBody3D_H__
+#endif // __PhysBody3D_H__*/

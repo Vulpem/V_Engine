@@ -6,20 +6,9 @@ Application::Application()
 	input = new ModuleInput(this);
 	audio = new ModuleAudio(this, true);
 
-	player = new ModulePlayer(this);
-
-	scene_1 = new ModuleScene1(this, true);
-	scene_2 = new ModuleScene2(this, false);
-	scene_3 = new ModuleScene3(this, false);
-	scene_4 = new ModuleScene4(this, false);
-	scene_5 = new ModuleScene5(this, false);
-	scene_6 = new ModuleScene6(this, false);
-	scene_7 = new ModuleScene7(this, false);
-	scene_end = new ModuleSceneEnd(this, false);
-
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
-	physics = new ModulePhysics3D(this);
+//	physics = new ModulePhysics3D(this);
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -30,31 +19,14 @@ Application::Application()
 	AddModule(camera);
 	AddModule(input);
 	AddModule(audio);
-	AddModule(physics);
+	//AddModule(physics);
 	
 	// Scenes
-	AddModule(scene_1);
-	AddModule(scene_2);
-	AddModule(scene_3);
-	AddModule(scene_4);
-	AddModule(scene_5);
-	AddModule(scene_6);
-	AddModule(scene_7);
-	AddModule(scene_end);
+	
 
-	AddModule(player);
 
 	// Renderer last!
 	AddModule(renderer3D);
-
-	scene_1->SetNextScene((ModuleScene*)scene_2);
-	scene_2->SetNextScene((ModuleScene*)scene_3);
-	scene_3->SetNextScene((ModuleScene*)scene_4);
-	scene_4->SetNextScene((ModuleScene*)scene_5);
-	scene_5->SetNextScene((ModuleScene*)scene_6);
-	scene_6->SetNextScene((ModuleScene*)scene_7);
-	scene_7->SetNextScene((ModuleScene*)scene_end);
-	scene_end->SetNextScene((ModuleScene*)scene_1);
 }
 
 Application::~Application()

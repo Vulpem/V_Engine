@@ -1,8 +1,7 @@
-#include "Globals.h"
+/*#include "Globals.h"
 #include "Application.h"
 #include "ModulePhysics3D.h"
-#include "PhysBody3D.h"
-#include "PhysVehicle3D.h"
+//#include "PhysBody3D.h"
 #include "Primitive.h"
 #include "glmath.h"
 
@@ -492,3 +491,4 @@ int	 DebugDrawer::getDebugMode() const
 {
 	return mode;
 }
+*/

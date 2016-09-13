@@ -1,8 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
-#include "PhysBody3D.h"
+//#include "PhysBody3D.h"
 #include "ModuleCamera3D.h"
-#include "PhysVehicle3D.h"
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -44,23 +43,6 @@ bool ModuleCamera3D::CleanUp()
 // -----------------------------------------------------------------
 update_status ModuleCamera3D::Update(float dt)
 {
-	btVector3 var;
-	float x, y, z;
-	App->player->vehicle->GetPos(&x, &y, &z);
-	LookAt({ x, y, z });
-
-	btVector3 distanceVec(Position.x - x, Position.y - y, Position.z - z);
-	float distanceToVehicle = distanceVec.length();
-	
-	if (distanceToVehicle != maxDistanceToVehicle)
-	{
-		btVector3FloatData data;
-		distanceVec.serializeFloat(data);
-		float angle = atan2(data.m_floats[0], data.m_floats[2]);
-		float toAdd = distanceToVehicle - maxDistanceToVehicle;
-		Position.x -= toAdd*sin(angle);
-		Position.z -= toAdd*cos(angle);
-	}
 	// Implement a debug camera with keys and mouse
 	// Now we can make this movememnt frame rate independant!
 
