@@ -1,8 +1,10 @@
 #include "Globals.h"
 #include "Application.h"
 
+#include "ModuleWindow.h"
+
 #include "ModuleUI.h"
-#include"imGUI\imgui.h"
+
 
 ModuleGUI::ModuleGUI(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -22,9 +24,11 @@ bool ModuleGUI::Init()
 	bool ret = true;
 
 	ImGuiIO& io = ImGui::GetIO();
+	
+	io.DisplaySize.x = App->window->screen_surface->w;
+	io.DisplaySize.y = App->window->screen_surface->h;
 
-	SDL_GL_
-	io.
+	//io.Fonts->
 	
 	//guiIO.Fonts->GetTexDataAsRGBA32();
 
