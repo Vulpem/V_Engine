@@ -21,9 +21,10 @@ bool ModuleGUI::Init()
 	LOG("Init UI");
 	bool ret = true;
 
-	ImGuiIO guiIO = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 
-	guiIO.RenderDrawListsFn()
+	SDL_GL_
+	io.
 	
 	//guiIO.Fonts->GetTexDataAsRGBA32();
 
