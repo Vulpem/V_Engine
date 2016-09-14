@@ -1,9 +1,8 @@
 
 #include "Globals.h"
-#include <gl/GL.h>
-#include <gl/GLU.h>
+//#include "OpenGL.h"
 #include "Primitive.h"
-//#include "glut/glut.h"
+#include "glut/glut.h"
 
 #pragma comment (lib, "glut/glut32.lib")
 

@@ -20,6 +20,8 @@ public:
 
 	void SetTitle(const char* title);
 
+	SDL_Window* GetWindow() { return window; }
+
 public:
 	//The window we'll be rendering to
 	SDL_Window* window;

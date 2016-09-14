@@ -3,9 +3,18 @@
 
 #include "Module.h"
 #include "Globals.h"
-#include"imGUI\imgui.h"
 
-#include "ModuleRenderer3D.h"
+union SDL_Event;
+
+class Panel;
+class PanelConsole;
+class PanelGOTree;
+class PanelProperties;
+class PanelConfiguration;
+class PanelAbout;
+class PanelResources;
+class PanelQuickBar;
+class GameObject;
 
 class ModuleGUI : public Module
 {
@@ -21,7 +30,14 @@ public:
 
 	bool CleanUp();
 
+		void HandleInput(SDL_Event* event);
+
 	bool testWindowOpen = true;
+
+	bool capture_mouse = false;
+	bool capture_keyboard = false;
+	bool in_modal = false;
+	bool draw_menu = true;
 };
 
 #endif

@@ -1,9 +1,15 @@
 #include "Globals.h"
 #include "Application.h"
 
+#include "ModuleUI.h"
 #include "ModuleWindow.h"
 
-#include "ModuleUI.h"
+
+
+#include "Imgui/imgui.h"
+#include "Imgui/imgui_impl_sdl_gl3.h"
+#include "OpenGL.h"
+
 
 
 ModuleGUI::ModuleGUI(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -20,17 +26,11 @@ ModuleGUI::~ModuleGUI()
 // Called before render is available
 bool ModuleGUI::Init()
 {
-	LOG("Init UI");
 	bool ret = true;
 
-	ImGuiIO& io = ImGui::GetIO();
-	
-	io.DisplaySize.x = App->window->screen_surface->w;
-	io.DisplaySize.y = App->window->screen_surface->h;
+	LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
 
-	//io.Fonts->
-	
-	//guiIO.Fonts->GetTexDataAsRGBA32();
+	ImGui_ImplSdlGL3_Init(App->window->GetWindow());
 
 		
 	return ret;
@@ -40,12 +40,10 @@ bool ModuleGUI::Init()
 update_status ModuleGUI::PreUpdate(float dt)
 {
 
-	ImGui::NewFrame();
-
-	if (false)
-	{
-		return UPDATE_STOP;
-	}
+	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
+	ImGuiIO& io = ImGui::GetIO();
+	capture_keyboard = io.WantCaptureKeyboard;
+	capture_mouse = io.WantCaptureMouse;
 
 	return UPDATE_CONTINUE;
 }
@@ -67,4 +65,9 @@ bool ModuleGUI::CleanUp()
 {
 
 	return true;
+}
+
+void ModuleGUI::HandleInput(SDL_Event* event)
+{
+	ImGui_ImplSdlGL3_ProcessEvent(event);
 }
