@@ -41,12 +41,7 @@ bool ModuleGUI::Start()
 
 	
 	tmpInput = new char[64];
-	char* tmp = tmpInput;
-	for (int n = 0; n < 64; n++)
-	{
-		tmp = " ";
-		tmp++;
-	}
+	strcpy(tmpInput, "InputTextHere");
 
 	return true;
 }
@@ -60,8 +55,10 @@ update_status ModuleGUI::PreUpdate(float dt)
 	capture_mouse = io.WantCaptureMouse;
 
 	ImGui::Button("TestButton", ImVec2(100, 50));
-	ImGui::LabelText("This is a label", "format");
-	ImGui::InputText("here goes the text", tmpInput, 19);
+	ImGui::LabelText("label", "cameraX %i", App->camera->Position.x);
+	ImGui::LabelText("label", "cameraY %i", App->camera->Position.y);
+	ImGui::LabelText("label", "cameraZ %i", App->camera->Position.z);
+	ImGui::InputText("input text", tmpInput, 60);
 
 
 	return UPDATE_CONTINUE;
