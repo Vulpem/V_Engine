@@ -49,19 +49,25 @@ bool ModuleGUI::Start()
 // Called every draw update
 update_status ModuleGUI::PreUpdate(float dt)
 {
+	update_status ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 	ImGuiIO& io = ImGui::GetIO();
 	capture_keyboard = io.WantCaptureKeyboard;
 	capture_mouse = io.WantCaptureMouse;
 
+
 	ImGui::Button("TestButton", ImVec2(100, 50));
+	if (ImGui::Button("Quit", ImVec2(75, 75)))
+	{
+		ret = UPDATE_STOP;
+	}
 	ImGui::LabelText("label", "cameraX %i", App->camera->Position.x);
 	ImGui::LabelText("label", "cameraY %i", App->camera->Position.y);
 	ImGui::LabelText("label", "cameraZ %i", App->camera->Position.z);
 	ImGui::InputText("input text", tmpInput, 60);
 
 
-	return UPDATE_CONTINUE;
+	return ret;
 }
 
 update_status ModuleGUI::Update(float dt)
