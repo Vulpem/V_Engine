@@ -11,6 +11,7 @@
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
 #include"ModuleUI.h"
+#include "MathGeoLib\include\MathGeoLibFwd.h"
 
 class Application
 {

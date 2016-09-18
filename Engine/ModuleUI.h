@@ -24,13 +24,15 @@ public:
 	~ModuleGUI();
 
 	bool Init();
+
+	bool Start();
 	update_status PreUpdate(float dt);
 	update_status Update(float dt);
 	update_status PostUpdate(float dt);
 
 	bool CleanUp();
 
-		void HandleInput(SDL_Event* event);
+	void HandleInput(SDL_Event* event);
 
 	bool testWindowOpen = true;
 
@@ -38,6 +40,8 @@ public:
 	bool capture_keyboard = false;
 	bool in_modal = false;
 	bool draw_menu = true;
+
+	char* tmpInput;
 };
 
 #endif

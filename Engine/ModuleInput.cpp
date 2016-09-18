@@ -2,6 +2,10 @@
 #include "Application.h"
 #include "ModuleInput.h"
 
+
+#include "imGUI\imgui.h"
+#include "Imgui/imgui_impl_sdl_gl3.h"
+
 #define MAX_KEYS 300
 
 ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -87,9 +91,11 @@ update_status ModuleInput::PreUpdate(float dt)
 	mouse_x_motion = mouse_y_motion = 0;
 
 	bool quit = false;
+
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
 	{
+		ImGui_ImplSdlGL3_ProcessEvent(&e);
 		switch(e.type)
 		{
 			case SDL_MOUSEWHEEL:
@@ -116,7 +122,6 @@ update_status ModuleInput::PreUpdate(float dt)
 		}
 	}
 
-	//SDL_WarpMouseInWindow(NULL, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	SDL_PollEvent(&e);
 
 	if(quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
