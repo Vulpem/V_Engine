@@ -1,5 +1,5 @@
-#ifndef __MODULE_GUI__
-#define __MODULE_GUI__
+#ifndef __MODULE_UI__
+#define __MODULE_UI__
 
 #include "Module.h"
 #include "Globals.h"
@@ -16,12 +16,12 @@ class PanelResources;
 class PanelQuickBar;
 class GameObject;
 
-class ModuleGUI : public Module
+class ModuleUI : public Module
 {
 public:
 	
-	ModuleGUI(Application* app, bool start_enabled = true);
-	~ModuleGUI();
+	ModuleUI(Application* app, bool start_enabled = true);
+	~ModuleUI();
 
 	bool Init();
 

@@ -12,19 +12,19 @@
 
 
 
-ModuleGUI::ModuleGUI(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleUI::ModuleUI(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 
 }
 
 // Destructor
-ModuleGUI::~ModuleGUI()
+ModuleUI::~ModuleUI()
 {
 
 }
 
 // Called before render is available
-bool ModuleGUI::Init()
+bool ModuleUI::Init()
 {
 	bool ret = true;
 
@@ -35,7 +35,7 @@ bool ModuleGUI::Init()
 	return ret;
 }
 
-bool ModuleGUI::Start()
+bool ModuleUI::Start()
 {
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
@@ -47,7 +47,7 @@ bool ModuleGUI::Start()
 }
 
 // Called every draw update
-update_status ModuleGUI::PreUpdate(float dt)
+update_status ModuleUI::PreUpdate(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
@@ -55,22 +55,19 @@ update_status ModuleGUI::PreUpdate(float dt)
 	capture_keyboard = io.WantCaptureKeyboard;
 	capture_mouse = io.WantCaptureMouse;
 
-
 	ImGui::Button("TestButton", ImVec2(100, 50));
 	if (ImGui::Button("Quit", ImVec2(75, 75)))
 	{
 		ret = UPDATE_STOP;
 	}
-	ImGui::LabelText("label", "cameraX %i", App->camera->Position.x);
-	ImGui::LabelText("label", "cameraY %i", App->camera->Position.y);
-	ImGui::LabelText("label", "cameraZ %i", App->camera->Position.z);
+	ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
+	ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
 	ImGui::InputText("input text", tmpInput, 60);
-
 
 	return ret;
 }
 
-update_status ModuleGUI::Update(float dt)
+update_status ModuleUI::Update(float dt)
 {
 	ImGui::ShowTestWindow(&testWindowOpen);
 
@@ -78,20 +75,20 @@ update_status ModuleGUI::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleGUI::PostUpdate(float dt)
+update_status ModuleUI::PostUpdate(float dt)
 {
 	ImGui::Render();
 	return UPDATE_CONTINUE;
 }
 
 // Called before quitting
-bool ModuleGUI::CleanUp()
+bool ModuleUI::CleanUp()
 {
 	delete[] tmpInput;
 	return true;
 }
 
-void ModuleGUI::HandleInput(SDL_Event* event)
+void ModuleUI::HandleInput(SDL_Event* event)
 {
 	ImGui_ImplSdlGL3_ProcessEvent(event);
 }
