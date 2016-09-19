@@ -4,7 +4,7 @@
 #include "p2List.h"
 #include "Primitive.h"
 
-//#include "bulletBuild\src\Bullet3Dynamics\CMakeFiles\"
+#include "Bullet\include\btBulletDynamicsCommon.h"
 
 // Recommended scale is 1.0f == 1 meter, no less than 0.2 objects
 #define GRAVITY btVector3(0.0f, -10.0f, 0.0f) 
@@ -27,14 +27,10 @@ public:
 	update_status PostUpdate(float dt);
 	bool CleanUp();
 
-	PhysBody3D* AddBody(const Sphere& sphere, float mass = 1.0f);
-	PhysBody3D* AddBody(const Cube& cube, float mass = 1.0f);
-	PhysBody3D* AddBody(const Cylinder& cylinder, float mass = 1.0f);
-	PhysVehicle3D* AddVehicle(VehicleInfo& info, float x, float y, float z);
+	PhysBody3D* AddBody(const P_Sphere& sphere, float mass = 1.0f);
+	PhysBody3D* AddBody(const P_Cube& cube, float mass = 1.0f);
+	PhysBody3D* AddBody(const P_Cylinder& cylinder, float mass = 1.0f);
 
-	bool ClearVehicle(PhysVehicle3D* vehicle);
-
-	PhysBody3D* Shoot(vec3 position, vec3 direction, float force, float radius = 1);
 
 	void AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, const vec3& anchorA, const vec3& anchorB);
 	void AddConstraintHinge(PhysBody3D& bodyA, PhysBody3D& bodyB, const vec3& anchorA, const vec3& anchorB, const vec3& axisS, const vec3& axisB, bool disable_collision = false);
@@ -75,6 +71,6 @@ public:
 	int	 getDebugMode() const;
 
 	DebugDrawModes mode;
-	Line line;
+	P_Line line;
 	Primitive point;
 };
