@@ -55,6 +55,41 @@ update_status ModuleUI::PreUpdate(float dt)
 	capture_keyboard = io.WantCaptureKeyboard;
 	capture_mouse = io.WantCaptureMouse;
 
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Quit"))
+			{
+				ret = UPDATE_STOP;
+			}
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Documentation"))
+		{
+			if (ImGui::MenuItem("MathGeoLib"))
+			{
+				App->OpenBrowser("http://clb.demon.fi/MathGeoLib/nightly/reference.html");
+			}
+			if (ImGui::MenuItem("ImGui"))
+			{
+				App->OpenBrowser("https://github.com/ocornut/imgui");
+			}
+			if (ImGui::MenuItem("Bullet"))
+			{
+				App->OpenBrowser("http://bulletphysics.org/Bullet/BulletFull/annotated.html");
+			}
+			if (ImGui::MenuItem("SDL"))
+			{
+				App->OpenBrowser("https://wiki.libsdl.org/APIByCategory");
+			}
+					
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
 	ImGui::Button("TestButton", ImVec2(100, 50));
 	if (ImGui::Button("Quit", ImVec2(75, 75)))
 	{

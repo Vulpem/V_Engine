@@ -1,4 +1,4 @@
-/*#pragma once
+#pragma once
 #include "Module.h"
 #include "Globals.h"
 #include "p2List.h"
@@ -77,4 +77,4 @@ public:
 	DebugDrawModes mode;
 	Line line;
 	Primitive point;
-};*/
+};

@@ -141,6 +141,14 @@ bool Application::CleanUp()
 	return ret;
 }
 
+
+bool Application::OpenBrowser(const char* link)
+{
+	ShellExecuteA(0, 0, "chrome.exe", link, 0, SW_SHOWMAXIMIZED);
+
+	return true;
+}
+
 void Application::AddModule(Module* mod)
 {
 	list_modules.add(mod);

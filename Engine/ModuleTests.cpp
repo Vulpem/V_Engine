@@ -28,8 +28,7 @@ bool ModuleTests::Init()
 
 bool ModuleTests::Start()
 {
-
-
+	
 	return true;
 }
 

@@ -43,6 +43,8 @@ public:
 	update_status Update();
 	bool CleanUp();
 
+	bool OpenBrowser(const char* link);
+
 private:
 
 	void AddModule(Module* mod);
