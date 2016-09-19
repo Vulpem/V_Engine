@@ -18,9 +18,6 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	App->camera->SetPos(vec3(10.0f, 10.0f, 10.0f));
-	
-	App->camera->LookAt(vec3(0, 0, 0));
 	loadNext = false;
 	ended = false;
 	loadNext = false;
@@ -39,7 +36,7 @@ bool ModuleScene::CleanUp()
 update_status ModuleScene::Update(float dt)
 {
 	
-	P_Plane p(0, 0, 0, 1);
+	P_Plane p(0, 0, 0, 0);
 	p.axis = true;
 	p.Render();
 	

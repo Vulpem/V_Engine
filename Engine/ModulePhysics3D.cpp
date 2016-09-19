@@ -126,7 +126,7 @@ update_status ModulePhysics3D::Update(float dt)
 	P_Cube ground;
 	ground.color = { 0.0f, 0.3f, 0.1f };
 	ground.size = { 1000, 10, 1000 };
-	ground.SetPos(0, -5.1f, 0);
+	ground.SetPos(0, 0, 0);
 	ground.Render();
 
 	return UPDATE_CONTINUE;
