@@ -96,7 +96,16 @@ update_status ModuleUI::PreUpdate(float dt)
 		ret = UPDATE_STOP;
 	}
 	ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
+	ImGui::SameLine();
 	ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
+
+	ImGui::LabelText("label", "CameraX: %i", App->camera->Position.x);
+	ImGui::LabelText("label", "CameraY: %i", App->camera->Position.y);
+	ImGui::LabelText("label", "CameraZ: %i", App->camera->Position.z);
+	ImGui::LabelText("label", "CameraRefX: %i", App->camera->Reference.x);
+	ImGui::LabelText("label", "CameraRefY: %i", App->camera->Reference.y);
+	ImGui::LabelText("label", "CameraRefZ: %i", App->camera->Reference.z);
+
 	ImGui::InputText("input text", tmpInput, 60);
 
 	return ret;

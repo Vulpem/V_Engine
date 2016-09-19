@@ -40,6 +40,9 @@
     <Filter Include="Sources\Math\MathGeoLib\Algorithm\Random">
       <UniqueIdentifier>{abfa937e-f724-4ec5-9f40-c941dd8dd3b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Scenes">
+      <UniqueIdentifier>{cd86892a-2f6a-49fa-a8d8-50beaddca8bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -309,6 +312,9 @@
     <ClInclude Include="ModuleTests.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleScene.h">
+      <Filter>Sources\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -469,6 +475,9 @@
     </ClCompile>
     <ClCompile Include="ModuleTests.cpp">
       <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleScene.cpp">
+      <Filter>Sources\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

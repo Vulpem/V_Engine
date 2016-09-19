@@ -11,7 +11,7 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	Y = vec3(0.0f, 1.0f, 0.0f);
 	Z = vec3(0.0f, 0.0f, 1.0f);
 
-	Position = vec3(0.0f, 20.0f, -10.0f);
+	Position = vec3(10.0f, 20.0f, 10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 }
 
@@ -129,6 +129,15 @@ void ModuleCamera3D::Move(const vec3 &Movement)
 {
 	Position += Movement;
 	Reference += Movement;
+
+	CalculateViewMatrix();
+}
+
+void ModuleCamera3D::SetPos(const vec3 &Pos)
+{
+	vec3 tmp = Pos - Position;
+	Position = Pos;
+	Reference += tmp;
 
 	CalculateViewMatrix();
 }

@@ -12,6 +12,7 @@
 #include "ModulePhysics3D.h"
 #include "ModuleUI.h"
 #include "ModuleTests.h"
+#include "ModuleScene.h"
 #include "MathGeoLib\include\MathGeoLibFwd.h"
 
 class Application
@@ -26,6 +27,9 @@ public:
 
 	ModuleUI* UI;
 	ModuleTests* test;
+	ModulePhysics3D* physics;
+
+	ModuleScene* scene;
 
 private:
 

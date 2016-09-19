@@ -1,6 +1,6 @@
 
 #include "Globals.h"
-//#include "OpenGL.h"
+#include "OpenGL.h"
 #include "Primitive.h"
 #include "glut/glut.h"
 
