@@ -18,9 +18,9 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	loadNext = false;
-	ended = false;
-	loadNext = false;
+	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
+	App->camera->LookAt(vec3(0, 0, 0));
+
 	reset = false;
 	return ret;
 }
@@ -36,7 +36,7 @@ bool ModuleScene::CleanUp()
 update_status ModuleScene::Update(float dt)
 {
 	
-	P_Plane p(0, 0, 0, 0);
+	P_Plane p(0, 0, 0, 1);
 	p.axis = true;
 	p.Render();
 	
@@ -51,11 +51,6 @@ update_status ModuleScene::PostUpdate(float dt)
 		ResetScene();
 		reset = false;
 	}
-	if (loadNext)
-	{
-		//LoadNextScene();
-		loadNext = false;
-	}
 
 	return UPDATE_CONTINUE;
 }
@@ -65,8 +60,6 @@ void ModuleScene::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 
 }
 
-void ModuleScene::LoadPositions()
-{}
 
 void ModuleScene::ResetScene()
 {

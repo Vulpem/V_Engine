@@ -90,6 +90,15 @@ update_status ModuleUI::PreUpdate(float dt)
 		ImGui::EndMainMenuBar();
 	}
 
+	if (ImGui::Begin("Camera"))
+	{
+		ImGui::InputFloat("X", &App->camera->Position.x);
+		ImGui::InputFloat("Y", &App->camera->Position.y);
+		ImGui::InputFloat("Z", &App->camera->Position.z);
+
+		ImGui::End();
+	}
+
 	ImGui::Button("TestButton", ImVec2(100, 50));
 	if (ImGui::Button("Quit", ImVec2(75, 75)))
 	{
@@ -99,9 +108,9 @@ update_status ModuleUI::PreUpdate(float dt)
 	ImGui::SameLine();
 	ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
 
-	ImGui::LabelText("label", "CameraX: %i", App->camera->Position.x);
-	ImGui::LabelText("label", "CameraY: %i", App->camera->Position.y);
-	ImGui::LabelText("label", "CameraZ: %i", App->camera->Position.z);
+	ImGui::LabelText("label", "CameraX: %f", App->camera->Position.x);
+	ImGui::LabelText("label", "CameraY: %f", App->camera->Position.y);
+	ImGui::LabelText("label", "CameraZ: %f", App->camera->Position.z);
 	ImGui::LabelText("label", "CameraRefX: %i", App->camera->Reference.x);
 	ImGui::LabelText("label", "CameraRefY: %i", App->camera->Reference.y);
 	ImGui::LabelText("label", "CameraRefZ: %i", App->camera->Reference.z);
