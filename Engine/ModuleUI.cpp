@@ -98,48 +98,40 @@ update_status ModuleUI::PreUpdate(float dt)
 		ImGui::EndMainMenuBar();
 	}
 
-	if (ImGui::Begin("Camera"))
-	{
-		ImGui::InputFloat("X", &App->camera->Position.x);
-		ImGui::InputFloat("Y", &App->camera->Position.y);
-		ImGui::InputFloat("Z", &App->camera->Position.z);
-
-		ImGui::End();
-	}
-
 	bool tmp = true;
 	if (ImGui::Begin("Editor", &tmp, ImVec2(500, 300), 1.0f, 0))
 	{
-		ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
-		char tmp[256];
-		sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES-1]));
-		ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
 
-		char tmp2[256];
-		sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
-		ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2,0.0f, 0.07f, ImVec2(310,100));
+		if (ImGui::CollapsingHeader("Application"))
+		{
+			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
+			char tmp[256];
+			sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
+			ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
 
+			char tmp2[256];
+			sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+			ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
+		}
+
+		if (ImGui::CollapsingHeader("Input"))
+		{
+			ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
+			ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
+		}
+
+		if (ImGui::CollapsingHeader("Camera"))
+		{
+			ImGui::InputFloat("X", &App->camera->Position.x);
+			ImGui::InputFloat("Y", &App->camera->Position.y);
+			ImGui::InputFloat("Z", &App->camera->Position.z);
+			ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
+			ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
+			ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
+		}
+		ImGui::InputText("input text", tmpInput, 60);
 		ImGui::End();
 	}
-	
-
-	ImGui::Button("TestButton", ImVec2(100, 50));
-	if (ImGui::Button("Quit", ImVec2(75, 75)))
-	{
-		ret = UPDATE_STOP;
-	}
-	ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
-	ImGui::SameLine();
-	ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
-
-	ImGui::LabelText("label", "CameraX: %f", App->camera->Position.x);
-	ImGui::LabelText("label", "CameraY: %f", App->camera->Position.y);
-	ImGui::LabelText("label", "CameraZ: %f", App->camera->Position.z);
-	ImGui::LabelText("label", "CameraRefX: %i", App->camera->Reference.x);
-	ImGui::LabelText("label", "CameraRefY: %i", App->camera->Reference.y);
-	ImGui::LabelText("label", "CameraRefZ: %i", App->camera->Reference.z);
-
-	ImGui::InputText("input text", tmpInput, 60);
 
 	return ret;
 }
