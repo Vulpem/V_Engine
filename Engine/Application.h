@@ -3,16 +3,18 @@
 #include "p2List.h"
 #include "Globals.h"
 #include "Timer.h"
-#include "Module.h"
-#include "ModuleWindow.h"
-#include "ModuleInput.h"
-#include "ModuleAudio.h"
-#include "ModuleRenderer3D.h"
-#include "ModuleCamera3D.h"
-#include "ModulePhysics3D.h"
-#include "ModuleUI.h"
-#include "ModuleTests.h"
-#include "ModuleScene.h"
+
+class Module;
+class ModuleWindow;
+class ModuleInput;
+class ModuleAudio;
+class ModuleRenderer3D;
+class ModuleCamera3D;
+class ModuleUI;
+class ModuleTests;
+class ModulePhysics3D;
+class ModuleScene;
+
 #include "MathGeoLib\include\MathGeoLibFwd.h"
 
 class Application

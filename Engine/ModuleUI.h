@@ -40,13 +40,16 @@ public:
 
 
 
-	bool testWindowOpen = true;
+	
 
 	bool capture_mouse = false;
 	bool capture_keyboard = false;
 	bool in_modal = false;
 	bool draw_menu = true;
+
 	bool consoleOpen = true;
+	bool editorOpen = true;
+	bool testWindowOpen = true;
 
 	char* tmpInput;
 

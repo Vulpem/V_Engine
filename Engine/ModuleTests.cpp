@@ -3,6 +3,7 @@
 
 #include "ModuleUI.h"
 #include "ModuleWindow.h"
+#include "ModuleTests.h"
 
 
 

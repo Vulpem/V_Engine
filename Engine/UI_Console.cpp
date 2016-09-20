@@ -25,19 +25,22 @@ void UI_Console::AddLog(const char* input)
 
 void UI_Console::Draw(bool* p_open)
 {
-	if (ImGui::Begin("Console", p_open, ImVec2(500, 300), 1.0f, 0))
+	if (*p_open == true)
 	{
-		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
-		ImGui::PushStyleColor(0, col);
+		if (ImGui::Begin("Console", p_open, ImVec2(500, 300), 1.0f, 0))
+		{
+			ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
+			ImGui::PushStyleColor(0, col);
 
-		ImGui::TextUnformatted(buffer.begin());
-		ImGui::PopStyleColor();
+			ImGui::TextUnformatted(buffer.begin());
+			ImGui::PopStyleColor();
 
-		if (scrollToBottom)
-			ImGui::SetScrollHere(1.0f);
+			if (scrollToBottom)
+				ImGui::SetScrollHere(1.0f);
 
-		scrollToBottom = false;
+			scrollToBottom = false;
 
-		ImGui::End();
+			ImGui::End();
+		}
 	}
 }

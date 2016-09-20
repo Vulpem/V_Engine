@@ -1,8 +1,15 @@
 #include "Globals.h"
 #include "Application.h"
-
 #include "ModuleUI.h"
+
 #include "ModuleWindow.h"
+#include "ModuleInput.h"
+#include "ModuleAudio.h"
+#include "ModuleRenderer3D.h"
+#include "ModuleCamera3D.h"
+#include "ModulePhysics3D.h"
+#include "ModuleTests.h"
+#include "ModuleScene.h"
 
 
 
@@ -57,7 +64,7 @@ update_status ModuleUI::PreUpdate(float dt)
 	capture_keyboard = io.WantCaptureKeyboard;
 	capture_mouse = io.WantCaptureMouse;
 
-		console->Draw(&consoleOpen);
+	console->Draw(&consoleOpen);
 
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -67,10 +74,9 @@ update_status ModuleUI::PreUpdate(float dt)
 			{
 				ret = UPDATE_STOP;
 			}
-			if (ImGui::MenuItem("Console"))
-			{
-				consoleOpen = !consoleOpen;
-			}
+			ImGui::Checkbox("Editor", &editorOpen);
+			ImGui::Checkbox("Console", &consoleOpen);
+			ImGui::Checkbox("ImGui TestBox", &testWindowOpen);
 			ImGui::EndMenu();
 		}
 
@@ -99,46 +105,51 @@ update_status ModuleUI::PreUpdate(float dt)
 	}
 
 	bool tmp = true;
-	if (ImGui::Begin("Editor", &tmp, ImVec2(500, 300), 1.0f, 0))
+	if (editorOpen == true)
 	{
-
-		if (ImGui::CollapsingHeader("Application"))
+		if (ImGui::Begin("Editor", &tmp, ImVec2(500, 300), 1.0f, 0))
 		{
-			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
-			char tmp[256];
-			sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
-			ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
 
-			char tmp2[256];
-			sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
-			ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
-		}
+			if (ImGui::CollapsingHeader("Application"))
+			{
+				ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
+				char tmp[256];
+				sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
+				ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
 
-		if (ImGui::CollapsingHeader("Input"))
-		{
-			ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
-			ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
-		}
+				char tmp2[256];
+				sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+				ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
+			}
 
-		if (ImGui::CollapsingHeader("Camera"))
-		{
-			ImGui::InputFloat("X", &App->camera->Position.x);
-			ImGui::InputFloat("Y", &App->camera->Position.y);
-			ImGui::InputFloat("Z", &App->camera->Position.z);
-			ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
-			ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
-			ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
+			if (ImGui::CollapsingHeader("Input"))
+			{
+				ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
+				ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
+			}
+
+			if (ImGui::CollapsingHeader("Camera"))
+			{
+				ImGui::InputFloat("X", &App->camera->Position.x);
+				ImGui::InputFloat("Y", &App->camera->Position.y);
+				ImGui::InputFloat("Z", &App->camera->Position.z);
+				ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
+				ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
+				ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
+			}
+			ImGui::InputText("input text", tmpInput, 60);
+			ImGui::End();
 		}
-		ImGui::InputText("input text", tmpInput, 60);
-		ImGui::End();
 	}
-
 	return ret;
 }
 
 update_status ModuleUI::Update(float dt)
 {
-	ImGui::ShowTestWindow(&testWindowOpen);
+	if (testWindowOpen)
+	{
+		ImGui::ShowTestWindow(&testWindowOpen);
+	}
 
 
 	return UPDATE_CONTINUE;

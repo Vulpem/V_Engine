@@ -1,5 +1,17 @@
 #include "Application.h"
 
+
+#include "Module.h"
+#include "ModuleWindow.h"
+#include "ModuleInput.h"
+#include "ModuleAudio.h"
+#include "ModuleRenderer3D.h"
+#include "ModuleCamera3D.h"
+#include "ModulePhysics3D.h"
+#include "ModuleUI.h"
+#include "ModuleTests.h"
+#include "ModuleScene.h"
+
 Application::Application()
 {
 	window = new ModuleWindow(this);
@@ -33,7 +45,6 @@ Application::Application()
 
 	// Renderer last!
 	AddModule(renderer3D);
-
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES; n++)
 	{
