@@ -74,6 +74,10 @@ update_status ModuleUI::PreUpdate(float dt)
 			{
 				ret = UPDATE_STOP;
 			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View"))
+		{
 			ImGui::Checkbox("Editor", &editorOpen);
 			ImGui::Checkbox("Console", &consoleOpen);
 			ImGui::Checkbox("ImGui TestBox", &testWindowOpen);
