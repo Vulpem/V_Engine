@@ -39,6 +39,8 @@ bool ModuleUI::Start()
 {
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
+	console = new UI_Console();
+
 	
 	tmpInput = new char[64];
 	strcpy(tmpInput, "InputTextHere");
@@ -55,6 +57,8 @@ update_status ModuleUI::PreUpdate(float dt)
 	capture_keyboard = io.WantCaptureKeyboard;
 	capture_mouse = io.WantCaptureMouse;
 
+		console->Draw(&consoleOpen);
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -62,6 +66,10 @@ update_status ModuleUI::PreUpdate(float dt)
 			if (ImGui::MenuItem("Quit"))
 			{
 				ret = UPDATE_STOP;
+			}
+			if (ImGui::MenuItem("Console"))
+			{
+				consoleOpen = !consoleOpen;
 			}
 			ImGui::EndMenu();
 		}
@@ -98,6 +106,22 @@ update_status ModuleUI::PreUpdate(float dt)
 
 		ImGui::End();
 	}
+
+	bool tmp = true;
+	if (ImGui::Begin("Editor", &tmp, ImVec2(500, 300), 1.0f, 0))
+	{
+		ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
+		char tmp[256];
+		sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES-1]));
+		ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
+
+		char tmp2[256];
+		sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+		ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2,0.0f, 0.07f, ImVec2(310,100));
+
+		ImGui::End();
+	}
+	
 
 	ImGui::Button("TestButton", ImVec2(100, 50));
 	if (ImGui::Button("Quit", ImVec2(75, 75)))
@@ -137,6 +161,14 @@ update_status ModuleUI::PostUpdate(float dt)
 // Called before quitting
 bool ModuleUI::CleanUp()
 {
+	if (console)
+	{
+		delete console;
+		console = NULL;
+	}
+
+	ImGui_ImplSdlGL3_Shutdown();
+
 	delete[] tmpInput;
 	return true;
 }
@@ -144,4 +176,10 @@ bool ModuleUI::CleanUp()
 void ModuleUI::HandleInput(SDL_Event* event)
 {
 	ImGui_ImplSdlGL3_ProcessEvent(event);
+}
+
+void ModuleUI::Log(const char* input)
+{
+	if (console != NULL)
+		console->AddLog(input);
 }

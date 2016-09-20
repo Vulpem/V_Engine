@@ -33,6 +33,14 @@ Application::Application()
 
 	// Renderer last!
 	AddModule(renderer3D);
+
+
+	for (int n = 0; n < EDITOR_FRAME_SAMPLES; n++)
+	{
+		ms_frame[n] = 0;
+		framerate[n] = 0;
+	}
+	FrameTime = -1.0f;
 }
 
 Application::~Application()
@@ -70,16 +78,51 @@ bool Application::Init()
 			ret = item->data->Start();
 		item = item->next;
 	}
-	
+	maxFPS = 0;
+
 	ms_timer.Start();
+	FPS_Timer.Start();
 	return ret;
 }
 
 // ---------------------------------------------
 void Application::PrepareUpdate()
 {
+	frameCount++;
 	dt = (float)ms_timer.Read() / 1000.0f;
 	ms_timer.Start();
+
+	for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
+	{
+		ms_frame[n] = ms_frame[n + 1];
+	}
+	ms_frame[EDITOR_FRAME_SAMPLES - 1] = dt;
+
+	float tmp = FPS_Timer.Read();
+	if (FPS_Timer.Read() > 1000.0f)
+	{
+		for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
+		{
+			framerate[n] = framerate[n + 1];
+		}
+		framerate[EDITOR_FRAME_SAMPLES-1] = frameCount;
+		frameCount = 0;
+		FPS_Timer.Start();
+	}
+	
+	if (maxFPS != previous_maxFPS)
+	{
+		if (maxFPS < 5)
+		{
+			FrameTime = -1.0f;
+		}
+		else
+		{
+			FrameTime = 1000.0f / maxFPS;
+		}
+		previous_maxFPS = maxFPS;
+	}
+
 }
 
 // ---------------------------------------------
@@ -127,6 +170,14 @@ update_status Application::Update()
 	}
 
 	FinishUpdate();
+
+	if (FrameTime > 0.0001f)
+	{
+		while (ms_timer.Read() < FrameTime)
+		{
+		}
+	}
+
 	return ret;
 }
 
@@ -149,6 +200,11 @@ bool Application::OpenBrowser(const char* link)
 	ShellExecuteA(0, 0, "chrome.exe", link, 0, SW_SHOWMAXIMIZED);
 
 	return true;
+}
+
+void Application::Log(char* str)
+{
+	UI->Log(str);
 }
 
 void Application::AddModule(Module* mod)

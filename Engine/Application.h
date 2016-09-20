@@ -31,11 +31,19 @@ public:
 
 	ModuleScene* scene;
 
+	float ms_frame[EDITOR_FRAME_SAMPLES];
+	float framerate[EDITOR_FRAME_SAMPLES];
+	int maxFPS = 0;
+
 private:
 
 	Timer	ms_timer;
 	float	dt;
 	p2List<Module*> list_modules;
+	int frameCount = 0;
+	Timer	FPS_Timer;
+	float FrameTime = -1.0f;
+	int previous_maxFPS = maxFPS;
 
 public:
 
@@ -48,6 +56,7 @@ public:
 	bool CleanUp();
 
 	bool OpenBrowser(const char* link);
+	void Log(char* str);
 
 private:
 

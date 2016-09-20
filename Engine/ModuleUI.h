@@ -4,6 +4,8 @@
 #include "Module.h"
 #include "Globals.h"
 
+#include "UI_Console.h"
+
 union SDL_Event;
 
 class Panel;
@@ -34,14 +36,21 @@ public:
 
 	void HandleInput(SDL_Event* event);
 
+	void ModuleUI::Log(const char* input);
+
+
+
 	bool testWindowOpen = true;
 
 	bool capture_mouse = false;
 	bool capture_keyboard = false;
 	bool in_modal = false;
 	bool draw_menu = true;
+	bool consoleOpen = true;
 
 	char* tmpInput;
+
+	UI_Console* console = NULL;
 };
 
 #endif

@@ -315,6 +315,9 @@
     <ClInclude Include="ModuleScene.h">
       <Filter>Sources\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="UI_Console.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -478,6 +481,9 @@
     </ClCompile>
     <ClCompile Include="ModuleScene.cpp">
       <Filter>Sources\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Console.cpp">
+      <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
