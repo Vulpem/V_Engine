@@ -46,6 +46,7 @@ private:
 	Timer	FPS_Timer;
 	float FrameTime = -1.0f;
 	int previous_maxFPS = maxFPS;
+	bool gameRunning = false;
 
 public:
 
@@ -67,4 +68,4 @@ private:
 	void FinishUpdate();
 };
 
-//extern Application* App;
+extern Application* App;

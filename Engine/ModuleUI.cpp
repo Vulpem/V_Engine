@@ -141,7 +141,10 @@ update_status ModuleUI::PreUpdate(float dt)
 				ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
 				ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
 			}
+			
 			ImGui::InputText("input text", tmpInput, 60);
+			LOG(tmpInput);
+
 			ImGui::End();
 		}
 	}
@@ -187,6 +190,8 @@ void ModuleUI::HandleInput(SDL_Event* event)
 
 void ModuleUI::Log(const char* input)
 {
-	if (console != NULL)
+	if (console != NULL && console->active)
+	{
 		console->AddLog(input);
+	}
 }

@@ -14,6 +14,8 @@
 
 Application::Application()
 {
+	gameRunning = false;
+
 	window = new ModuleWindow(this);
 	input = new ModuleInput(this);
 	audio = new ModuleAudio(this, true);
@@ -93,6 +95,9 @@ bool Application::Init()
 
 	ms_timer.Start();
 	FPS_Timer.Start();
+
+	gameRunning = true;
+
 	return ret;
 }
 
@@ -194,6 +199,8 @@ update_status Application::Update()
 
 bool Application::CleanUp()
 {
+	gameRunning = false;
+
 	bool ret = true;
 	p2List_item<Module*>* item = list_modules.getLast();
 
@@ -215,7 +222,13 @@ bool Application::OpenBrowser(const char* link)
 
 void Application::Log(char* str)
 {
-	UI->Log(str);
+	if (gameRunning == true)
+	{
+		if (UI != NULL && UI->IsEnabled())
+		{
+			UI->Log(str);
+		}
+	}
 }
 
 void Application::AddModule(Module* mod)

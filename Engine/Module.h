@@ -71,6 +71,7 @@ public:
 
 	virtual bool CleanUp() 
 	{ 
+		enabled = false;
 		return true; 
 	}
 
