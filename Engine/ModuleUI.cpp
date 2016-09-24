@@ -143,7 +143,6 @@ update_status ModuleUI::PreUpdate(float dt)
 			}
 			
 			ImGui::InputText("input text", tmpInput, 60);
-			LOG(tmpInput);
 
 			ImGui::End();
 		}
