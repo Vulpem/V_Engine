@@ -40,6 +40,11 @@ update_status ModuleScene::Update(float dt)
 	p.axis = true;
 	p.Render();
 	
+	if (renderTeapot)
+	{
+		P_Teapot teapot(teapotSize);
+		teapot.Render();
+	}
 
 	return UPDATE_CONTINUE;
 }

@@ -54,7 +54,19 @@ update_status ModuleCamera3D::Update(float dt)
 		ref.Render();
 	}
 
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+	bool updatePos = false;
+	if (App->input->GetMouseButton(4) == KEY_DOWN)
+	{
+		distanceToRef++;
+		updatePos = true;
+	}
+	else if(App->input->GetMouseButton(5) == KEY_DOWN)
+	{
+		distanceToRef++;
+		updatePos = true;
+	}
+
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT || updatePos)
 	{
 		int dx = -App->input->GetMouseXMotion();
 		int dy = -App->input->GetMouseYMotion();

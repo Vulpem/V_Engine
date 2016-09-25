@@ -274,3 +274,20 @@ void P_Plane::InnerRender() const
 
 	glEnd();
 }
+
+
+// TEAPOT ============================================
+P_Teapot::P_Teapot() : Primitive(), size(1.0f)
+{
+	type = PrimitiveTypes::Primitive_Teapot;
+}
+
+P_Teapot::P_Teapot(float _size) : Primitive(), size(_size)
+{
+	type = PrimitiveTypes::Primitive_Teapot;
+}
+
+void P_Teapot::InnerRender() const
+{
+	glutSolidTeapot(size);
+}

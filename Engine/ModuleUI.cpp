@@ -60,26 +60,7 @@ update_status ModuleUI::PreUpdate(float dt)
 	capture_keyboard = io.WantCaptureKeyboard;
 	capture_mouse = io.WantCaptureMouse;
 
-#pragma region console
-
-	if (ImGui::Begin("Console", &IsOpenConsole, ImVec2(500, 300), 1.0f, 0))
-	{
-		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
-		ImGui::PushStyleColor(0, col);
-
-		ImGui::TextUnformatted(buffer.begin());
-		ImGui::PopStyleColor();
-
-		if (scrollToBottom)
-			ImGui::SetScrollHere(1.0f);
-
-		scrollToBottom = false;
-
-		ImGui::End();
-	}
-
-#pragma endregion
-
+	bool tmp = true;
 
 #pragma region MenuBar
 	if (ImGui::BeginMainMenuBar())
@@ -101,6 +82,7 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::Checkbox("Editor", &IsOpenEditor);
 			ImGui::Checkbox("Console", &IsOpenConsole);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
+			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
 			ImGui::EndMenu();
 		}
 
@@ -127,77 +109,111 @@ update_status ModuleUI::PreUpdate(float dt)
 		}
 		ImGui::EndMainMenuBar();
 	}
-
 #pragma endregion
 
-	if (ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0))
+#pragma region Editor
+	if (IsOpenEditor)
 	{
-		if (ImGui::CollapsingHeader("Application"))
-		{
-			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
-			char tmp[256];
-			sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
-			ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
+		ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0);
+		
 
-			char tmp2[256];
-			sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
-			ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
-		}
-
-		if (ImGui::CollapsingHeader("Input"))
-		{
-			ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
-			ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
-		}
-
-		if (ImGui::CollapsingHeader("Camera"))
-		{
-			ImGui::InputFloat("X", &App->camera->Position.x);
-			ImGui::InputFloat("Y", &App->camera->Position.y);
-			ImGui::InputFloat("Z", &App->camera->Position.z);
-			ImGui::NewLine();
-			ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
-			ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
-			ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
-			ImGui::NewLine();
-			ImGui::InputFloat("Distance to Ref", &App->camera->distanceToRef);
-
-
-			if (ImGui::BeginPopup("SetCameraRef"))
+			if (ImGui::CollapsingHeader("Application"))
 			{
-				ImGui::InputFloat("RefX", &camRefX);
-				ImGui::InputFloat("RefY", &camRefY);
-				ImGui::InputFloat("RefZ", &camRefZ);
-				if (ImGui::Button("Set"))
+				ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
+				char tmp[256];
+				sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));
+				ImGui::PlotHistogram("##Framerate:", App->framerate, EDITOR_FRAME_SAMPLES - 1, 0, tmp, 0.0f, 100.0f, ImVec2(310, 100));
+
+				char tmp2[256];
+				sprintf(tmp2, "Ms: %i", int(App->ms_frame[EDITOR_FRAME_SAMPLES - 1] * 1000));
+				ImGui::PlotHistogram("##ms", App->ms_frame, EDITOR_FRAME_SAMPLES - 1, 0, tmp2, 0.0f, 0.07f, ImVec2(310, 100));
+			}
+
+			if (ImGui::CollapsingHeader("Input"))
+			{
+				ImGui::LabelText("label", "MouseX: %i", App->input->GetMouseX());
+				ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
+			}
+
+			if (ImGui::CollapsingHeader("Camera"))
+			{
+				ImGui::InputFloat("X", &App->camera->Position.x);
+				ImGui::InputFloat("Y", &App->camera->Position.y);
+				ImGui::InputFloat("Z", &App->camera->Position.z);
+				ImGui::NewLine();
+				ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
+				ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
+				ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
+				ImGui::NewLine();
+				ImGui::InputFloat("Distance to Ref", &App->camera->distanceToRef);
+
+
+				if (ImGui::BeginPopup("SetCameraRef"))
 				{
-					App->camera->LookAt(vec3(camRefX, camRefY, camRefZ));
+					ImGui::InputFloat("RefX", &camRefX);
+					ImGui::InputFloat("RefY", &camRefY);
+					ImGui::InputFloat("RefZ", &camRefZ);
+					if (ImGui::Button("Set"))
+					{
+						App->camera->LookAt(vec3(camRefX, camRefY, camRefZ));
+					}
+
+					ImGui::EndPopup();
 				}
 
-				ImGui::EndPopup();
+				if (ImGui::Button("SetCameraReference"))
+				{
+					ImGui::OpenPopup("SetCameraRef");
+				}
+
 			}
 
-			if (ImGui::Button("SetCameraReference"))
+			if (ImGui::CollapsingHeader("Tests"))
 			{
-				ImGui::OpenPopup("SetCameraRef");
+				ImGui::InputText("##consoleTest", testConsoleInput, 60);
+				ImGui::SameLine();
+				if (ImGui::Button("TestConsole"))
+				{
+					LOG(testConsoleInput);
+				}
+				ImGui::NewLine();
+				ImGui::Checkbox("Teapot", &App->scene->renderTeapot);
+				ImGui::InputFloat("TeapotSize", &App->scene->teapotSize);
+
 			}
+			ImGui::End();
+	}
+#pragma endregion
 
-		}
+#pragma region Console
+	if (IsOpenConsole)
+	{
+		ImGui::Begin("Console", &tmp, ImVec2(500, 300), 1.0f, 0);
 
-		ImGui::InputText("##consoleTest", testConsoleInput, 60);
-		ImGui::SameLine();
-		if (ImGui::Button("TestConsole"))
-		{
-			LOG(testConsoleInput);
-		}
+		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
+		ImGui::PushStyleColor(0, col);
+
+		ImGui::TextUnformatted(buffer.begin());
+		ImGui::PopStyleColor();
+
+		if (scrollToBottom)
+			ImGui::SetScrollHere(1.0f);
+
+		scrollToBottom = false;
 
 		ImGui::End();
 	}
+#pragma endregion
+
 	return ret;
 }
 
 update_status ModuleUI::Update(float dt)
 {
+	if (IsOpenTestWindow)
+	{
 		ImGui::ShowTestWindow(&IsOpenTestWindow);
+	}
 
 	return UPDATE_CONTINUE;
 }
