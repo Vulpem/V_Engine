@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "PhysBody3D.h"
+#include "Primitive.h"
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
 
@@ -45,6 +46,13 @@ bool ModuleCamera3D::CleanUp()
 update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
+	if (renderReference)
+	{
+		P_Sphere ref(0.25f);
+		ref.color = Color(240, 0, 0, 0.5f);
+		ref.SetPos(Reference.x, Reference.y, Reference.z);
+		ref.Render();
+	}
 
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
@@ -78,7 +86,7 @@ update_status ModuleCamera3D::Update(float dt)
 			}
 		}
 
-		Position = Reference + Z * length(Position);
+		Position = Reference + Z * distanceToRef;// length(Position);
 	}
 
 	// Recalculate matrix -------------

@@ -25,7 +25,8 @@ private:
 
 public:
 	
-	float maxDistanceToVehicle = 25.0f;
+	bool renderReference = true;
+	float distanceToRef = 20.f;
 	vec3 X, Y, Z, Position, Reference;
 
 private:

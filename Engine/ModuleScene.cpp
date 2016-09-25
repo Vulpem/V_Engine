@@ -21,7 +21,6 @@ bool ModuleScene::Start()
 
 	App->camera->LookAt(vec3(0, 0, 0));
 
-	//grid.axis = true;
 
 	reset = false;
 	return ret;
@@ -37,9 +36,6 @@ bool ModuleScene::CleanUp()
 // Update
 update_status ModuleScene::Update(float dt)
 {
-
-	//grid.Render();
-
 	P_Plane p(0, 0, 0, 1);
 	p.axis = true;
 	p.Render();

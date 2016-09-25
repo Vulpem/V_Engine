@@ -52,7 +52,9 @@ public:
 	bool IsOpenEditor = true;
 	bool IsOpenTestWindow = true;
 
-	char* tmpInput;
+	char* testConsoleInput;
+
+	float camRefX, camRefY, camRefZ = 0.0f;
 
 private:
 	ImGuiTextBuffer buffer;

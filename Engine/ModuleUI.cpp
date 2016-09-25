@@ -44,8 +44,9 @@ bool ModuleUI::Start()
 {
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 	
-	tmpInput = new char[64];
-	strcpy(tmpInput, "InputTextHere");
+	testConsoleInput = new char[64];
+	strcpy(testConsoleInput, "InputTextHere");
+	camRefX = camRefY = camRefZ = 0.0f;
 
 	return true;
 }
@@ -80,7 +81,7 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma endregion
 
 
-
+#pragma region MenuBar
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -88,6 +89,10 @@ update_status ModuleUI::PreUpdate(float dt)
 			if (ImGui::MenuItem("Quit"))
 			{
 				ret = UPDATE_STOP;
+			}
+			if (ImGui::MenuItem("ClearConsole"))
+			{
+				ClearConsole();
 			}
 			ImGui::EndMenu();
 		}
@@ -123,9 +128,10 @@ update_status ModuleUI::PreUpdate(float dt)
 		ImGui::EndMainMenuBar();
 	}
 
+#pragma endregion
+
 	if (ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0))
 	{
-
 		if (ImGui::CollapsingHeader("Application"))
 		{
 			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
@@ -149,12 +155,40 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::InputFloat("X", &App->camera->Position.x);
 			ImGui::InputFloat("Y", &App->camera->Position.y);
 			ImGui::InputFloat("Z", &App->camera->Position.z);
+			ImGui::NewLine();
 			ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
 			ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
 			ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
+			ImGui::NewLine();
+			ImGui::InputFloat("Distance to Ref", &App->camera->distanceToRef);
+
+
+			if (ImGui::BeginPopup("SetCameraRef"))
+			{
+				ImGui::InputFloat("RefX", &camRefX);
+				ImGui::InputFloat("RefY", &camRefY);
+				ImGui::InputFloat("RefZ", &camRefZ);
+				if (ImGui::Button("Set"))
+				{
+					App->camera->LookAt(vec3(camRefX, camRefY, camRefZ));
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::Button("SetCameraReference"))
+			{
+				ImGui::OpenPopup("SetCameraRef");
+			}
+
 		}
 
-		ImGui::InputText("input text", tmpInput, 60);
+		ImGui::InputText("##consoleTest", testConsoleInput, 60);
+		ImGui::SameLine();
+		if (ImGui::Button("TestConsole"))
+		{
+			LOG(testConsoleInput);
+		}
 
 		ImGui::End();
 	}
@@ -181,7 +215,7 @@ bool ModuleUI::CleanUp()
 
 	ImGui_ImplSdlGL3_Shutdown();
 
-	delete[] tmpInput;
+	delete[] testConsoleInput;
 	return true;
 }
 

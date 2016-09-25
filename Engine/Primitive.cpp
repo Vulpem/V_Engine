@@ -169,7 +169,7 @@ P_Sphere::P_Sphere(float radius) : Primitive(), radius(radius)
 
 void P_Sphere::InnerRender() const
 {
-	//glutSolidSphere(radius, 25, 25);
+	glutSolidSphere(radius, 25, 25);
 }
 
 
