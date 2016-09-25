@@ -53,14 +53,17 @@ bool ModuleRenderer3D::Init()
 		LOG("OpenGL version supported %s", glGetString(GL_VERSION));
 		LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-		//Use Vsync
-		//bool set_vsync = config->GetBool("Vertical Sync", false);
-		//vsync = !set_vsync; // force change
-		//SetVSync(set_vsync);
+		if (VSYNC && SDL_GL_SetSwapInterval(1) < 0)
+			LOG("Warning: Unable to set VSync! SDL Error: %s", SDL_GetError());
 
 		//Initialize Projection Matrix
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
+
+
+		ProjectionMatrix = perspective(60.0f, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.125f, 512.0f);
+		glLoadMatrixf(&ProjectionMatrix);
+
 
 		//Check for error
 		GLenum error = glGetError();
@@ -83,7 +86,7 @@ bool ModuleRenderer3D::Init()
 		}
 
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-		glClearDepth(1.0f);
+		glClearDepth(10.0f);
 
 		//Initialize clear color
 		glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -97,7 +100,7 @@ bool ModuleRenderer3D::Init()
 		}
 
 		// Blend for transparency
-		//glBlendEquation(GL_FUNC_ADD);
+		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
@@ -107,7 +110,7 @@ bool ModuleRenderer3D::Init()
 		lights[0].ref = GL_LIGHT0;
 		lights[0].ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
 		lights[0].diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
-		//lights[0].position = float3::zero;
+		lights[0].SetPos(0.0f, 0.0f, 2.5f);
 		lights[0].Init();
 
 		GLfloat MaterialAmbient[] = { 1.0f, 1.0f, 1.0f, 1.0f };

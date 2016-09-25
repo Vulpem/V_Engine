@@ -4,6 +4,8 @@
 #include "Globals.h"
 #include "Primitive.h"
 #include "PhysBody3D.h"
+#include "GameObject.h"
+
 
 struct PhysBody3D;
 struct PhysMotor3D;
@@ -25,4 +27,7 @@ public:
 
 public:
 	bool reset = false;
+
+private:
+	//GO_Grid grid;
 };

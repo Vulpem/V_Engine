@@ -12,7 +12,7 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	Y = vec3(0.0f, 1.0f, 0.0f);
 	Z = vec3(0.0f, 0.0f, 1.0f);
 
-	Position = vec3(10.0f, 20.0f, 10.0f);
+	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 }
 
@@ -28,7 +28,7 @@ bool ModuleCamera3D::Start()
 	Y = vec3(0.0f, 1.0f, 0.0f);
 	Z = vec3(0.0f, 0.0f, 1.0f);
 
-	Position = vec3(2.0f, 3.0f, 2.0f);
+	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 	return ret;
 }
@@ -53,7 +53,7 @@ update_status ModuleCamera3D::Update(float dt)
 
 		float Sensitivity = 0.15f;
 
-		//Position -= Reference;
+		Position -= Reference;
 
 		if (dx != 0)
 		{
@@ -78,7 +78,7 @@ update_status ModuleCamera3D::Update(float dt)
 			}
 		}
 
-		//Position = Reference + Z * length(Position);
+		Position = Reference + Z * length(Position);
 	}
 
 	// Recalculate matrix -------------

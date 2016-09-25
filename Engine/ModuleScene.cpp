@@ -19,8 +19,9 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	App->camera->Move(vec3(1.0f, 1.0f, 0.0f));
 	App->camera->LookAt(vec3(0, 0, 0));
+
+	//grid.axis = true;
 
 	reset = false;
 	return ret;
@@ -36,7 +37,9 @@ bool ModuleScene::CleanUp()
 // Update
 update_status ModuleScene::Update(float dt)
 {
-	
+
+	//grid.Render();
+
 	P_Plane p(0, 0, 0, 1);
 	p.axis = true;
 	p.Render();

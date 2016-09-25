@@ -4,7 +4,7 @@
 #include "Module.h"
 #include "Globals.h"
 
-#include "UI_Console.h"
+#include "ImGui\imgui.h"
 
 union SDL_Event;
 
@@ -37,6 +37,7 @@ public:
 	void HandleInput(SDL_Event* event);
 
 	void ModuleUI::Log(const char* input);
+	void ClearConsole();
 
 
 
@@ -47,13 +48,15 @@ public:
 	bool in_modal = false;
 	bool draw_menu = true;
 
-	bool consoleOpen = true;
-	bool editorOpen = true;
-	bool testWindowOpen = true;
+	bool IsOpenConsole = true;
+	bool IsOpenEditor = true;
+	bool IsOpenTestWindow = true;
 
 	char* tmpInput;
 
-	UI_Console* console = NULL;
+private:
+	ImGuiTextBuffer buffer;
+	bool scrollToBottom;
 };
 
 #endif
