@@ -176,9 +176,6 @@ update_status ModuleUI::PreUpdate(float dt)
 				{
 					LOG(testConsoleInput);
 				}
-				ImGui::NewLine();
-				ImGui::Checkbox("Teapot", &App->scene->renderTeapot);
-				ImGui::InputFloat("TeapotSize", &App->scene->teapotSize);
 
 			}
 			ImGui::End();

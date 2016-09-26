@@ -39,12 +39,6 @@ update_status ModuleScene::Update(float dt)
 	P_Plane p(0, 0, 0, 1);
 	p.axis = true;
 	p.Render();
-	
-	if (renderTeapot)
-	{
-		P_Teapot teapot(teapotSize);
-		teapot.Render();
-	}
 
 	return UPDATE_CONTINUE;
 }

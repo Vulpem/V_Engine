@@ -28,9 +28,6 @@ public:
 public:
 	bool reset = false;
 
-	bool renderTeapot = true;
-	float teapotSize = 1.0f;
-
 private:
 	//GO_Grid grid;
 };

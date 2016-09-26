@@ -94,13 +94,3 @@ public:
 	vec3 normal;
 	float constant;
 };
-
-class P_Teapot : public Primitive
-{
-public:
-	P_Teapot();
-	P_Teapot(float size);
-	void InnerRender() const;
-public:
-	float size;
-};

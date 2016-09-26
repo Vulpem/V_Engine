@@ -2,9 +2,7 @@
 #include "Globals.h"
 #include "OpenGL.h"
 #include "Primitive.h"
-#include "glut/glut.h"
 
-#pragma comment (lib, "glut/glut32.lib")
 
 // ------------------------------------------------------------
 Primitive::Primitive() : transform(IdentityMatrix), color(White), wire(false), axis(false), type(PrimitiveTypes::Primitive_Point)
@@ -169,7 +167,7 @@ P_Sphere::P_Sphere(float radius) : Primitive(), radius(radius)
 
 void P_Sphere::InnerRender() const
 {
-	glutSolidSphere(radius, 25, 25);
+	//glutSolidSphere(radius, 25, 25);
 }
 
 
@@ -273,21 +271,4 @@ void P_Plane::InnerRender() const
 	}
 
 	glEnd();
-}
-
-
-// TEAPOT ============================================
-P_Teapot::P_Teapot() : Primitive(), size(1.0f)
-{
-	type = PrimitiveTypes::Primitive_Teapot;
-}
-
-P_Teapot::P_Teapot(float _size) : Primitive(), size(_size)
-{
-	type = PrimitiveTypes::Primitive_Teapot;
-}
-
-void P_Teapot::InnerRender() const
-{
-	glutSolidTeapot(size);
 }

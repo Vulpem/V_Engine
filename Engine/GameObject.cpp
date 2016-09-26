@@ -3,7 +3,6 @@
 #include "OpenGL.h"
 
 #include "GameObject.h"
-#include "glut/glut.h"
 
 
 // ------------------------------------------------------------
@@ -181,7 +180,7 @@ GO_Sphere::GO_Sphere(float radius) : GameObject(), radius(radius)
 
 void GO_Sphere::InnerRender() const
 {
-	glutSolidSphere(radius, 25, 25);
+//	glutSolidSphere(radius, 25, 25);
 }
 
 
