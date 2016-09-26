@@ -121,10 +121,12 @@ bool ModuleRenderer3D::Init()
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
-		lights[0].Active(true);
 		glEnable(GL_LIGHTING);
 		glEnable(GL_COLOR_MATERIAL);
 		glEnable(GL_TEXTURE_2D);
+
+
+		lights[0].Active(true);
 
 		glShadeModel(GL_SMOOTH);		 // Enables Smooth Shading
 	}

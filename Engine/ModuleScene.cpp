@@ -40,6 +40,10 @@ update_status ModuleScene::Update(float dt)
 	p.axis = true;
 	p.Render();
 
+	GO_Cube cube;
+	cube.SetPos(0, 0, 0);
+	cube.Render();
+
 	return UPDATE_CONTINUE;
 }
 
