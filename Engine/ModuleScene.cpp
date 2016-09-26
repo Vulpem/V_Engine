@@ -41,7 +41,7 @@ update_status ModuleScene::Update(float dt)
 	p.Render();
 
 	P_Cube cube;
-	cube.SetPos(0, 0, 0);
+	cube.SetPos(5, 0, 0);
 	cube.Render();
 
 	return UPDATE_CONTINUE;

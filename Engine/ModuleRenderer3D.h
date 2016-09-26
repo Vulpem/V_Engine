@@ -19,6 +19,14 @@ public:
 
 	void OnResize(int width, int height);
 
+	uint vertexArrayBuffer = -1;
+	float vertexs[108];
+
+	uint indexArrayBuffer = -1;
+	uint indexVertexArrayBuffer = -1;
+	float indexVertex[24];
+	uint indexArray[36];
+
 public:
 
 	Light lights[MAX_LIGHTS];

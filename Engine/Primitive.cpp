@@ -113,44 +113,77 @@ void P_Cube::InnerRender() const
 	float sy = size.y * 0.5f;
 	float sz = size.z * 0.5f;
 
-	glBegin(GL_QUADS);
+	glBegin(GL_TRIANGLES);
 
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(-sx, -sy, sz);
-	glVertex3f( sx, -sy, sz);
-	glVertex3f( sx,  sy, sz);
-	glVertex3f(-sx,  sy, sz);
+#pragma region directMode
+	//Back
+	glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
 
-	glNormal3f(0.0f, 0.0f, -1.0f);
-	glVertex3f( sx, -sy, -sz);
+	glVertex3f(sx, sy, -sz);
 	glVertex3f(-sx, -sy, -sz);
-	glVertex3f(-sx,  sy, -sz);
-	glVertex3f( sx,  sy, -sz);
-
-	glNormal3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(sx, -sy,  sz);
-	glVertex3f(sx, -sy, -sz);
-	glVertex3f(sx,  sy, -sz);
-	glVertex3f(sx,  sy,  sz);
-
-	glNormal3f(-1.0f, 0.0f, 0.0f);
-	glVertex3f(-sx, -sy, -sz);
-	glVertex3f(-sx, -sy,  sz);
-	glVertex3f(-sx,  sy,  sz);
-	glVertex3f(-sx,  sy, -sz);
-
-	glNormal3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(-sx, sy,  sz);
-	glVertex3f( sx, sy,  sz);
-	glVertex3f( sx, sy, -sz);
 	glVertex3f(-sx, sy, -sz);
 
-	glNormal3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(sx, sy, -sz);
+	glVertex3f(sx, -sy, -sz);
 	glVertex3f(-sx, -sy, -sz);
-	glVertex3f( sx, -sy, -sz);
-	glVertex3f( sx, -sy,  sz);
-	glVertex3f(-sx, -sy,  sz);
 
+	//Left
+	glColor4f(0.25f, 1.0f, 0.25f, 1.0f);
+
+	glVertex3f(sx, sy, -sz);
+	glVertex3f(sx, -sy, sz);
+	glVertex3f(sx, -sy, -sz);
+
+	glVertex3f(sx, sy, -sz);
+	glVertex3f(sx, sy, sz);
+	glVertex3f(sx, -sy, sz);
+
+	//Front
+	glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
+
+	glVertex3f(sx, sy, sz);
+	glVertex3f(-sx, sy, sz);
+	glVertex3f(sx, -sy, sz);
+
+	glVertex3f(-sx, sy, sz);
+	glVertex3f(-sx, -sy, sz);
+	glVertex3f(sx, -sy, sz);
+
+	//Right
+	glColor4f(1.0f, 1.0f, 0.25f, 1.0f);
+
+	glVertex3f(-sx, sy, sz);
+	glVertex3f(-sx, -sy, -sz);
+	glVertex3f(-sx, -sy, sz);
+
+	glVertex3f(-sx, sy, sz);
+	glVertex3f(-sx, sy, -sz);
+	glVertex3f(-sx, -sy, -sz);
+
+	//Top
+	glColor4f(1.0f, 0.25f, 1.0f, 1.0f);
+
+	glVertex3f(sx, sy, sz);
+	glVertex3f(sx, sy, -sz);
+	glVertex3f(-sx, sy, sz);
+
+	glVertex3f(-sx, sy, sz);
+	glVertex3f(sx, sy, -sz);
+	glVertex3f(-sx, sy, -sz);
+
+	//Down
+	glColor4f(0.25f, 1.0f, 1.0f, 1.0f);
+
+	glVertex3f(sx, -sy, sz);
+	glVertex3f(-sx, -sy, sz);
+	glVertex3f(sx, -sy, -sz);
+	
+	glVertex3f(-sx, -sy, sz);
+	glVertex3f(-sx, -sy, -sz);
+	glVertex3f(sx, -sy, -sz);
+
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+#pragma endregion
 	glEnd();
 }
 
