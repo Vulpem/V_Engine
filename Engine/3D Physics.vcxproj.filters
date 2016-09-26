@@ -312,9 +312,6 @@
     <ClInclude Include="ModuleScene.h">
       <Filter>Sources\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Sources\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="OpenGL.h">
       <Filter>Sources</Filter>
     </ClInclude>
@@ -481,9 +478,6 @@
     </ClCompile>
     <ClCompile Include="ModuleScene.cpp">
       <Filter>Sources\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Sources\Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,6 @@
 #include "Globals.h"
 #include "Primitive.h"
 #include "PhysBody3D.h"
-#include "GameObject.h"
 
 
 struct PhysBody3D;
