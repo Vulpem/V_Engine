@@ -3,6 +3,8 @@
 #include "Globals.h"
 #include "Primitive.h"
 
+#include "Math.h"
+
 #include "Bullet\include\btBulletDynamicsCommon.h"
 
 // Recommended scale is 1.0f == 1 meter, no less than 0.2 objects
@@ -10,8 +12,6 @@
 
 class DebugDrawer;
 struct PhysBody3D;
-struct PhysVehicle3D;
-struct VehicleInfo;
 
 class ModulePhysics3D : public Module
 {
@@ -31,8 +31,8 @@ public:
 	PhysBody3D* AddBody(const P_Cylinder& cylinder, float mass = 1.0f);
 
 
-	void AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, const vec3& anchorA, const vec3& anchorB);
-	void AddConstraintHinge(PhysBody3D& bodyA, PhysBody3D& bodyB, const vec3& anchorA, const vec3& anchorB, const vec3& axisS, const vec3& axisB, bool disable_collision = false);
+	void AddConstraintP2P(PhysBody3D& bodyA, PhysBody3D& bodyB, const math::float3& anchorA, const math::float3& anchorB);
+	void AddConstraintHinge(PhysBody3D& bodyA, PhysBody3D& bodyB, const math::float3& anchorA, const math::float3& anchorB, const math::float3& axisS, const math::float3& axisB, bool disable_collision = false);
 	void DeleteBody(PhysBody3D* body);
 
 private:
