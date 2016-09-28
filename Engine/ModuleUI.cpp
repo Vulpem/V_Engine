@@ -8,7 +8,6 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
-#include "ModuleTests.h"
 #include "ModuleScene.h"
 
 

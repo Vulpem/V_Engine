@@ -9,7 +9,7 @@
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
 #include "ModuleUI.h"
-#include "ModuleTests.h"
+#include "ModuleImportGeometry.h"
 #include "ModuleScene.h"
 
 Application::Application()
@@ -24,7 +24,7 @@ Application::Application()
 	camera = new ModuleCamera3D(this);
 	physics = new ModulePhysics3D(this);
 	UI = new ModuleUI(this);
-	test = new ModuleTests(this);
+	importGeometry = new ModuleImportGeometry(this);
 
 	scene = new ModuleScene(this);
 
@@ -39,7 +39,7 @@ Application::Application()
 	AddModule(audio);
 	AddModule(physics);
 	AddModule(UI);
-	AddModule(test);
+	AddModule(importGeometry);
 	
 	// Scenes
 	AddModule(scene);

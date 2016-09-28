@@ -306,14 +306,14 @@
     <ClInclude Include="Math.h">
       <Filter>Sources\Math</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleTests.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleScene.h">
       <Filter>Sources\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="OpenGL.h">
       <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleImportGeometry.h">
+      <Filter>Sources\Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -473,11 +473,11 @@
     <ClCompile Include="MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>Sources\Math\MathGeoLib\Algorithm\Random</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleTests.cpp">
-      <Filter>Sources\Modules</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleScene.cpp">
       <Filter>Sources\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleImportGeometry.cpp">
+      <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

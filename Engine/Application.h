@@ -11,7 +11,7 @@ class ModuleAudio;
 class ModuleRenderer3D;
 class ModuleCamera3D;
 class ModuleUI;
-class ModuleTests;
+class ModuleImportGeometry;
 class ModulePhysics3D;
 class ModuleScene;
 
@@ -28,7 +28,7 @@ public:
 	ModuleCamera3D* camera;
 
 	ModuleUI* UI;
-	ModuleTests* test;
+	ModuleImportGeometry* importGeometry;
 	ModulePhysics3D* physics;
 
 	ModuleScene* scene;

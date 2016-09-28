@@ -153,7 +153,7 @@
     <ClInclude Include="ModulePhysics3D.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
     <ClInclude Include="ModuleScene.h" />
-    <ClInclude Include="ModuleTests.h" />
+    <ClInclude Include="ModuleImportGeometry.h" />
     <ClInclude Include="ModuleUI.h" />
     <ClInclude Include="OpenGL.h" />
     <ClInclude Include="p2List.h" />
@@ -216,7 +216,7 @@
     <ClCompile Include="ModulePhysics3D.cpp" />
     <ClCompile Include="ModuleRenderer3D.cpp" />
     <ClCompile Include="ModuleScene.cpp" />
-    <ClCompile Include="ModuleTests.cpp" />
+    <ClCompile Include="ModuleImportGeometry.cpp" />
     <ClCompile Include="ModuleUI.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="PhysBody3D.cpp" />
