@@ -21,6 +21,8 @@ struct mesh
 	float b = 1.0f;
 	float a = 1.0f;
 
+	bool wires = false;
+
 	void Draw();
 
 };

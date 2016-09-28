@@ -16,6 +16,11 @@
 
 void mesh::Draw()
 {
+	if (wires)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glColor4f(r, g, b, a);
@@ -27,6 +32,8 @@ void mesh::Draw()
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, NULL);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 ModuleImportGeometry::ModuleImportGeometry(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -142,8 +149,6 @@ void ModuleImportGeometry::LoadFBX(char* path)
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, toPush->id_indices);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * toPush->num_indices, toPush->indices, GL_STATIC_DRAW);
 				}
-				
-
 				meshes.push_back(toPush);
 			}
 		}
