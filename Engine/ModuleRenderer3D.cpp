@@ -108,10 +108,20 @@ bool ModuleRenderer3D::Init()
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, LightModelAmbient);
 
 		lights[0].ref = GL_LIGHT0;
-		lights[0].ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
-		lights[0].diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
-		lights[0].SetPos(0.0f, 0.0f, 2.5f);
-		lights[0].Init();
+		lights[1].ref = GL_LIGHT1;
+		lights[2].ref = GL_LIGHT2;
+		lights[3].ref = GL_LIGHT3;
+		lights[4].ref = GL_LIGHT4;
+		lights[5].ref = GL_LIGHT5;
+		lights[6].ref = GL_LIGHT6;
+		lights[7].ref = GL_LIGHT7;
+		for (int n = 0; n < MAX_LIGHTS; n++)
+		{
+			lights[n].ambient.Set(0.25f, 0.25f, 0.25f, 1.0f);
+			lights[n].diffuse.Set(0.75f, 0.75f, 0.75f, 1.0f);
+			lights[n].SetPos(n * 5, 10, 0);
+			lights[n].Init();
+		}
 
 		GLfloat MaterialAmbient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, MaterialAmbient);
@@ -419,12 +429,12 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 	glLoadMatrixf(App->camera->GetViewMatrix());
 
 	// light 0 on cam pos
-	lights[0].SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
+	lights[0].SetPos(App->camera->Position.x + 1, App->camera->Position.y + 5, App->camera->Position.z + 1);
 
 	for(uint i = 0; i < MAX_LIGHTS; ++i)
 		lights[i].Render();
 
-
+	/*
 	//Vertex Buffer draw
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -447,7 +457,7 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 	//Index - VErtex Buffer draw
-
+	*/
 
 	return UPDATE_CONTINUE;
 }

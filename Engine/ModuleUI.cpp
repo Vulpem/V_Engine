@@ -136,9 +136,9 @@ update_status ModuleUI::PreUpdate(float dt)
 
 			if (ImGui::CollapsingHeader("Camera"))
 			{
-				ImGui::InputFloat("X", &App->camera->Position.x);
-				ImGui::InputFloat("Y", &App->camera->Position.y);
-				ImGui::InputFloat("Z", &App->camera->Position.z);
+				ImGui::InputFloat("X##cam", &App->camera->Position.x);
+				ImGui::InputFloat("Y##cam", &App->camera->Position.y);
+				ImGui::InputFloat("Z##cam", &App->camera->Position.z);
 				ImGui::NewLine();
 				ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
 				ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
@@ -165,6 +165,44 @@ update_status ModuleUI::PreUpdate(float dt)
 					ImGui::OpenPopup("SetCameraRef");
 				}
 
+			}
+
+			if (ImGui::CollapsingHeader("Render"))
+			{
+				if (ImGui::TreeNode("Lights"))
+				{
+					for (int nLight = 0; nLight < MAX_LIGHTS; nLight++)
+					{
+						char lightName[46];
+						sprintf(lightName, "Light %i", nLight);
+						bool on = App->renderer3D->lights[nLight].on;
+						ImGui::Checkbox(lightName, &on);
+
+						if (on != App->renderer3D->lights[nLight].on)
+						{
+							App->renderer3D->lights[nLight].Active(on);
+						}
+						if (App->renderer3D->lights[nLight].on == true)
+						{
+
+							sprintf(lightName, "Expand##Light_%i", nLight);
+							ImGui::SameLine();
+							if (ImGui::TreeNode(lightName))
+							{
+								char tmp[46];
+								sprintf(tmp, "X##light_%i", nLight);
+								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.x);
+								sprintf(tmp, "Y##light_%i", nLight);
+								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.y);
+								sprintf(tmp, "Z##light_%i", nLight);
+								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.z);
+
+								ImGui::TreePop();
+							}
+						}
+					}
+					ImGui::TreePop();
+				}
 			}
 
 			if (ImGui::CollapsingHeader("Tests"))

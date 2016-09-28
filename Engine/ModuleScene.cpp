@@ -21,9 +21,9 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	App->camera->LookAt(vec3(0, 0, 0));
+	App->camera->LookAt(vec3(0, 7, 0));
 
-	App->importGeometry->LoadFBX("FBX/warrior.FBX");
+	App->importGeometry->LoadFBX("FBX/Mecha.fbx");
 
 	reset = false;
 	return ret;
@@ -42,10 +42,6 @@ update_status ModuleScene::Update(float dt)
 	P_Plane p(0, 0, 0, 1);
 	p.axis = true;
 	p.Render();
-
-	P_Cube cube;
-	cube.SetPos(5, 0, 0);
-	cube.Render();
 
 	return UPDATE_CONTINUE;
 }

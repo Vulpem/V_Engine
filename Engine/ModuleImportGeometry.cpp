@@ -17,6 +17,9 @@
 void mesh::Draw()
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glColor4f(r, g, b, a);
+
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
@@ -42,9 +45,9 @@ bool ModuleImportGeometry::Init()
 {
 	bool ret = true;
 
-	struct aiLogStream stream;
-	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
-	aiAttachLogStream(&stream);
+	//struct aiLogStream stream;
+	//stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
+	//aiAttachLogStream(&stream);
 		
 	return ret;
 }
@@ -85,7 +88,7 @@ update_status ModuleImportGeometry::PostUpdate(float dt)
 // Called before quitting
 bool ModuleImportGeometry::CleanUp()
 {
-	aiDetachAllLogStreams();
+	//aiDetachAllLogStreams();
 
 	return true;
 }
@@ -93,59 +96,62 @@ bool ModuleImportGeometry::CleanUp()
 void ModuleImportGeometry::LoadFBX(char* path)
 {
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
-	if (scene != nullptr && scene->HasMeshes())
+	if (scene != nullptr)
 	{
-		for (uint n = 0; n < scene->mNumMeshes; n++)
+		if (scene->HasMeshes())
 		{
-			aiMesh* impMesh = scene->mMeshes[n];
-
-			mesh* toPush = new mesh;
-
-			glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
-			glGenBuffers(1, (GLuint*) &(toPush->id_indices));
-
-			//Importing vertex
-			toPush->num_vertices = impMesh->mNumVertices;
-			toPush->vertices = new float(toPush->num_vertices * 3);
-			memcpy(toPush->vertices, impMesh->mVertices, sizeof(float) * toPush->num_vertices * 3);
-
-			glBindBuffer(GL_ARRAY_BUFFER, toPush->id_vertices);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_vertices * 3, toPush->vertices, GL_STATIC_DRAW);
-
-
-			glBindBuffer(GL_ARRAY_BUFFER, indexVertexArrayBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8 * 3, indexVertex, GL_STATIC_DRAW);
-
-
-			//Importing index (3 per face)
-			if (impMesh->HasFaces())
+			for (uint n = 0; n < scene->mNumMeshes; n++)
 			{
-				aiFace* currentFace = impMesh->mFaces;
+				const aiMesh* impMesh = scene->mMeshes[n];
+	
+				mesh* toPush = new mesh;
 
-				toPush->num_indices = impMesh->mNumFaces * 3;
-				toPush->indices = new uint(toPush->num_indices);
-				for (int i = 0; i < toPush->num_indices; i += 3)
+				glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
+				glGenBuffers(1, (GLuint*) &(toPush->id_indices));
+
+				//Importing vertex
+				toPush->num_vertices = impMesh->mNumVertices;
+				toPush->vertices = new float[toPush->num_vertices * 3];
+				memcpy_s(toPush->vertices, sizeof(float) * toPush->num_vertices * 3, impMesh->mVertices, sizeof(float) * toPush->num_vertices * 3);
+
+				glBindBuffer(GL_ARRAY_BUFFER, toPush->id_vertices);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_vertices * 3, toPush->vertices, GL_STATIC_DRAW);
+
+
+				//Importing index (3 per face)
+				if (impMesh->HasFaces())
 				{
-					if (currentFace->mNumIndices != 3)
+					aiFace* currentFace = impMesh->mFaces;
+
+					toPush->num_indices = impMesh->mNumFaces * 3;
+					toPush->indices = new uint[toPush->num_indices];
+					for (int i = 0; i < toPush->num_indices; i += 3)
 					{
-						LOG("A face had more than 3 vertices in %s", path);
+						if (currentFace->mNumIndices != 3)
+						{
+							LOG("A face had more than 3 vertices in %s", path);
+						}
+						else
+						{
+							toPush->indices[i] = currentFace->mIndices[0];
+							toPush->indices[i + 1] = currentFace->mIndices[1];
+							toPush->indices[i + 2] = currentFace->mIndices[2];
+						}
+						currentFace++;
 					}
-					else
-					{
-						toPush->indices[i] = currentFace->mIndices[0];
-						toPush->indices[i + 1] = currentFace->mIndices[1];
-						toPush->indices[i + 2] = currentFace->mIndices[2];
-					}
-					currentFace++;
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, toPush->id_indices);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * toPush->num_indices, toPush->indices, GL_STATIC_DRAW);
 				}
+				
+
+				meshes.push_back(toPush);
 			}
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, toPush->id_indices);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * toPush->num_indices, toPush->indices, GL_STATIC_DRAW);
-
-
-			meshes.push_back(toPush);
 		}
-		aiReleaseImport(scene);
+		if (scene)
+		{
+			aiReleaseImport(scene);
+			scene = NULL;
+		}
 	}
 	else
 	{
