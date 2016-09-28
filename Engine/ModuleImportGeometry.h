@@ -4,7 +4,18 @@
 #include "Module.h"
 #include "Globals.h"
 
+#include <vector>
 
+struct mesh
+{
+	uint id_vertices = 0;
+	uint num_vertices = 0;
+	float* vertices = nullptr;
+
+	uint id_indices = 0;
+	uint num_indices = 0;
+	uint* indices = nullptr;
+};
 
 class ModuleImportGeometry : public Module
 {
@@ -21,6 +32,11 @@ public:
 	update_status PostUpdate(float dt);
 
 	bool CleanUp();
+
+	void LoadFBX(char* path);
+
+	std::vector<mesh> meshes;
+
 };
 
 #endif
