@@ -5,6 +5,8 @@
 #include "PhysBody3D.h"
 #include "ModuleCamera3D.h"
 
+#include "ModuleImportGeometry.h"
+
 
 ModuleScene::ModuleScene(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -21,6 +23,7 @@ bool ModuleScene::Start()
 
 	App->camera->LookAt(vec3(0, 0, 0));
 
+	App->importGeometry->LoadFBX("FBX/warrior.FBX");
 
 	reset = false;
 	return ret;

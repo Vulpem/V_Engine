@@ -15,6 +15,9 @@ struct mesh
 	uint id_indices = 0;
 	uint num_indices = 0;
 	uint* indices = nullptr;
+
+	void Draw();
+
 };
 
 class ModuleImportGeometry : public Module
@@ -35,7 +38,7 @@ public:
 
 	void LoadFBX(char* path);
 
-	std::vector<mesh> meshes;
+	std::vector<mesh*> meshes;
 
 };
 

@@ -446,11 +446,6 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-	while (glGetError() != GL_NO_ERROR)
-	{
-		int a = 0;
-	}
-
 	//Index - VErtex Buffer draw
 
 
