@@ -1,6 +1,5 @@
 #pragma once
 #include "Module.h"
-#include "p2DynArray.h"
 #include "Globals.h"
 #include "Primitive.h"
 #include "PhysBody3D.h"
@@ -26,7 +25,4 @@ public:
 
 public:
 	bool reset = false;
-
-private:
-	//GO_Grid grid;
 };

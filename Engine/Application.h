@@ -1,8 +1,10 @@
 #pragma once
 
-#include "p2List.h"
 #include "Globals.h"
 #include "Timer.h"
+
+#include <vector>
+#include <list>
 
 class Module;
 class ModuleWindow;
@@ -41,7 +43,7 @@ private:
 
 	Timer	ms_timer;
 	float	dt;
-	p2List<Module*> list_modules;
+	std::vector<Module*> list_modules;
 	int frameCount = 0;
 	Timer	FPS_Timer;
 	float FrameTime = -1.0f;

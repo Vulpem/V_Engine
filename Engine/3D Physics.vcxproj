@@ -156,12 +156,10 @@
     <ClInclude Include="ModuleImportGeometry.h" />
     <ClInclude Include="ModuleUI.h" />
     <ClInclude Include="OpenGL.h" />
-    <ClInclude Include="p2List.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleAudio.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModuleWindow.h" />
-    <ClInclude Include="p2DynArray.h" />
     <ClInclude Include="p2Point.h" />
     <ClInclude Include="PhysBody3D.h" />
     <ClInclude Include="Primitive.h" />
