@@ -80,9 +80,9 @@ update_status ModuleUI::PreUpdate(float dt)
 		if (ImGui::BeginMenu("View"))
 		{
 			ImGui::Checkbox("Editor", &IsOpenEditor);
+			ImGui::Checkbox("Outliner", &IsOpenOutliner);
 			ImGui::Checkbox("Console", &IsOpenConsole);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
-			ImGui::Checkbox("ImGui TestBox", &IsOpenOutliner);
 			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
 			ImGui::EndMenu();
 		}
@@ -245,35 +245,24 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma endregion
 
 #pragma region outliner
-	ImGui::Begin("Outliner", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0);
-	if (ImGui::TreeNode("Scene"))
+	if (IsOpenOutliner)
 	{
-		std::vector<Node*>::iterator node = App->importGeometry->geometryNodes.begin();
-		while (node != App->importGeometry->geometryNodes.end())
+		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 1.0f, 0);
+		if (ImGui::TreeNode("Scene"))
 		{
-			SceneTreeNodes((*node));
-			node++;
+			std::vector<Node*>::iterator node = App->importGeometry->geometryNodes.begin();
+			while (node != App->importGeometry->geometryNodes.end())
+			{
+				SceneTreeNodes((*node));
+				node++;
+			}
+			ImGui::TreePop();
 		}
-		ImGui::TreePop();
+		ImGui::End();
 	}
-	ImGui::End();
 #pragma endregion
 
 	return ret;
-}
-
-void ModuleUI::SceneTreeNodes(Node* node)
-{
-	if (ImGui::TreeNode(node->name.GetString()))
-	{
-		std::vector<Node*>::iterator it = node->childs.begin();
-		while (it != node->childs.end())
-		{
-			SceneTreeNodes((*it));
-			it++;
-		}
-		ImGui::TreePop();
-	}
 }
 
 update_status ModuleUI::Update(float dt)
@@ -318,4 +307,22 @@ void ModuleUI::ClearConsole()
 {
 	buffer.clear();
 	scrollToBottom = true;
+}
+
+void ModuleUI::SceneTreeNodes(Node* node)
+{
+	if (ImGui::TreeNode(node->name.GetString()))
+	{
+		math::float3 pos = node->GetPos();
+		ImGui::SameLine();
+		ImGui::Text("X:%.1f, Y:%.1f, Z:%.1f", pos.x, pos.y, pos.z);
+
+		std::vector<Node*>::iterator it = node->childs.begin();
+		while (it != node->childs.end())
+		{
+			SceneTreeNodes((*it));
+			it++;
+		}
+		ImGui::TreePop();
+	}
 }
