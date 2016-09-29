@@ -3,7 +3,8 @@
 #include "Application.h"
 
 #include "PhysFS/include/physfs.h"
-//#pragma comment( lib, "PhysFS/libx86/physfs.lib" )
+
+#pragma comment( lib, "PhysFS/libx86/physfs.lib" )
 
 ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
