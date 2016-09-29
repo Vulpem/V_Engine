@@ -287,9 +287,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 
 	glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
 	glGenBuffers(1, (GLuint*) &(toPush->id_indices));
-	glGenBuffers(1, (GLuint*) &(toPush->id_normals));
-	glGenBuffers(1, (GLuint*) &(toPush->id_colors));
-
+	
 	//Importing vertex
 	toPush->num_vertices = toLoad->mNumVertices;
 	toPush->vertices = new float[toPush->num_vertices * 3];
@@ -301,6 +299,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 	//Importing normals
 	if (toLoad->HasNormals())
 	{
+		glGenBuffers(1, (GLuint*) &(toPush->id_normals));
 		toPush->num_normals = toPush->num_vertices;
 		toPush->normals = new float[toPush->num_normals * 3];
 		memcpy_s(toPush->normals, sizeof(float) * toPush->num_normals * 3, toLoad->mNormals, sizeof(float) * toPush->num_normals * 3);
@@ -310,7 +309,9 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 	}
 
 	//Importing colors
-		//uint nChannels = toLoad->GetNumColorChannels();
+	if (toLoad->GetNumColorChannels() > 0)
+	{
+		glGenBuffers(1, (GLuint*) &(toPush->id_colors));
 		toPush->num_colors = toPush->num_vertices;
 
 		toPush->colors = new float[toPush->num_colors * 4];
@@ -318,7 +319,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 
 		glBindBuffer(GL_ARRAY_BUFFER, toPush->id_colors);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_colors * 4, toPush->colors, GL_STATIC_DRAW);
-
+	}
 
 	//Importing index (3 per face)
 	if (toLoad->HasFaces())
