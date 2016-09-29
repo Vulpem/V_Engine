@@ -15,12 +15,64 @@
 
 #pragma comment(lib, "Assimp/libx86/assimp.lib")
 
+Node::~Node()
+{
+	if (childs.empty() == false)
+	{
+		std::vector<Node*>::iterator iterator = childs.begin();
+		while (iterator != childs.end())
+		{
+			delete (*iterator);
+			iterator++;
+		}
+	}
 
-void mesh::Draw()
+	if (meshes.empty() == false)
+	{
+		std::vector<mesh*>::iterator iterator = meshes.begin();
+		while (iterator != meshes.end())
+		{
+			delete (*iterator);
+			iterator++;
+		}
+	}
+}
+
+void Node::Draw()
 {
 	glPushMatrix();
 	glMultMatrixf(transform.ptr());
 
+	if (childs.empty() == false)
+	{
+		std::vector<Node*>::iterator iterator = childs.begin();
+		while (iterator != childs.end())
+		{
+			(*iterator)->Draw();
+			iterator++;
+		}
+	}
+
+	if (meshes.empty() == false)
+	{
+		std::vector<mesh*>::iterator iterator = meshes.begin();
+		while (iterator != meshes.end())
+		{
+			(*iterator)->Draw();
+			iterator++;
+		}
+	}
+
+	glPopMatrix();
+}
+
+void Node::SetPos(float x, float y, float z)
+{
+	transform.Translate(x, y, z);
+}
+
+void mesh::Draw()
+{
 	if (wires)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -51,14 +103,6 @@ void mesh::Draw()
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	glPopMatrix();
-
-}
-
-void mesh::SetPos(float x, float y, float z)
-{
-	transform.Translate(x, y, z);
 }
 
 ModuleImportGeometry::ModuleImportGeometry(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -101,8 +145,8 @@ update_status ModuleImportGeometry::PreUpdate(float dt)
 update_status ModuleImportGeometry::Update(float dt)
 {
 	
-	std::vector<mesh*>::iterator it = meshes.begin();
-	while (it != meshes.end())
+	std::vector<Node*>::iterator it = geometryNodes.begin();
+	while (it != geometryNodes.end())
 	{
 		(*it)->Draw();
 		it++;
@@ -122,39 +166,38 @@ bool ModuleImportGeometry::CleanUp()
 {
 	aiDetachAllLogStreams();
 
+	std::vector<Node*>::iterator it = geometryNodes.begin();
+	while (it != geometryNodes.end())
+	{
+		delete (*it);
+		it++;
+	}
+
 	return true;
 }
 
-mesh* ModuleImportGeometry::LoadFBX(char* path)
+Node* ModuleImportGeometry::LoadFBX(char* path)
 {
 //	SDL_RWops* file = App->fs->Load(path);
 
 //	aiFileIO aiFile;
 //	aiFile.OpenProc(&aiFile, "App->fs->Load(path)", "this");
-	mesh* ret = NULL;
+
+	Node* ret = NULL;
 
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene != nullptr)
 	{
 		if (scene->HasMeshes())
 		{
-			for (uint n = 0; n < scene->mNumMeshes; n++)
-			{
-				const aiMesh* impMesh = scene->mMeshes[n];
-	
-				
-
-				meshes.push_back(LoadMesh(impMesh, path));
-			}
+			ret = LoadNode(scene->mRootNode, scene);
+			geometryNodes.push_back(ret);
 		}
 		if (scene)
 		{
 			aiReleaseImport(scene);
 			scene = NULL;
 		}
-
-		ret = (*meshes.cbegin());
-
 	}
 	else
 	{
@@ -164,7 +207,43 @@ mesh* ModuleImportGeometry::LoadFBX(char* path)
 	return ret;
 }
 
-mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, char* path)
+Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent)
+{
+	Node* ret = new Node();
+
+	//Setting Name
+	char tmpName[MAXLEN];
+	//Warning. may require +1 char
+	memcpy(tmpName, toLoad->mName.data, toLoad->mName.length + 1);
+	ret->name = tmpName;
+
+	//Setting parent
+	ret->parent = parent;
+
+	//Setting transform
+	ret->transform.SetIdentity();
+
+	//TODO
+//		ret->transform[n] = toLoad->mTransformation[n];
+
+
+	//Loading meshes
+	for (int n = 0; n < toLoad->mNumMeshes; n++)
+	{   
+		mesh* tmp = LoadMesh(scene->mMeshes[toLoad->mMeshes[n]]);
+		ret->meshes.push_back(tmp);
+	}
+
+	//Loading child nodes
+	for (int n = 0; n < toLoad->mNumChildren; n++)
+	{
+		ret->childs.push_back(LoadNode(toLoad->mChildren[n], scene, ret));
+	}
+
+	return ret;
+}
+
+mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 {
 	mesh* toPush = new mesh;
 
@@ -203,7 +282,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, char* path)
 		{
 			if (currentFace->mNumIndices != 3)
 			{
-				LOG("A loaded face had more than 3 vertices in %s", path);
+				LOG("A loaded face had more than 3 vertices");// in %s", path);
 			}
 			else
 			{

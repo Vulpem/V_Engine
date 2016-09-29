@@ -23,8 +23,7 @@ bool ModuleScene::Start()
 
 	App->camera->LookAt(vec3(0, 7, 0));
 
-	mesh* tmp = App->importGeometry->LoadFBX("FBX/Mecha.fbx");
-	tmp->SetPos(20, -5, 10);
+	Node* tmp = App->importGeometry->LoadFBX("FBX/Mecha.fbx");
 
 	reset = false;
 	return ret;

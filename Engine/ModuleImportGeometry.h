@@ -8,9 +8,12 @@
 #include <vector>
 
 struct aiMesh;
+struct aiNode;
+struct aiScene;
 
-struct mesh
+class mesh
 {
+public:
 	uint id_vertices = 0;
 	uint num_vertices = 0;
 	float* vertices = nullptr;
@@ -23,17 +26,31 @@ struct mesh
 	uint num_normals;
 	float* normals = nullptr;
 
+
 	float r = 0.5f;
 	float g = 0.5f;
 	float b = 0.5f;
 	float a = 1.0f;
 
-	math::float4x4 transform = math::float4x4::identity;
-
 	bool wires = false;
 
 	void Draw();
+};
 
+class Node
+{
+public:
+	C_String name;
+
+	std::vector<mesh*> meshes;
+	std::vector<Node*> childs;
+	Node* parent = nullptr;
+
+	math::float4x4 transform = math::float4x4::identity;
+
+	~Node();
+
+	void Draw();
 	void SetPos(float x, float y, float z);
 
 };
@@ -54,14 +71,15 @@ public:
 
 	bool CleanUp();
 
-	mesh* LoadFBX(char* path);
+	Node* LoadFBX(char* path);
 
 private:
-	mesh* LoadMesh(const aiMesh* toLoad, char* path);
+	Node* LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent = NULL);
+	mesh* LoadMesh(const aiMesh* toLoad);	
 
 public:
 
-	std::vector<mesh*> meshes;
+	std::vector<Node*> geometryNodes;
 
 };
 
