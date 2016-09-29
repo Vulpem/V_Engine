@@ -3,6 +3,8 @@
 
 #include "ModuleImportGeometry.h"
 
+#include "ModuleFileSystem.h"
+
 #include "OpenGL.h"
 
 
@@ -25,12 +27,24 @@ void mesh::Draw()
 
 	glColor4f(r, g, b, a);
 
+	//Setting vertex
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
+	if (num_normals > 0)
+	{
+		glEnableClientState(GL_NORMAL_ARRAY);
+		//Setting Normals
+		glBindBuffer(GL_ARRAY_BUFFER, id_normals);
+		glNormalPointer(GL_FLOAT, 0, NULL);
+	}
+
+	//Setting index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_indices);
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, NULL);
 
+	//Cleaning
+	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -52,9 +66,9 @@ bool ModuleImportGeometry::Init()
 {
 	bool ret = true;
 
-	//struct aiLogStream stream;
-	//stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
-	//aiAttachLogStream(&stream);
+	struct aiLogStream stream;
+	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
+	aiAttachLogStream(&stream);
 		
 	return ret;
 }
@@ -95,13 +109,19 @@ update_status ModuleImportGeometry::PostUpdate(float dt)
 // Called before quitting
 bool ModuleImportGeometry::CleanUp()
 {
-	//aiDetachAllLogStreams();
+	aiDetachAllLogStreams();
 
 	return true;
 }
 
 void ModuleImportGeometry::LoadFBX(char* path)
 {
+//	SDL_RWops* file = App->fs->Load(path);
+
+//	aiFileIO aiFile;
+//	aiFile.OpenProc(&aiFile, "App->fs->Load(path)", "this");
+
+
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene != nullptr)
 	{
@@ -115,6 +135,7 @@ void ModuleImportGeometry::LoadFBX(char* path)
 
 				glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
 				glGenBuffers(1, (GLuint*) &(toPush->id_indices));
+				glGenBuffers(1, (GLuint*) &(toPush->id_normals));
 
 				//Importing vertex
 				toPush->num_vertices = impMesh->mNumVertices;
@@ -123,6 +144,17 @@ void ModuleImportGeometry::LoadFBX(char* path)
 
 				glBindBuffer(GL_ARRAY_BUFFER, toPush->id_vertices);
 				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_vertices * 3, toPush->vertices, GL_STATIC_DRAW);
+
+				//Importing normals
+				if (impMesh->HasNormals())
+				{
+					toPush->num_normals = toPush->num_vertices;
+					toPush->normals = new float[toPush->num_normals * 3];
+					memcpy_s(toPush->normals, sizeof(float) * toPush->num_normals * 3, impMesh->mNormals, sizeof(float) * toPush->num_normals * 3);
+
+					glBindBuffer(GL_ARRAY_BUFFER, toPush->id_normals);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_normals * 3, toPush->normals, GL_STATIC_DRAW);
+				}
 
 
 				//Importing index (3 per face)
@@ -149,6 +181,7 @@ void ModuleImportGeometry::LoadFBX(char* path)
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, toPush->id_indices);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * toPush->num_indices, toPush->indices, GL_STATIC_DRAW);
 				}
+
 				meshes.push_back(toPush);
 			}
 		}

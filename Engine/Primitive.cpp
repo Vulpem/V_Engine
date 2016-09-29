@@ -117,8 +117,9 @@ void P_Cube::InnerRender() const
 
 #pragma region directMode
 	//Back
-	glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
+	glColor4f(color.r, color.g, color.b, color.a);
 
+	glNormal3f(0, 0, -1);
 	glVertex3f(sx, sy, -sz);
 	glVertex3f(-sx, -sy, -sz);
 	glVertex3f(-sx, sy, -sz);
@@ -128,8 +129,7 @@ void P_Cube::InnerRender() const
 	glVertex3f(-sx, -sy, -sz);
 
 	//Left
-	glColor4f(0.25f, 1.0f, 0.25f, 1.0f);
-
+	glNormal3f(1, 0, 0);
 	glVertex3f(sx, sy, -sz);
 	glVertex3f(sx, -sy, sz);
 	glVertex3f(sx, -sy, -sz);
@@ -139,8 +139,7 @@ void P_Cube::InnerRender() const
 	glVertex3f(sx, -sy, sz);
 
 	//Front
-	glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
-
+	glNormal3f(0, 0, 1);
 	glVertex3f(sx, sy, sz);
 	glVertex3f(-sx, sy, sz);
 	glVertex3f(sx, -sy, sz);
@@ -150,8 +149,7 @@ void P_Cube::InnerRender() const
 	glVertex3f(sx, -sy, sz);
 
 	//Right
-	glColor4f(1.0f, 1.0f, 0.25f, 1.0f);
-
+	glNormal3f(-1, 0, 0);
 	glVertex3f(-sx, sy, sz);
 	glVertex3f(-sx, -sy, -sz);
 	glVertex3f(-sx, -sy, sz);
@@ -161,8 +159,7 @@ void P_Cube::InnerRender() const
 	glVertex3f(-sx, -sy, -sz);
 
 	//Top
-	glColor4f(1.0f, 0.25f, 1.0f, 1.0f);
-
+	glNormal3f(0, 1, 0);
 	glVertex3f(sx, sy, sz);
 	glVertex3f(sx, sy, -sz);
 	glVertex3f(-sx, sy, sz);
@@ -172,8 +169,7 @@ void P_Cube::InnerRender() const
 	glVertex3f(-sx, sy, -sz);
 
 	//Down
-	glColor4f(0.25f, 1.0f, 1.0f, 1.0f);
-
+	glNormal3f(0, -1, 0);
 	glVertex3f(sx, -sy, sz);
 	glVertex3f(-sx, -sy, sz);
 	glVertex3f(sx, -sy, -sz);

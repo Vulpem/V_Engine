@@ -16,9 +16,13 @@ struct mesh
 	uint num_indices = 0;
 	uint* indices = nullptr;
 
-	float r = 1.0f;
-	float g = 1.0f;
-	float b = 1.0f;
+	uint id_normals = 0;
+	uint num_normals;
+	float* normals = nullptr;
+
+	float r = 0.5f;
+	float g = 0.5f;
+	float b = 0.5f;
 	float a = 1.0f;
 
 	bool wires = false;

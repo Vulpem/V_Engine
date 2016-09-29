@@ -50,8 +50,8 @@ update_status ModuleCamera3D::Update(float dt)
 	// Mouse motion ----------------
 	if (renderReference)
 	{
-		P_Sphere ref(0.25f);
-		ref.color = Color(240, 0, 0, 0.5f);
+		P_Cube ref(0.25,0.25,0.25);
+		ref.color = Color(0.95, 0.1, 0.1, 1.0);
 		ref.SetPos(Reference.x, Reference.y, Reference.z);
 		ref.Render();
 	}

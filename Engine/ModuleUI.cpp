@@ -196,6 +196,9 @@ update_status ModuleUI::PreUpdate(float dt)
 								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.y);
 								sprintf(tmp, "Z##light_%i", nLight);
 								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.z);
+								//TMP
+								sprintf(tmp, "TMP##light_%tmp", nLight);
+								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].tmp);
 
 								ImGui::TreePop();
 							}
