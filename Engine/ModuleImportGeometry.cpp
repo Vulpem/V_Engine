@@ -71,6 +71,15 @@ void Node::SetPos(float x, float y, float z)
 	transform.Translate(x, y, z);
 }
 
+math::float3 Node::GetPos()
+{
+	math::float3 ret;
+	math::float3 tmp;
+	math::Quat tmp2;
+	transform.Decompose(ret, tmp2, tmp);
+	return ret;
+}
+
 void mesh::Draw()
 {
 	if (wires)
@@ -94,12 +103,21 @@ void mesh::Draw()
 		glNormalPointer(GL_FLOAT, 0, NULL);
 	}
 
+	if (num_colors > 0)
+	{
+		glEnableClientState(GL_COLOR_ARRAY);
+		//Setting colors
+		glBindBuffer(GL_ARRAY_BUFFER, id_colors);
+		glColorPointer(4, GL_FLOAT, 0, NULL);
+	}
+
 	//Setting index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_indices);
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, NULL);
 
 	//Cleaning
 	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -270,6 +288,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 	glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
 	glGenBuffers(1, (GLuint*) &(toPush->id_indices));
 	glGenBuffers(1, (GLuint*) &(toPush->id_normals));
+	glGenBuffers(1, (GLuint*) &(toPush->id_colors));
 
 	//Importing vertex
 	toPush->num_vertices = toLoad->mNumVertices;
@@ -289,6 +308,16 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 		glBindBuffer(GL_ARRAY_BUFFER, toPush->id_normals);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_normals * 3, toPush->normals, GL_STATIC_DRAW);
 	}
+
+	//Importing colors
+		//uint nChannels = toLoad->GetNumColorChannels();
+		toPush->num_colors = toPush->num_vertices;
+
+		toPush->colors = new float[toPush->num_colors * 4];
+		memcpy(toPush->colors, toLoad->mColors, sizeof(float) * toPush->num_colors * 4);
+
+		glBindBuffer(GL_ARRAY_BUFFER, toPush->id_colors);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_colors * 4, toPush->colors, GL_STATIC_DRAW);
 
 
 	//Importing index (3 per face)

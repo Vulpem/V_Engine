@@ -28,6 +28,10 @@ public:
 	uint num_normals;
 	float* normals = nullptr;
 
+	uint id_colors = 0;
+	uint num_colors = 0;
+	float* colors = nullptr;
+
 
 	float r = 0.5f;
 	float g = 0.5f;
@@ -54,6 +58,7 @@ public:
 
 	void Draw();
 	void SetPos(float x, float y, float z);
+	math::float3 GetPos();
 
 };
 

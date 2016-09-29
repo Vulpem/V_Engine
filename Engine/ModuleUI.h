@@ -6,6 +6,8 @@
 
 #include "ImGui\imgui.h"
 
+class Node;
+
 union SDL_Event;
 
 class Panel;
@@ -38,10 +40,10 @@ public:
 
 	void ModuleUI::Log(const char* input);
 	void ClearConsole();
+private:
+	void SceneTreeNodes(Node* node);
 
-
-
-	
+public:
 
 	bool capture_mouse = false;
 	bool capture_keyboard = false;
@@ -50,7 +52,8 @@ public:
 
 	bool IsOpenConsole = true;
 	bool IsOpenEditor = true;
-	bool IsOpenTestWindow = true;
+	bool IsOpenTestWindow = false;
+	bool IsOpenOutliner = true;
 
 	char* testConsoleInput;
 

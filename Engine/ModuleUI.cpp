@@ -9,6 +9,7 @@
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
 #include "ModuleScene.h"
+#include "ModuleImportGeometry.h"
 
 
 #include "Imgui/imgui_impl_sdl_gl3.h"
@@ -81,6 +82,7 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::Checkbox("Editor", &IsOpenEditor);
 			ImGui::Checkbox("Console", &IsOpenConsole);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
+			ImGui::Checkbox("ImGui TestBox", &IsOpenOutliner);
 			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
 			ImGui::EndMenu();
 		}
@@ -242,7 +244,36 @@ update_status ModuleUI::PreUpdate(float dt)
 	}
 #pragma endregion
 
+#pragma region outliner
+	ImGui::Begin("Outliner", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0);
+	if (ImGui::TreeNode("Scene"))
+	{
+		std::vector<Node*>::iterator node = App->importGeometry->geometryNodes.begin();
+		while (node != App->importGeometry->geometryNodes.end())
+		{
+			SceneTreeNodes((*node));
+			node++;
+		}
+		ImGui::TreePop();
+	}
+	ImGui::End();
+#pragma endregion
+
 	return ret;
+}
+
+void ModuleUI::SceneTreeNodes(Node* node)
+{
+	if (ImGui::TreeNode(node->name.GetString()))
+	{
+		std::vector<Node*>::iterator it = node->childs.begin();
+		while (it != node->childs.end())
+		{
+			SceneTreeNodes((*it));
+			it++;
+		}
+		ImGui::TreePop();
+	}
 }
 
 update_status ModuleUI::Update(float dt)
