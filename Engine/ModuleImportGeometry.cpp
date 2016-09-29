@@ -110,7 +110,7 @@ ModuleImportGeometry::ModuleImportGeometry(Application* app, bool start_enabled)
 	name.create("ModuleGeometry");
 }
 
-// Destructor
+// DestructorF
 ModuleImportGeometry::~ModuleImportGeometry()
 {
 
@@ -213,7 +213,6 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 
 	//Setting Name
 	char tmpName[MAXLEN];
-	//Warning. may require +1 char
 	memcpy(tmpName, toLoad->mName.data, toLoad->mName.length + 1);
 	ret->name = tmpName;
 
@@ -223,8 +222,25 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 	//Setting transform
 	ret->transform.SetIdentity();
 
-	//TODO
-//		ret->transform[n] = toLoad->mTransformation[n];
+	ret->transform[0][0] = toLoad->mTransformation.a1;
+	ret->transform[0][1] = toLoad->mTransformation.b1;
+	ret->transform[0][2] = toLoad->mTransformation.c1;
+	ret->transform[0][3] = toLoad->mTransformation.d1;
+
+	ret->transform[1][0] = toLoad->mTransformation.a2;
+	ret->transform[1][1] = toLoad->mTransformation.b2;
+	ret->transform[1][2] = toLoad->mTransformation.c2;
+	ret->transform[1][3] = toLoad->mTransformation.d2;
+
+	ret->transform[2][0] = toLoad->mTransformation.a3;
+	ret->transform[2][1] = toLoad->mTransformation.b3;
+	ret->transform[2][2] = toLoad->mTransformation.c3;
+	ret->transform[2][3] = toLoad->mTransformation.d3;
+
+	ret->transform[3][0] = toLoad->mTransformation.a4;
+	ret->transform[3][1] = toLoad->mTransformation.b4;
+	ret->transform[3][2] = toLoad->mTransformation.c4;
+	ret->transform[3][3] = toLoad->mTransformation.d4;
 
 
 	//Loading meshes
@@ -246,6 +262,10 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 {
 	mesh* toPush = new mesh;
+
+	char tmpName[MAXLEN];
+	memcpy(tmpName, toLoad->mName.data, toLoad->mName.length + 1);
+	toPush->name = tmpName;
 
 	glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
 	glGenBuffers(1, (GLuint*) &(toPush->id_indices));

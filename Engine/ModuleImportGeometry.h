@@ -14,6 +14,8 @@ struct aiScene;
 class mesh
 {
 public:
+	C_String name;
+
 	uint id_vertices = 0;
 	uint num_vertices = 0;
 	float* vertices = nullptr;

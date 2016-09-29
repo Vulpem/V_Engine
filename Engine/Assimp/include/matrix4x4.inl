@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
+#define PI 3.14159265359
+
 /** @file matrix4x4.inl
  *  @brief Inline implementation of the 4x4 matrix operators
  */
