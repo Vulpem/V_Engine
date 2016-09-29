@@ -4,7 +4,10 @@
 #include "Module.h"
 #include "Globals.h"
 
+#include "Math.h"
 #include <vector>
+
+struct aiMesh;
 
 struct mesh
 {
@@ -25,9 +28,13 @@ struct mesh
 	float b = 0.5f;
 	float a = 1.0f;
 
+	math::float4x4 transform = math::float4x4::identity;
+
 	bool wires = false;
 
 	void Draw();
+
+	void SetPos(float x, float y, float z);
 
 };
 
@@ -47,7 +54,12 @@ public:
 
 	bool CleanUp();
 
-	void LoadFBX(char* path);
+	mesh* LoadFBX(char* path);
+
+private:
+	mesh* LoadMesh(const aiMesh* toLoad, char* path);
+
+public:
 
 	std::vector<mesh*> meshes;
 
