@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 #include "Timer.h"
+#include "C_String.h"
 
 #include <vector>
 #include <list>
@@ -16,6 +17,7 @@ class ModuleUI;
 class ModuleImportGeometry;
 class ModulePhysics3D;
 class ModuleScene;
+class ModuleFileSystem;
 
 #include "MathGeoLib\include\MathGeoLibFwd.h"
 
@@ -25,6 +27,7 @@ public:
 	ModuleWindow* window;
 	ModuleInput* input;
 	ModuleAudio* audio;
+	ModuleFileSystem* fs;
 
 	ModuleRenderer3D* renderer3D;
 	ModuleCamera3D* camera;
@@ -50,6 +53,9 @@ private:
 	int previous_maxFPS = maxFPS;
 	bool gameRunning = false;
 
+	C_String title;
+	C_String organisation;
+
 public:
 
 	Application();
@@ -62,6 +68,9 @@ public:
 
 	bool OpenBrowser(const char* link);
 	void Log(char* str);
+
+	const char* GetOrganization();
+	const char* GetTitle();
 
 private:
 

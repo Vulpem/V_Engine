@@ -34,4 +34,4 @@ enum update_status
 #define WIN_FULLSCREEN_DESKTOP false
 #define VSYNC true
 #define TITLE "3D Physics Playground"
-#define LIFES 5
+#define ORGANISATION "UPC"

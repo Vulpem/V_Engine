@@ -11,14 +11,19 @@
 #include "ModuleUI.h"
 #include "ModuleImportGeometry.h"
 #include "ModuleScene.h"
+#include "ModuleFileSystem.h"
 
 Application::Application()
 {
 	gameRunning = false;
 
+	title = TITLE;
+	organisation = ORGANISATION;
+
 	window = new ModuleWindow(this);
 	input = new ModuleInput(this);
 	audio = new ModuleAudio(this, true);
+	fs = new ModuleFileSystem(this);
 
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
@@ -36,6 +41,7 @@ Application::Application()
 	AddModule(window);
 	AddModule(camera);
 	AddModule(input);
+	AddModule(fs);
 	AddModule(audio);
 	AddModule(physics);
 	AddModule(UI);
@@ -230,6 +236,16 @@ void Application::Log(char* str)
 			UI->Log(str);
 		}
 	}
+}
+
+const char* Application::GetOrganization()
+{
+	return organisation.GetString();
+}
+
+const char* Application::GetTitle()
+{
+	return title.GetString();
 }
 
 void Application::AddModule(Module* mod)

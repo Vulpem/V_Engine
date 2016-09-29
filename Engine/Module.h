@@ -3,10 +3,16 @@
 class Application;
 struct PhysBody3D;
 
+#include "C_String.h"
+#include "PugiXml\src\pugixml.hpp"
+
 class Module
 {
 private :
 	bool enabled;
+
+protected:
+	C_String name;
 
 public:
 	Application* App;
@@ -73,6 +79,11 @@ public:
 	{ 
 		enabled = false;
 		return true; 
+	}
+
+	C_String GetName()
+	{
+		return name;
 	}
 
 	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2)
