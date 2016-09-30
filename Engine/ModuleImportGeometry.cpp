@@ -70,17 +70,59 @@ void Node::Draw()
 
 void Node::SetPos(float x, float y, float z)
 {
-	//transform.Translate(x, y, z);
-	//transform.TranslatePart(x, y, z);
+	transform[3][0] = x;
+	transform[3][1] = y;
+	transform[3][2] = z;
 }
 
 math::float3 Node::GetPos()
 {
 	math::float3 ret;
-	math::float3 tmp;
-	math::Quat tmp2;
-	transform.Decompose(ret, tmp2, tmp);
+	ret.x = transform[3][0];
+	ret.y = transform[3][1];
+	ret.z = transform[3][2];
 	return ret;
+}
+
+void Node::SetRot(float x, float y, float z)
+{
+	math::float3 scale = GetScale();
+	x *= DEGTORAD;
+	y *= DEGTORAD;
+	z *= DEGTORAD;
+	math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
+	transform.Set3x3Part(tmp.Float3x3Part());
+	SetScale(scale.x, scale.y, scale.z);
+}
+
+math::float3 Node::GetRot()
+{
+	math::float3 ret = transform.ToEulerXYZ();
+	ret.x *= RADTODEG;
+	ret.y *= RADTODEG;
+	ret.z *= RADTODEG;
+	return ret;
+}
+
+void Node::SetScale(float x, float y, float z)
+{
+	if (x != 0 && y != 0 && z != 0)
+	{
+		math::float3 actualScale = GetScale();
+		transform[0][0] /= actualScale.x;
+		transform[1][1] /= actualScale.y;
+		transform[2][2] /= actualScale.z;
+
+		transform[0][0] *= x;
+		transform[1][1] *= y;
+		transform[2][2] *= z;
+	}
+}
+
+math::float3 Node::GetScale()
+{
+	math::float3 tmp = transform.GetScale();
+	return transform.GetScale();
 }
 
 void mesh::Draw()

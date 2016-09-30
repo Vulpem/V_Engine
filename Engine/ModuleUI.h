@@ -61,7 +61,7 @@ public:
 
 	char* testConsoleInput;
 
-	float camRefX, camRefY, camRefZ = 0.0f;
+	float camRef[3] = { 0,0,0 };
 
 private:
 	ImGuiTextBuffer buffer;

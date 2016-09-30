@@ -46,7 +46,6 @@ bool ModuleUI::Start()
 	
 	testConsoleInput = new char[64];
 	strcpy(testConsoleInput, "InputTextHere");
-	camRefX = camRefY = camRefZ = 0.0f;
 
 	strcpy(toImport, "FBX/-.fbx");
 
@@ -140,35 +139,21 @@ update_status ModuleUI::PreUpdate(float dt)
 
 			if (ImGui::CollapsingHeader("Camera"))
 			{
+				ImGui::Text("Position");
 				ImGui::InputFloat("X##cam", &App->camera->Position.x);
 				ImGui::InputFloat("Y##cam", &App->camera->Position.y);
 				ImGui::InputFloat("Z##cam", &App->camera->Position.z);
 				ImGui::NewLine();
-				ImGui::LabelText("##CamRefX", "CameraRefX: %i", App->camera->Reference.x);
-				ImGui::LabelText("##CamRefY", "CameraRefY: %i", App->camera->Reference.y);
-				ImGui::LabelText("##CamRefZ", "CameraRefZ: %i", App->camera->Reference.z);
+				ImGui::Text("Reference");
+				if (ImGui::InputFloat3("##CamReference", camRef, 2))
+				{
+					App->camera->LookAt(vec3(camRef[0], camRef[1], camRef[2]));
+				}
 				ImGui::NewLine();
-				ImGui::InputFloat("Distance to Ref", &App->camera->distanceToRef);
+				ImGui::Text("Distance to reference");
+				ImGui::InputFloat("##Distance to reference", &App->camera->distanceToRef);
 
-
-				if (ImGui::BeginPopup("SetCameraRef"))
-				{
-					ImGui::InputFloat("RefX", &camRefX);
-					ImGui::InputFloat("RefY", &camRefY);
-					ImGui::InputFloat("RefZ", &camRefZ);
-					if (ImGui::Button("Set"))
-					{
-						App->camera->LookAt(vec3(camRefX, camRefY, camRefZ));
-					}
-
-					ImGui::EndPopup();
-				}
-
-				if (ImGui::Button("SetCameraReference"))
-				{
-					ImGui::OpenPopup("SetCameraRef");
-				}
-
+				
 			}
 
 			if (ImGui::CollapsingHeader("Render"))
@@ -293,9 +278,18 @@ update_status ModuleUI::PreUpdate(float dt)
 		if (selectedGeometry)
 		{
 			ImGui::Text(selectedGeometry->name.GetString());
-			ImGui::InputFloat3("Position", selectedPos, 2);
-			ImGui::InputFloat3("Rotation", selectedEuler, 2);
-			ImGui::InputFloat3("Scale", selectedScale, 2);
+			if (ImGui::InputFloat3("Position", selectedPos, 2))
+			{
+				selectedGeometry->SetPos(selectedPos[0], selectedPos[1], selectedPos[2]);
+			}
+			if (ImGui::InputFloat3("Rotation", selectedEuler, 2))
+			{
+				selectedGeometry->SetRot(selectedEuler[0], selectedEuler[1], selectedEuler[2]);
+			}
+			if (ImGui::InputFloat3("Scale", selectedScale, 2))
+			{
+				selectedGeometry->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
+			}
 
 					}
 		ImGui::End();
@@ -357,9 +351,6 @@ void ModuleUI::SceneTreeNodes(Node* node)
 		{
 			SelectNode(node);
 		}
-		//math::float3 pos = node->GetPos();
-		//ImGui::SameLine();
-		//ImGui::Text("X:%.1f, Y:%.1f, Z:%.1f", pos.x, pos.y, pos.z);
 
 		std::vector<Node*>::iterator it = node->childs.begin();
 		while (it != node->childs.end())
@@ -375,19 +366,21 @@ void ModuleUI::SelectNode(Node* node)
 {
 	selectedGeometry = node;
 	math::float3 pos, rot, scale;
-	math::Quat tmpRot;
-	node->transform.Decompose(pos,tmpRot, scale);
-	rot = tmpRot.ToEulerXYZ();
 
+	pos = node->GetPos();
 	selectedPos[0] = pos.x;
 	selectedPos[1] = pos.y;
 	selectedPos[2] = pos.z;
 
+	rot = node->GetRot();
 	selectedEuler[0] = rot.x;
 	selectedEuler[1] = rot.y;
 	selectedEuler[2] = rot.z;
 
+	scale = node->GetScale();
 	selectedScale[0] = scale.x;
 	selectedScale[1] = scale.y;
 	selectedScale[2] = scale.z;
+
+	App->camera->LookAt(vec3(pos.x, pos.y, pos.z));
 }

@@ -57,8 +57,15 @@ public:
 	~Node();
 
 	void Draw();
+
 	void SetPos(float x, float y, float z);
 	math::float3 GetPos();
+
+	void SetRot(float x, float y, float z);
+	math::float3 GetRot();
+
+	void SetScale(float x, float y, float z);
+	math::float3 GetScale();
 
 };
 
