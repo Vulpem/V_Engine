@@ -44,6 +44,7 @@ public:
 	void ClearConsole();
 private:
 	void SceneTreeNodes(Node* node);
+	void SelectNode(Node* node);
 
 public:
 
@@ -56,6 +57,7 @@ public:
 	bool IsOpenEditor = true;
 	bool IsOpenTestWindow = false;
 	bool IsOpenOutliner = true;
+	bool IsOpenAttributes = true;
 
 	char* testConsoleInput;
 
@@ -69,6 +71,11 @@ private:
 	char toImport[256];
 	C_String importResult;
 	math::float3 changeGeometryPos;
+
+	Node* selectedGeometry = nullptr;
+	float selectedPos[3] = { 0,0,0 };
+	float selectedScale[3] = { 1,1,1 };
+	float selectedEuler[3] = { 0,0,0 };
 };
 
 #endif

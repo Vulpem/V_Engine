@@ -286,6 +286,22 @@ update_status ModuleUI::PreUpdate(float dt)
 	}
 #pragma endregion
 
+#pragma region Attributes window
+	if (IsOpenAttributes)
+	{
+		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
+		if (selectedGeometry)
+		{
+			ImGui::Text(selectedGeometry->name.GetString());
+			ImGui::InputFloat3("Position", selectedPos, 2);
+			ImGui::InputFloat3("Rotation", selectedEuler, 2);
+			ImGui::InputFloat3("Scale", selectedScale, 2);
+
+					}
+		ImGui::End();
+	}
+#pragma endregion
+
 	return ret;
 }
 
@@ -337,9 +353,13 @@ void ModuleUI::SceneTreeNodes(Node* node)
 {
 	if (ImGui::TreeNode(node->name.GetString()))
 	{
-		math::float3 pos = node->GetPos();
-		ImGui::SameLine();
-		ImGui::Text("X:%.1f, Y:%.1f, Z:%.1f", pos.x, pos.y, pos.z);
+		if (ImGui::IsItemClicked())
+		{
+			SelectNode(node);
+		}
+		//math::float3 pos = node->GetPos();
+		//ImGui::SameLine();
+		//ImGui::Text("X:%.1f, Y:%.1f, Z:%.1f", pos.x, pos.y, pos.z);
 
 		std::vector<Node*>::iterator it = node->childs.begin();
 		while (it != node->childs.end())
@@ -349,4 +369,25 @@ void ModuleUI::SceneTreeNodes(Node* node)
 		}
 		ImGui::TreePop();
 	}
+}
+
+void ModuleUI::SelectNode(Node* node)
+{
+	selectedGeometry = node;
+	math::float3 pos, rot, scale;
+	math::Quat tmpRot;
+	node->transform.Decompose(pos,tmpRot, scale);
+	rot = tmpRot.ToEulerXYZ();
+
+	selectedPos[0] = pos.x;
+	selectedPos[1] = pos.y;
+	selectedPos[2] = pos.z;
+
+	selectedEuler[0] = rot.x;
+	selectedEuler[1] = rot.y;
+	selectedEuler[2] = rot.z;
+
+	selectedScale[0] = scale.x;
+	selectedScale[1] = scale.y;
+	selectedScale[2] = scale.z;
 }
