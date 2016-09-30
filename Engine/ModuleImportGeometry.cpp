@@ -92,19 +92,17 @@ math::float3 Node::GetPos()
 
 void Node::SetRot(float x, float y, float z)
 {
-	//math::float3 scale = GetScale();
+	math::float3 scale = GetScale();
 	x *= DEGTORAD;
 	y *= DEGTORAD;
 	z *= DEGTORAD;
 	if (x == -0) { x = 0; }
 	if (y == -0) { y = 0; }
 	if (z == -0) { z = 0; }
-
-	//math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
-	//transform.Set3x3Part(tmp.Float3x3Part());
-	//SetScale(scale.x, scale.y, scale.z);
-	math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
 	
+	math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
+	transform.Set3x3Part(tmp.Float3x3Part());
+	SetScale(scale.x, scale.y, scale.z);
 }
 
 void Node::ResetRot()
@@ -125,14 +123,10 @@ void Node::SetScale(float x, float y, float z)
 {
 	if (x != 0 && y != 0 && z != 0)
 	{
-		math::float3 actualScale = GetScale();
-		transform[0][0] /= actualScale.x;
-		transform[1][1] /= actualScale.y;
-		transform[2][2] /= actualScale.z;
-
-		transform[0][0] *= x;
-		transform[1][1] *= y;
-		transform[2][2] *= z;
+		transform.RemoveScale();
+		math::ScaleOp op = transform.Scale(math::float3(x, y, z));
+		math::float4x4 tmp = transform * op;
+		transform.Set(tmp.ptr());
 	}
 }
 
