@@ -79,14 +79,18 @@ public:
 	bool CleanUp();
 
 	Node* LoadFBX(char* path);
+	bool DeleteRootNode(Node* toErase);
 
 private:
 	Node* LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent = NULL);
 	mesh* LoadMesh(const aiMesh* toLoad);	
 
+	void CleanName(char* toClean);
+
 public:
 
 	std::vector<Node*> geometryNodes;
+
 
 };
 

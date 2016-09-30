@@ -48,6 +48,8 @@ bool ModuleUI::Start()
 	strcpy(testConsoleInput, "InputTextHere");
 	camRefX = camRefY = camRefZ = 0.0f;
 
+	strcpy(toImport, "FBX/-.fbx");
+
 	return true;
 }
 
@@ -198,10 +200,6 @@ update_status ModuleUI::PreUpdate(float dt)
 								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.y);
 								sprintf(tmp, "Z##light_%i", nLight);
 								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.z);
-								//TMP
-								sprintf(tmp, "TMP##light_%tmp", nLight);
-								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].tmp);
-
 								ImGui::TreePop();
 							}
 						}
@@ -248,12 +246,38 @@ update_status ModuleUI::PreUpdate(float dt)
 	if (IsOpenOutliner)
 	{
 		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 1.0f, 0);
+		if (ImGui::CollapsingHeader("Load Geometry"))
+		{
+			ImGui::InputText("Load:", toImport, 256);
+			if (ImGui::Button("Import"))
+			{
+				Node* import = App->importGeometry->LoadFBX(toImport);
+				if (import != NULL)
+				{
+					geometries.push_back(App->importGeometry->LoadFBX(toImport));
+					importResult = "Import successful!";
+				}
+				else
+				{
+					importResult = "Error importing.";
+				}
+
+
+			}
+			ImGui::Text(importResult.GetString());
+		}
+
 		if (ImGui::TreeNode("Scene"))
 		{
 			std::vector<Node*>::iterator node = App->importGeometry->geometryNodes.begin();
 			while (node != App->importGeometry->geometryNodes.end())
 			{
-				SceneTreeNodes((*node));
+				std::vector<Node*>::iterator childNodes = (*node)->childs.begin();
+				while (childNodes != (*node)->childs.end())
+				{
+					SceneTreeNodes((*childNodes));
+					childNodes++;
+				}				
 				node++;
 			}
 			ImGui::TreePop();

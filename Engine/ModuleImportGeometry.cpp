@@ -7,6 +7,8 @@
 
 #include "OpenGL.h"
 
+#include "ModuleInput.h"
+
 
 #include "Assimp\include\cimport.h"
 #include "Assimp\include\scene.h"
@@ -68,7 +70,8 @@ void Node::Draw()
 
 void Node::SetPos(float x, float y, float z)
 {
-	transform.Translate(x, y, z);
+	//transform.Translate(x, y, z);
+	//transform.TranslatePart(x, y, z);
 }
 
 math::float3 Node::GetPos()
@@ -162,7 +165,11 @@ update_status ModuleImportGeometry::PreUpdate(float dt)
 
 update_status ModuleImportGeometry::Update(float dt)
 {
-	
+	if (App->input->file_was_dropped)
+	{
+		LoadFBX(App->input->dropped_file);
+	}
+
 	std::vector<Node*>::iterator it = geometryNodes.begin();
 	while (it != geometryNodes.end())
 	{
@@ -225,6 +232,22 @@ Node* ModuleImportGeometry::LoadFBX(char* path)
 	return ret;
 }
 
+bool ModuleImportGeometry::DeleteRootNode(Node* toErase)
+{
+	std::vector<Node*>::iterator it = geometryNodes.begin();
+	while (it != geometryNodes.end())
+	{
+		if ((*it) == toErase)
+		{
+			delete(*it);
+			geometryNodes.erase(it);
+			return true;
+		}
+		it++;
+	}
+	return false;
+}
+
 Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent)
 {
 	Node* ret = new Node();
@@ -232,6 +255,9 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 	//Setting Name
 	char tmpName[MAXLEN];
 	memcpy(tmpName, toLoad->mName.data, toLoad->mName.length + 1);
+
+	CleanName(tmpName);
+
 	ret->name = tmpName;
 
 	//Setting parent
@@ -348,4 +374,18 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 
 	return toPush;
 
+}
+
+void ModuleImportGeometry::CleanName(char* toClean)
+{
+	char* searcher = toClean;
+	while (*searcher != '\0')
+	{
+		if (*searcher == '$')
+		{
+			*searcher = '\0';
+			break;
+		}
+		searcher++;
+	}
 }

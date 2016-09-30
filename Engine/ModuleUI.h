@@ -4,6 +4,8 @@
 #include "Module.h"
 #include "Globals.h"
 
+#include "Math.h"
+
 #include "ImGui\imgui.h"
 
 class Node;
@@ -62,6 +64,11 @@ public:
 private:
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;
+
+	std::vector<Node*> geometries;
+	char toImport[256];
+	C_String importResult;
+	math::float3 changeGeometryPos;
 };
 
 #endif

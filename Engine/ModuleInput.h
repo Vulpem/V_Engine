@@ -67,4 +67,7 @@ private:
 	int mouse_x_motion;
 	int mouse_y_motion;
 	//int mouse_z_motion;
+public:
+	char dropped_file[1024];
+	mutable bool file_was_dropped;
 };

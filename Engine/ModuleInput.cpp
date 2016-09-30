@@ -39,6 +39,9 @@ bool ModuleInput::Init()
 		ret = false;
 	}
 
+	dropped_file[0] = '\0';
+	file_was_dropped = false;
+
 	return ret;
 }
 
@@ -46,6 +49,8 @@ bool ModuleInput::Init()
 update_status ModuleInput::PreUpdate(float dt)
 {
 	SDL_PumpEvents();
+
+	file_was_dropped = false;
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	
@@ -112,6 +117,12 @@ update_status ModuleInput::PreUpdate(float dt)
 			mouse_x_motion = e.motion.xrel / SCREEN_SIZE;
 			mouse_y_motion = e.motion.yrel / SCREEN_SIZE;
 			break;
+
+			case SDL_DROPFILE:
+				strcpy_s(dropped_file, e.drop.file);
+				SDL_free(e.drop.file);
+				file_was_dropped = true;
+				break;
 
 			case SDL_QUIT:
 			quit = true;

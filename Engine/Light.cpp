@@ -24,7 +24,7 @@ void Light::Render()
 {
 	if(on)
 	{
-		float pos[] = { position.x, position.y, position.z, tmp };// 1.0f};
+		float pos[] = { position.x, position.y, position.z, 1.0f};
 		glLightfv(ref, GL_POSITION, pos);
 	}
 }
