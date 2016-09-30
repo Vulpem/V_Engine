@@ -59,12 +59,15 @@ public:
 	void Draw();
 
 	void SetPos(float x, float y, float z);
+	void ResetPos();
 	math::float3 GetPos();
 
 	void SetRot(float x, float y, float z);
+	void ResetRot();
 	math::float3 GetRot();
 
 	void SetScale(float x, float y, float z);
+	void ResetScale();
 	math::float3 GetScale();
 
 };

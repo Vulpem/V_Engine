@@ -43,6 +43,7 @@ Node::~Node()
 void Node::Draw()
 {
 	glPushMatrix();
+
 	glMultMatrixf(transform.ptr());
 
 	if (childs.empty() == false)
@@ -75,6 +76,11 @@ void Node::SetPos(float x, float y, float z)
 	transform[3][2] = z;
 }
 
+void Node::ResetPos()
+{
+	SetPos(0, 0, 0);
+}
+
 math::float3 Node::GetPos()
 {
 	math::float3 ret;
@@ -86,13 +92,24 @@ math::float3 Node::GetPos()
 
 void Node::SetRot(float x, float y, float z)
 {
-	math::float3 scale = GetScale();
+	//math::float3 scale = GetScale();
 	x *= DEGTORAD;
 	y *= DEGTORAD;
 	z *= DEGTORAD;
+	if (x == -0) { x = 0; }
+	if (y == -0) { y = 0; }
+	if (z == -0) { z = 0; }
+
+	//math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
+	//transform.Set3x3Part(tmp.Float3x3Part());
+	//SetScale(scale.x, scale.y, scale.z);
 	math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
-	transform.Set3x3Part(tmp.Float3x3Part());
-	SetScale(scale.x, scale.y, scale.z);
+	
+}
+
+void Node::ResetRot()
+{
+	SetRot(0, 0, 0);
 }
 
 math::float3 Node::GetRot()
@@ -117,6 +134,11 @@ void Node::SetScale(float x, float y, float z)
 		transform[1][1] *= y;
 		transform[2][2] *= z;
 	}
+}
+
+void Node::ResetScale()
+{
+	SetScale(1, 1, 1);
 }
 
 math::float3 Node::GetScale()
