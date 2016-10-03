@@ -28,9 +28,9 @@ public:
 	uint num_normals;
 	float* normals = nullptr;
 
-	uint id_colors = 0;
-	uint num_colors = 0;
-	float* colors = nullptr;
+	uint id_textureCoords = 0;
+	uint num_textureCoords = 0;
+	float* textureCoords = nullptr;
 
 
 	float r = 0.5f;

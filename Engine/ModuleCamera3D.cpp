@@ -4,6 +4,7 @@
 #include "Primitive.h"
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
+#include "ModuleImportGeometry.h"
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -33,6 +34,10 @@ bool ModuleCamera3D::Start()
 
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
+
+	ref = App->importGeometry->LoadFBX("FBX/Cube.fbx");
+	ref->SetScale(0.25f, 0.25f, 0.25f);
+
 	return ret;
 }
 
@@ -48,12 +53,9 @@ bool ModuleCamera3D::CleanUp()
 update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
-	if (renderReference)
+	if (renderReference || true)
 	{
-		P_Cube ref(0.25,0.25,0.25);
-		ref.color = Color(0.95, 0.1, 0.1, 1.0);
-		ref.SetPos(Reference.x, Reference.y, Reference.z);
-		ref.Render();
+		ref->SetPos(Reference.x, Reference.y, Reference.z);
 	}
 
 	bool updatePos = false;

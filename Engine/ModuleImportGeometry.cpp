@@ -156,12 +156,12 @@ void mesh::Draw()
 		glNormalPointer(GL_FLOAT, 0, NULL);
 	}
 
-	if (num_colors > 0)
+	if (num_textureCoords > 0)
 	{
-		glEnableClientState(GL_COLOR_ARRAY);
-		//Setting colors
-		glBindBuffer(GL_ARRAY_BUFFER, id_colors);
-		glColorPointer(4, GL_FLOAT, 0, NULL);
+		glEnableClientState(GL_TEXTURE_2D);
+		//Setting texture coords
+		glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
+		glTexCoordPointer(3, GL_FLOAT, 0, NULL);
 	}
 
 	//Setting index
@@ -172,6 +172,7 @@ void mesh::Draw()
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_2D);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
@@ -381,17 +382,17 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_normals * 3, toPush->normals, GL_STATIC_DRAW);
 	}
 
-	//Importing colors
-	if (toLoad->GetNumColorChannels() > 0)
+	//Importing texture coords
+	if (toLoad->HasTextureCoords(0))
 	{
-		glGenBuffers(1, (GLuint*) &(toPush->id_colors));
-		toPush->num_colors = toPush->num_vertices;
+		glGenBuffers(1, (GLuint*) &(toPush->id_textureCoords));
+		toPush->num_textureCoords = toPush->num_vertices;
 
-		toPush->colors = new float[toPush->num_colors * 4];
-		memcpy(toPush->colors, toLoad->mColors, sizeof(float) * toPush->num_colors * 4);
+		toPush->textureCoords = new float[toPush->num_textureCoords * 3];
+		memcpy(toPush->textureCoords, toLoad->mTextureCoords[0], sizeof(float) * toPush->num_textureCoords * 3);
 
-		glBindBuffer(GL_ARRAY_BUFFER, toPush->id_colors);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_colors * 4, toPush->colors, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, toPush->id_textureCoords);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_textureCoords * 3, toPush->textureCoords, GL_STATIC_DRAW);
 	}
 
 	//Importing index (3 per face)

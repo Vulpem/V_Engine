@@ -3,6 +3,8 @@
 #include "Globals.h"
 #include "glmath.h"
 
+class Node;
+
 class ModuleCamera3D : public Module
 {
 public:
@@ -24,6 +26,7 @@ public:
 private:
 
 	void CalculateViewMatrix();
+	Node* ref;
 
 public:
 	
