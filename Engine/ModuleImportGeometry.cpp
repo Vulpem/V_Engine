@@ -4,10 +4,13 @@
 #include "ModuleImportGeometry.h"
 
 #include "ModuleFileSystem.h"
+#include "ModuleInput.h"
 
 #include "OpenGL.h"
 
-#include "ModuleInput.h"
+#include "Devil\include\il.h"
+#include "Devil\include\ilu.h"
+#include "Devil\include\ilut.h"
 
 
 #include "Assimp\include\cimport.h"
@@ -16,6 +19,11 @@
 #include "Assimp\include\cfileio.h"
 
 #pragma comment(lib, "Assimp/libx86/assimp.lib")
+
+#pragma comment(lib, "Devil/libx86/DevIL.lib")
+#pragma comment(lib, "Devil/libx86/ILU.lib")
+#pragma comment(lib, "Devil/libx86/ILUT.lib")
+
 
 //------------------------- NODE --------------------------------------------------------------------------------
 
@@ -153,22 +161,29 @@ void mesh::Draw()
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
+	if (texture != 0)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture);
+	}
+	else
+	{
+		glBindTexture(GL_TEXTURE_2D, App->importGeometry->GetCheckerID());
+	}
+
+	if (num_textureCoords > 0)
+	{
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		//Setting texture coords
+		glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
+		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+	}
+
 	if (num_normals > 0)
 	{
 		glEnableClientState(GL_NORMAL_ARRAY);
 		//Setting Normals
 		glBindBuffer(GL_ARRAY_BUFFER, id_normals);
 		glNormalPointer(GL_FLOAT, 0, NULL);
-	}
-
-	if (num_textureCoords > 0)
-	{
-		//Setting texture coords
-		glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
-		glTexCoordPointer(3, GL_FLOAT, 0, NULL);
-
-		uint tmp = App->importGeometry->GetCheckerID();
-		glBindTexture(GL_TEXTURE_2D, App->importGeometry->GetCheckerID());
 	}
 
 	//Setting index
@@ -183,8 +198,7 @@ void mesh::Draw()
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
-	//glDisableClientState(GL_TEXTURE_2D);
-
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -212,6 +226,17 @@ bool ModuleImportGeometry::Init()
 	struct aiLogStream stream;
 	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
 	aiAttachLogStream(&stream);
+
+	ilInit();
+
+	ILuint devilError = ilGetError();
+
+	if (devilError != IL_NO_ERROR)
+	{
+		printf("Devil Error (ilInit: %s\n", iluErrorString(devilError));
+		exit(2);
+	}
+
 		
 	return ret;
 }
@@ -219,6 +244,9 @@ bool ModuleImportGeometry::Init()
 bool ModuleImportGeometry::Start()
 {
 	//Generating checker texture
+	ilutRenderer(ILUT_OPENGL);
+
+	int a = 0;
 	GLubyte checkImage[CHECKERS_HEIGHT][CHECKERS_WIDTH][4];
 	for (int i = 0; i < CHECKERS_HEIGHT; i++) {
 		for (int j = 0; j < CHECKERS_WIDTH; j++) {
@@ -233,11 +261,15 @@ bool ModuleImportGeometry::Start()
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &id_checkerTexture);
 	glBindTexture(GL_TEXTURE_2D, id_checkerTexture);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	return true;
 }
 
@@ -338,6 +370,39 @@ bool ModuleImportGeometry::DeleteRootNode(Node* toErase)
 	return false;
 }
 
+uint ModuleImportGeometry::LoadTexture(char* path)
+{
+	if (*path == '\0')
+	{
+		return 0;
+	}
+
+	char image[256] = "FBX/";
+	strcat(image, path);
+
+	//C_String image = "FBX/";
+	//image += path;
+
+	uint ret = ilutGLLoadImage(image);
+	
+
+	if (ret != 0)
+	{
+		id_textures.push_back(ret);
+		return ret;
+	}
+	else
+	{
+		LOG("Error loading texture %s", path);
+		for(ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
+		{
+			LOG("devIL got error %d", error);
+		//	LOG("%s", iluErrorString(error));
+		}
+		return 0;
+	}
+}
+
 Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent)
 {
 	Node* ret = new Node();
@@ -377,7 +442,7 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 	//Loading meshes
 	for (int n = 0; n < toLoad->mNumMeshes; n++)
 	{   
-		mesh* tmp = LoadMesh(scene->mMeshes[toLoad->mMeshes[n]]);
+		mesh* tmp = LoadMesh(scene->mMeshes[toLoad->mMeshes[n]], scene);
 		ret->meshes.push_back(tmp);
 	}
 
@@ -390,7 +455,7 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 	return ret;
 }
 
-mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
+mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 {
 	mesh* toPush = new mesh;
 
@@ -427,12 +492,23 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad)
 		glGenBuffers(1, (GLuint*) &(toPush->id_textureCoords));
 		toPush->num_textureCoords = toPush->num_vertices;
 
-		toPush->textureCoords = new float[toPush->num_textureCoords * 3];
-		memcpy(toPush->textureCoords, toLoad->mTextureCoords[0], sizeof(float) * toPush->num_textureCoords * 3);
+		toPush->textureCoords = new float[toPush->num_textureCoords * 2];
+		
+		aiVector3D* tmp = toLoad->mTextureCoords[0];
+		for (int n = 0; n < toPush->num_textureCoords * 2; n+=2)
+		{
+			toPush->textureCoords[n] = tmp->x;
+			toPush->textureCoords[n+1] = tmp->y;
+			tmp++;
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, toPush->id_textureCoords);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_textureCoords * 3, toPush->textureCoords, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * toPush->num_textureCoords * 2, toPush->textureCoords, GL_STATIC_DRAW);
 	}
+	aiString path;
+	scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
+
+	toPush->texture = App->importGeometry->LoadTexture(path.data);
 
 	//Importing index (3 per face)
 	if (toLoad->HasFaces())

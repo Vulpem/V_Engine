@@ -43,6 +43,9 @@
     <Filter Include="Sources\Scenes">
       <UniqueIdentifier>{cd86892a-2f6a-49fa-a8d8-50beaddca8bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\devIL">
+      <UniqueIdentifier>{b8694ff7-7cc8-4cdd-8254-75d0b4ec3916}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -311,6 +314,30 @@
     </ClInclude>
     <ClInclude Include="C_String.h">
       <Filter>Sources\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\config.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\devil_internal_exports.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\il.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\il_wrap.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilu.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilu_region.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilut.h">
+      <Filter>Sources\devIL</Filter>
+    </ClInclude>
+    <ClInclude Include="Devil\include\ilut_config.h">
+      <Filter>Sources\devIL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

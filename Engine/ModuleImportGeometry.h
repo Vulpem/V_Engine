@@ -7,8 +7,8 @@
 #include "Math.h"
 #include <vector>
 
-#define CHECKERS_HEIGHT 10
-#define CHECKERS_WIDTH 10
+#define CHECKERS_HEIGHT 128
+#define CHECKERS_WIDTH 128
 
 struct aiMesh;
 struct aiNode;
@@ -40,6 +40,8 @@ public:
 	float g = 0.5f;
 	float b = 0.5f;
 	float a = 1.0f;
+
+	uint texture = 0;
 
 	bool wires = false;
 
@@ -96,15 +98,17 @@ public:
 	Node* LoadFBX(char* path);
 	bool DeleteRootNode(Node* toErase);
 
+	uint LoadTexture(char* path);
 	uint GetCheckerID() { return id_checkerTexture; }
 
 private:
 	Node* LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent = NULL);
-	mesh* LoadMesh(const aiMesh* toLoad);	
+	mesh* LoadMesh(const aiMesh* toLoad, const aiScene* scene);
 
 	void CleanName(char* toClean);
 public:
 	uint id_checkerTexture;
+	std::vector<uint> id_textures;
 
 public:
 
