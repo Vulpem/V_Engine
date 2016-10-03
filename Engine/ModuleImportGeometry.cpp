@@ -44,16 +44,8 @@ void Node::Draw()
 {
 	glPushMatrix();
 
-	math::float4x4 transform = math::float4x4::identity;
-	
-	transform = math::float4x4::FromQuat(rotation);
-
-	transform[0][0] *= scale.x;
-	transform[1][1] *= scale.y;
-	transform[2][2] *= scale.z;
-	transform[3][0] = position.x;
-	transform[3][1] = position.y;
-	transform[3][2] = position.z;
+	math::float4x4 transform = math::float4x4::FromTRS(position, rotation, scale);
+	transform.Transpose();
 
 	glMultMatrixf(transform.ptr());
 

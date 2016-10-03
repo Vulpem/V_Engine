@@ -288,7 +288,7 @@ update_status ModuleUI::PreUpdate(float dt)
 			{
 				selectedGeometry->SetRot(selectedEuler[0], selectedEuler[1], selectedEuler[2]);
 			}
-			if (ImGui::DragFloat3("Scale", selectedScale, 1.0f, 0.1f))
+			if (ImGui::DragFloat3("Scale", selectedScale, 0.01f, 0.1f))
 			{
 				selectedGeometry->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
 			}
