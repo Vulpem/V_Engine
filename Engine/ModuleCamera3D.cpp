@@ -137,6 +137,8 @@ void ModuleCamera3D::LookAt( const vec3 &Spot)
 	X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), Z));
 	Y = cross(Z, X);
 
+	Position = Reference + Z * distanceToRef;
+
 	CalculateViewMatrix();
 }
 
@@ -167,4 +169,11 @@ void ModuleCamera3D::CalculateViewMatrix()
 {
 	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
 	ViewMatrixInverse = inverse(ViewMatrix);
+}
+
+void ModuleCamera3D::UpdateView()
+{
+	Position = Reference + Z * distanceToRef;
+
+	CalculateViewMatrix();
 }

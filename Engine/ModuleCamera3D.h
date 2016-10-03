@@ -19,6 +19,8 @@ public:
 	void SetPos(const vec3 &Pos);
 	float* GetViewMatrix();
 
+	void UpdateView();
+
 private:
 
 	void CalculateViewMatrix();

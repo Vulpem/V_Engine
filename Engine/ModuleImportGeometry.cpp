@@ -44,6 +44,17 @@ void Node::Draw()
 {
 	glPushMatrix();
 
+	math::float4x4 transform = math::float4x4::identity;
+	
+	transform = math::float4x4::FromQuat(rotation);
+
+	transform[0][0] *= scale.x;
+	transform[1][1] *= scale.y;
+	transform[2][2] *= scale.z;
+	transform[3][0] = position.x;
+	transform[3][1] = position.y;
+	transform[3][2] = position.z;
+
 	glMultMatrixf(transform.ptr());
 
 	if (childs.empty() == false)
@@ -71,9 +82,9 @@ void Node::Draw()
 
 void Node::SetPos(float x, float y, float z)
 {
-	transform[3][0] = x;
-	transform[3][1] = y;
-	transform[3][2] = z;
+	position.x = x;
+	position.y = y;
+	position.z = z;
 }
 
 void Node::ResetPos()
@@ -83,16 +94,11 @@ void Node::ResetPos()
 
 math::float3 Node::GetPos()
 {
-	math::float3 ret;
-	ret.x = transform[3][0];
-	ret.y = transform[3][1];
-	ret.z = transform[3][2];
-	return ret;
+	return position;
 }
 
 void Node::SetRot(float x, float y, float z)
 {
-	math::float3 scale = GetScale();
 	x *= DEGTORAD;
 	y *= DEGTORAD;
 	z *= DEGTORAD;
@@ -100,9 +106,7 @@ void Node::SetRot(float x, float y, float z)
 	if (y == -0) { y = 0; }
 	if (z == -0) { z = 0; }
 	
-	math::float4x4 tmp = transform.FromEulerXYZ(x, y, z);
-	transform.Set3x3Part(tmp.Float3x3Part());
-	SetScale(scale.x, scale.y, scale.z);
+	rotation = math::Quat::FromEulerXYZ(x, y, z);
 }
 
 void Node::ResetRot()
@@ -112,7 +116,7 @@ void Node::ResetRot()
 
 math::float3 Node::GetRot()
 {
-	math::float3 ret = transform.ToEulerXYZ();
+	math::float3 ret = rotation.ToEulerXYZ();
 	ret.x *= RADTODEG;
 	ret.y *= RADTODEG;
 	ret.z *= RADTODEG;
@@ -123,10 +127,7 @@ void Node::SetScale(float x, float y, float z)
 {
 	if (x != 0 && y != 0 && z != 0)
 	{
-		transform.RemoveScale();
-		math::ScaleOp op = transform.Scale(math::float3(x, y, z));
-		math::float4x4 tmp = transform * op;
-		transform.Set(tmp.ptr());
+		scale.Set(x, y, z);
 	}
 }
 
@@ -137,8 +138,7 @@ void Node::ResetScale()
 
 math::float3 Node::GetScale()
 {
-	math::float3 tmp = transform.GetScale();
-	return transform.GetScale();
+	return scale;
 }
 
 void mesh::Draw()
@@ -322,27 +322,24 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 	ret->parent = parent;
 
 	//Setting transform
-	ret->transform.SetIdentity();
+	aiQuaternion rot;
+	aiVector3D scal;
+	aiVector3D pos;
 
-	ret->transform[0][0] = toLoad->mTransformation.a1;
-	ret->transform[0][1] = toLoad->mTransformation.b1;
-	ret->transform[0][2] = toLoad->mTransformation.c1;
-	ret->transform[0][3] = toLoad->mTransformation.d1;
+	toLoad->mTransformation.Decompose(scal, rot, pos);
 
-	ret->transform[1][0] = toLoad->mTransformation.a2;
-	ret->transform[1][1] = toLoad->mTransformation.b2;
-	ret->transform[1][2] = toLoad->mTransformation.c2;
-	ret->transform[1][3] = toLoad->mTransformation.d2;
+	ret->scale.x = scal.x;
+	ret->scale.y = scal.y;
+	ret->scale.z = scal.z;
 
-	ret->transform[2][0] = toLoad->mTransformation.a3;
-	ret->transform[2][1] = toLoad->mTransformation.b3;
-	ret->transform[2][2] = toLoad->mTransformation.c3;
-	ret->transform[2][3] = toLoad->mTransformation.d3;
+	ret->position.x = pos.x;
+	ret->position.y = pos.y;
+	ret->position.z = pos.z;
 
-	ret->transform[3][0] = toLoad->mTransformation.a4;
-	ret->transform[3][1] = toLoad->mTransformation.b4;
-	ret->transform[3][2] = toLoad->mTransformation.c4;
-	ret->transform[3][3] = toLoad->mTransformation.d4;
+	ret->rotation.x = rot.x;
+	ret->rotation.y = rot.y;
+	ret->rotation.z = rot.z;
+	ret->rotation.w = rot.w;
 
 
 	//Loading meshes

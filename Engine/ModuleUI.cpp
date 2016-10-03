@@ -140,20 +140,22 @@ update_status ModuleUI::PreUpdate(float dt)
 			if (ImGui::CollapsingHeader("Camera"))
 			{
 				ImGui::Text("Position");
-				ImGui::InputFloat("X##cam", &App->camera->Position.x);
-				ImGui::InputFloat("Y##cam", &App->camera->Position.y);
-				ImGui::InputFloat("Z##cam", &App->camera->Position.z);
+				ImGui::DragFloat("X##cam", &App->camera->Position.x);
+				ImGui::DragFloat("Y##cam", &App->camera->Position.y);
+				ImGui::DragFloat("Z##cam", &App->camera->Position.z);
 				ImGui::NewLine();
 				ImGui::Text("Reference");
-				if (ImGui::InputFloat3("##CamReference", camRef, 2))
+				if (ImGui::DragFloat3("##CamReference", camRef, 1.0f))
 				{
 					App->camera->LookAt(vec3(camRef[0], camRef[1], camRef[2]));
 				}
 				ImGui::NewLine();
 				ImGui::Text("Distance to reference");
-				ImGui::InputFloat("##Distance to reference", &App->camera->distanceToRef);
-
-				
+				if (ImGui::DragFloat("##Distance to reference", &App->camera->distanceToRef, 1.0f, 1.0f))
+				{
+					App->camera->UpdateView();
+				}
+								
 			}
 
 			if (ImGui::CollapsingHeader("Render"))
@@ -278,15 +280,15 @@ update_status ModuleUI::PreUpdate(float dt)
 		if (selectedGeometry)
 		{
 			ImGui::Text(selectedGeometry->name.GetString());
-			if (ImGui::InputFloat3("Position", selectedPos, 2))
+			if (ImGui::DragFloat3("Position", selectedPos, 1.0f))
 			{
 				selectedGeometry->SetPos(selectedPos[0], selectedPos[1], selectedPos[2]);
 			}
-			if (ImGui::InputFloat3("Rotation", selectedEuler, 2))
+			if (ImGui::DragFloat3("Rotation", selectedEuler, 1.0f, 0.0f, 360.0f))
 			{
 				selectedGeometry->SetRot(selectedEuler[0], selectedEuler[1], selectedEuler[2]);
 			}
-			if (ImGui::InputFloat3("Scale", selectedScale, 2))
+			if (ImGui::DragFloat3("Scale", selectedScale, 1.0f, 0.1f))
 			{
 				selectedGeometry->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
 			}

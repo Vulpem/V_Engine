@@ -52,7 +52,9 @@ public:
 	std::vector<Node*> childs;
 	Node* parent = nullptr;
 
-	math::float4x4 transform = math::float4x4::identity;
+	math::Quat rotation = math::Quat::identity;
+	math::float3 position = math::float3::zero;
+	math::float3 scale = math::float3::zero;
 
 	~Node();
 
