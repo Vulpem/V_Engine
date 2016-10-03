@@ -17,6 +17,8 @@
 
 #pragma comment(lib, "Assimp/libx86/assimp.lib")
 
+//------------------------- NODE --------------------------------------------------------------------------------
+
 Node::~Node()
 {
 	if (childs.empty() == false)
@@ -133,6 +135,9 @@ math::float3 Node::GetScale()
 	return scale;
 }
 
+
+//------------------------- MESH --------------------------------------------------------------------------------
+
 void mesh::Draw()
 {
 	if (wires)
@@ -158,24 +163,35 @@ void mesh::Draw()
 
 	if (num_textureCoords > 0)
 	{
-		glEnableClientState(GL_TEXTURE_2D);
 		//Setting texture coords
 		glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
 		glTexCoordPointer(3, GL_FLOAT, 0, NULL);
+
+		uint tmp = App->importGeometry->GetCheckerID();
+		glBindTexture(GL_TEXTURE_2D, App->importGeometry->GetCheckerID());
 	}
 
 	//Setting index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_indices);
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, NULL);
 
+
 	//Cleaning
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_2D);
+	//glDisableClientState(GL_TEXTURE_2D);
+
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
+
+
+//------------------------- MODULE --------------------------------------------------------------------------------
 
 ModuleImportGeometry::ModuleImportGeometry(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -202,7 +218,26 @@ bool ModuleImportGeometry::Init()
 
 bool ModuleImportGeometry::Start()
 {
-	
+	//Generating checker texture
+	GLubyte checkImage[CHECKERS_HEIGHT][CHECKERS_WIDTH][4];
+	for (int i = 0; i < CHECKERS_HEIGHT; i++) {
+		for (int j = 0; j < CHECKERS_WIDTH; j++) {
+			int c = ((((i & 0x8) == 0) ^ (((j & 0x8)) == 0))) * 255;
+			checkImage[i][j][0] = (GLubyte)c;
+			checkImage[i][j][1] = (GLubyte)c;
+			checkImage[i][j][2] = (GLubyte)c;
+			checkImage[i][j][3] = (GLubyte)255;
+		}
+	}
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glGenTextures(1, &id_checkerTexture);
+	glBindTexture(GL_TEXTURE_2D, id_checkerTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
 	return true;
 }
 
@@ -218,7 +253,11 @@ update_status ModuleImportGeometry::Update(float dt)
 {
 	if (App->input->file_was_dropped)
 	{
-		LoadFBX(App->input->dropped_file);
+		C_String format = App->input->DroppedFileFormat();
+		if ( format == ".fbx" || format == ".FBX")
+		{
+			LoadFBX(App->input->dropped_file);
+		}
 	}
 
 	std::vector<Node*>::iterator it = geometryNodes.begin();

@@ -1,11 +1,14 @@
-#ifndef __MODULE_GUI__
-#define __MODULE_GUI__
+#ifndef __MODULE_GEOMETRY__
+#define __MODULE_GEOMETRY__
 
 #include "Module.h"
 #include "Globals.h"
 
 #include "Math.h"
 #include <vector>
+
+#define CHECKERS_HEIGHT 10
+#define CHECKERS_WIDTH 10
 
 struct aiMesh;
 struct aiNode;
@@ -93,11 +96,15 @@ public:
 	Node* LoadFBX(char* path);
 	bool DeleteRootNode(Node* toErase);
 
+	uint GetCheckerID() { return id_checkerTexture; }
+
 private:
 	Node* LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent = NULL);
 	mesh* LoadMesh(const aiMesh* toLoad);	
 
 	void CleanName(char* toClean);
+public:
+	uint id_checkerTexture;
 
 public:
 

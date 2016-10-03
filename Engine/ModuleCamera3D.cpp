@@ -35,7 +35,7 @@ bool ModuleCamera3D::Start()
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
-	ref = App->importGeometry->LoadFBX("FBX/Cube.fbx");
+	ref = App->importGeometry->LoadFBX("FBX/Sphere.fbx");
 	ref->SetScale(0.25f, 0.25f, 0.25f);
 
 	return ret;

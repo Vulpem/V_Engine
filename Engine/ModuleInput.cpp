@@ -151,3 +151,22 @@ bool ModuleInput::CleanUp()
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
 }
+
+C_String ModuleInput::DroppedFileFormat()
+{
+	if (file_was_dropped)
+	{
+		char* tmp = dropped_file;
+		while (*tmp != '\0')
+		{
+			tmp++;
+		}
+		while (*tmp != '.')
+		{
+			tmp--;
+		}
+		return C_String(tmp);
+
+	}
+	return C_String("Error_Reading_format");
+}
