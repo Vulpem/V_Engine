@@ -210,6 +210,30 @@ math::float3 Node::GetScale()
 
 
 //------------------------- MESH --------------------------------------------------------------------------------
+mesh::~mesh()
+{
+	if (indices) { delete[] indices; }
+	if (vertices) { delete[] vertices; }
+	if (textureCoords) { delete[] textureCoords; }
+	if (normals) { delete[] normals; }
+
+	if (id_indices != 0)
+	{
+		glDeleteBuffers(1, &id_indices);
+	}
+	if (id_normals != 0)
+	{
+		glDeleteBuffers(1, &id_normals);
+	}
+	if (id_textureCoords != 0)
+	{
+		glDeleteBuffers(1, &id_textureCoords);
+	}
+	if (id_vertices != 0)
+	{
+		glDeleteBuffers(1, &id_vertices);
+	}
+}
 
 void mesh::Draw()
 {

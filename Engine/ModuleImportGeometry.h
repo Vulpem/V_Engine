@@ -19,6 +19,8 @@ struct aiScene;
 class mesh
 {
 public:
+	~mesh();
+
 	char name[NAME_MAX_LEN];
 
 	uint id_vertices = 0;
