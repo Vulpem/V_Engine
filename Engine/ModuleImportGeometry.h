@@ -104,7 +104,7 @@ public:
 	bool CleanUp();
 
 	Node* LoadFBX(char* path);
-	bool DeleteRootNode(Node* toErase);
+	bool DeleteNode(Node* toErase);
 
 	uint LoadTexture(char* path);
 	uint GetCheckerID() { return id_checkerTexture; }

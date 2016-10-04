@@ -29,23 +29,56 @@
 
 Node::~Node()
 {
+	
+	if (parent != nullptr)
+	{
+		std::vector<Node*>::iterator it = parent->childs.begin();
+		while ((*it) != this)
+		{
+			it++;
+		}
+		parent->childs.erase(it);
+	}
+	else
+	{
+		std::vector<Node*>::iterator it = App->importGeometry->geometryNodes.begin();
+		while (it != App->importGeometry->geometryNodes.end())
+		{
+			if ((*it) == this)
+			{
+				App->importGeometry->geometryNodes.erase(it);
+				break;
+			}
+			it++;
+		}
+	}
+
 	if (childs.empty() == false)
 	{
 		std::vector<Node*>::iterator iterator = childs.begin();
-		while (iterator != childs.end())
+		while (childs.size() > 0 && iterator != childs.end())
 		{
 			delete (*iterator);
-			iterator++;
+			//Erasing a Node will already remove it from the child list in its destructor, so we don't have to empty the list here, it will be done automatically
+			iterator = childs.begin();
 		}
 	}
 
 	if (meshes.empty() == false)
 	{
 		std::vector<mesh*>::iterator iterator = meshes.begin();
-		while (iterator != meshes.end())
+		while (meshes.size() > 0 && iterator != meshes.end())
 		{
 			delete (*iterator);
-			iterator++;
+			if (meshes.size() > 1)
+			{
+				iterator = meshes.erase(iterator);
+			}
+			else
+			{
+				meshes.erase(iterator);
+			}
+			
 		}
 	}
 }
@@ -365,10 +398,13 @@ bool ModuleImportGeometry::CleanUp()
 	aiDetachAllLogStreams();
 
 	std::vector<Node*>::iterator it = geometryNodes.begin();
-	while (it != geometryNodes.end())
+	while (geometryNodes.size() > 0)
 	{
-		delete (*it);
-		it++;
+		Node* tmp = *it;
+		it = geometryNodes.erase(it);
+		delete (tmp);
+		
+		
 	}
 
 	return true;
@@ -405,20 +441,22 @@ Node* ModuleImportGeometry::LoadFBX(char* path)
 	return ret;
 }
 
-bool ModuleImportGeometry::DeleteRootNode(Node* toErase)
+bool ModuleImportGeometry::DeleteNode(Node* toErase)
 {
 	std::vector<Node*>::iterator it = geometryNodes.begin();
 	while (it != geometryNodes.end())
 	{
 		if ((*it) == toErase)
 		{
-			delete(*it);
 			geometryNodes.erase(it);
-			return true;
+			break;
 		}
 		it++;
 	}
-	return false;
+
+	delete toErase;
+
+	return true;
 }
 
 uint ModuleImportGeometry::LoadTexture(char* path)

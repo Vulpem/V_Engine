@@ -307,8 +307,15 @@ update_status ModuleUI::PreUpdate(float dt)
 			{
 				selectedGeometry->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
 			}
+			ImGui::NewLine();
+			ImGui::Text("Danger Zone:");
+			if (ImGui::Button("Delete"))
+			{
+				App->importGeometry->DeleteNode(selectedGeometry);
+				selectedGeometry = NULL;
+			}
 
-					}
+		}
 		ImGui::End();
 	}
 #pragma endregion
@@ -385,24 +392,30 @@ void ModuleUI::SelectNode(Node* node)
 	{
 		selectedGeometry->Unselect();
 	}
-	node->Select();
+	if (node)
+	{
+		node->Select();
+	}
 	selectedGeometry = node;
-	math::float3 pos, rot, scale;
+	if (selectedGeometry)
+	{
+		math::float3 pos, rot, scale;
 
-	pos = node->GetPos();
-	selectedPos[0] = pos.x;
-	selectedPos[1] = pos.y;
-	selectedPos[2] = pos.z;
+		pos = node->GetPos();
+		selectedPos[0] = pos.x;
+		selectedPos[1] = pos.y;
+		selectedPos[2] = pos.z;
 
-	rot = node->GetRot();
-	selectedEuler[0] = rot.x;
-	selectedEuler[1] = rot.y;
-	selectedEuler[2] = rot.z;
+		rot = node->GetRot();
+		selectedEuler[0] = rot.x;
+		selectedEuler[1] = rot.y;
+		selectedEuler[2] = rot.z;
 
-	scale = node->GetScale();
-	selectedScale[0] = scale.x;
-	selectedScale[1] = scale.y;
-	selectedScale[2] = scale.z;
+		scale = node->GetScale();
+		selectedScale[0] = scale.x;
+		selectedScale[1] = scale.y;
+		selectedScale[2] = scale.z;
 
-	App->camera->LookAt(vec3(pos.x, pos.y, pos.z));
+		App->camera->LookAt(vec3(pos.x, pos.y, pos.z));
+	}
 }
