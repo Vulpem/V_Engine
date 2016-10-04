@@ -10,6 +10,8 @@
 #define CHECKERS_HEIGHT 128
 #define CHECKERS_WIDTH 128
 
+#define NAME_MAX_LEN 1024
+
 struct aiMesh;
 struct aiNode;
 struct aiScene;
@@ -17,7 +19,7 @@ struct aiScene;
 class mesh
 {
 public:
-	C_String name;
+	char name[NAME_MAX_LEN];
 
 	uint id_vertices = 0;
 	uint num_vertices = 0;
@@ -51,7 +53,7 @@ public:
 class Node
 {
 public:
-	C_String name;
+	char name[NAME_MAX_LEN];
 
 	std::vector<mesh*> meshes;
 	std::vector<Node*> childs;

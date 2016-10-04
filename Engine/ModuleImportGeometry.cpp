@@ -413,7 +413,7 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 
 	CleanName(tmpName);
 
-	ret->name = tmpName;
+	strcpy(ret->name, tmpName);
 
 	//Setting parent
 	ret->parent = parent;
@@ -461,7 +461,8 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 
 	char tmpName[MAXLEN];
 	memcpy(tmpName, toLoad->mName.data, toLoad->mName.length + 1);
-	toPush->name = tmpName;
+	CleanName(tmpName);
+	strcpy(toPush->name, tmpName);
 
 	glGenBuffers(1, (GLuint*) &(toPush->id_vertices));
 	glGenBuffers(1, (GLuint*) &(toPush->id_indices));
@@ -542,13 +543,19 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 void ModuleImportGeometry::CleanName(char* toClean)
 {
 	char* searcher = toClean;
+	int n = 0;
 	while (*searcher != '\0')
 	{
-		if (*searcher == '$')
+		if (*searcher == '_')
+		{
+			*searcher = ' ';
+		}
+		if (*searcher == '$' || n == NAME_MAX_LEN)
 		{
 			*searcher = '\0';
 			break;
 		}
+		n++;
 		searcher++;
 	}
 }

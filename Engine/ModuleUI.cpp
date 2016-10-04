@@ -279,7 +279,7 @@ update_status ModuleUI::PreUpdate(float dt)
 		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
 		if (selectedGeometry)
 		{
-			ImGui::Text(selectedGeometry->name.GetString());
+			ImGui::InputText("Name", selectedGeometry->name, NAME_MAX_LEN);
 			if (ImGui::DragFloat3("Position", selectedPos, 1.0f))
 			{
 				selectedGeometry->SetPos(selectedPos[0], selectedPos[1], selectedPos[2]);
@@ -347,7 +347,7 @@ void ModuleUI::ClearConsole()
 
 void ModuleUI::SceneTreeNodes(Node* node)
 {
-	if (ImGui::TreeNode(node->name.GetString()))
+	if (ImGui::TreeNode(node->name))
 	{
 		if (ImGui::IsItemClicked())
 		{
