@@ -65,6 +65,9 @@ update_status ModuleUI::PreUpdate(float dt)
 
 	bool tmp = true;
 
+	int screenW, screenH;
+	App->window->GetWindowSize(&screenW, &screenH);
+
 #pragma region MenuBar
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -118,8 +121,10 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma region Editor
 	if (IsOpenEditor)
 	{
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 300));
+		ImGui::SetNextWindowSize(ImVec2(330, screenH -300));
+
 		ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0);
-		
 
 			if (ImGui::CollapsingHeader("Application"))
 			{
@@ -214,6 +219,9 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma region Console
 	if (IsOpenConsole)
 	{
+		ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
+		ImGui::SetNextWindowSize(ImVec2(screenW - 330, 200));
+
 		ImGui::Begin("Console", &tmp, ImVec2(500, 300), 1.0f, 0);
 
 		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
@@ -234,6 +242,9 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma region outliner
 	if (IsOpenOutliner)
 	{
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
+		ImGui::SetNextWindowSize(ImVec2(300, screenH - 220));
+
 		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 1.0f, 0);
 		if (ImGui::CollapsingHeader("Load Geometry"))
 		{
@@ -278,6 +289,8 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma region Attributes window
 	if (IsOpenAttributes)
 	{
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
+		ImGui::SetNextWindowSize(ImVec2(330, 280));
 		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
 		if (selectedGeometry)
 		{
