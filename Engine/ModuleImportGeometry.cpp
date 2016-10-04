@@ -82,6 +82,38 @@ void Node::Draw()
 	glPopMatrix();
 }
 
+void Node::Select()
+{
+	std::vector<mesh*>::iterator it = meshes.begin();
+	while (it != meshes.end())
+	{
+		(*it)->selected = true;
+		it++;
+	}
+	std::vector<Node*>::iterator childIt = childs.begin();
+	while (childIt != childs.end())
+	{
+		(*childIt)->Select();
+		childIt++;
+	}
+}
+
+void Node::Unselect()
+{
+	std::vector<mesh*>::iterator it = meshes.begin();
+	while (it != meshes.end())
+	{
+		(*it)->selected = false;
+		it++;
+	}
+	std::vector<Node*>::iterator childIt = childs.begin();
+	while (childIt != childs.end())
+	{
+		(*childIt)->Unselect();
+		childIt++;
+	}
+}
+
 void Node::SetPos(float x, float y, float z)
 {
 	position.x = x;
@@ -148,11 +180,18 @@ math::float3 Node::GetScale()
 
 void mesh::Draw()
 {
-	if (wires)
+	if (wires == false /*|| selected*/)
 	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		RealRender();
+	}	
+	if (wires == true || selected)
+	{
+		RealRender(true);
 	}
+}
 
+void mesh::RealRender(bool wired)
+{
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glColor4f(r, g, b, a);
@@ -161,29 +200,42 @@ void mesh::Draw()
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-	if (texture != 0)
+	if (wired)
 	{
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glDisable(GL_LIGHTING);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glLineWidth(4);
+		glColor4f(0, 1, 1, 1);
 	}
 	else
 	{
-		glBindTexture(GL_TEXTURE_2D, App->importGeometry->GetCheckerID());
-	}
+		glEnable(GL_LIGHTING);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	if (num_textureCoords > 0)
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		//Setting texture coords
-		glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
-		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-	}
+		if (texture != 0)
+		{
+			glBindTexture(GL_TEXTURE_2D, texture);
+		}
+		else
+		{
+			glBindTexture(GL_TEXTURE_2D, App->importGeometry->GetCheckerID());
+		}
 
-	if (num_normals > 0)
-	{
-		glEnableClientState(GL_NORMAL_ARRAY);
-		//Setting Normals
-		glBindBuffer(GL_ARRAY_BUFFER, id_normals);
-		glNormalPointer(GL_FLOAT, 0, NULL);
+		if (num_textureCoords > 0)
+		{
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			//Setting texture coords
+			glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
+			glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+		}
+
+		if (num_normals > 0)
+		{
+			glEnableClientState(GL_NORMAL_ARRAY);
+			//Setting Normals
+			glBindBuffer(GL_ARRAY_BUFFER, id_normals);
+			glNormalPointer(GL_FLOAT, 0, NULL);
+		}
 	}
 
 	//Setting index
@@ -199,9 +251,8 @@ void mesh::Draw()
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_LIGHTING);
 }
 
 

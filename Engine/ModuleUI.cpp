@@ -49,6 +49,8 @@ bool ModuleUI::Start()
 
 	strcpy(toImport, "FBX/-.fbx");
 
+	selectedGeometry = NULL;
+
 	return true;
 }
 
@@ -182,11 +184,11 @@ update_status ModuleUI::PreUpdate(float dt)
 							{
 								char tmp[46];
 								sprintf(tmp, "X##light_%i", nLight);
-								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.x);
+								ImGui::DragFloat(tmp, &App->renderer3D->lights[nLight].position.x, 1.0f);
 								sprintf(tmp, "Y##light_%i", nLight);
-								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.y);
+								ImGui::DragFloat(tmp, &App->renderer3D->lights[nLight].position.y, 1.0f);
 								sprintf(tmp, "Z##light_%i", nLight);
-								ImGui::InputFloat(tmp, &App->renderer3D->lights[nLight].position.z);
+								ImGui::DragFloat(tmp, &App->renderer3D->lights[nLight].position.z, 1.0f);
 								ImGui::TreePop();
 							}
 						}
@@ -366,6 +368,11 @@ void ModuleUI::SceneTreeNodes(Node* node)
 
 void ModuleUI::SelectNode(Node* node)
 {
+	if (selectedGeometry)
+	{
+		selectedGeometry->Unselect();
+	}
+	node->Select();
 	selectedGeometry = node;
 	math::float3 pos, rot, scale;
 

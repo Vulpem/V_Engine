@@ -46,8 +46,11 @@ public:
 	uint texture = 0;
 
 	bool wires = false;
+	bool selected = false;
 
 	void Draw();
+private:
+	void RealRender(bool wired = false);
 };
 
 class Node
@@ -66,6 +69,9 @@ public:
 	~Node();
 
 	void Draw();
+
+	void Select();
+	void Unselect();
 
 	void SetPos(float x, float y, float z);
 	void ResetPos();
