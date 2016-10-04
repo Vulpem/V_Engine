@@ -22,6 +22,7 @@ void Primitive::Render() const
 
 	if(axis == true)
 	{
+		glDisable(GL_LIGHTING);
 		// Draw Axis Grid
 		glLineWidth(2.0f);
 
@@ -50,6 +51,7 @@ void Primitive::Render() const
 		glEnd();
 
 		glLineWidth(1.0f);
+		glEnable(GL_LIGHTING);
 	}
 
 	glColor3f(color.r, color.g, color.b);
@@ -285,11 +287,11 @@ P_Plane::P_Plane(float x, float y, float z, float d) : Primitive(), normal(x, y,
 
 void P_Plane::InnerRender() const
 {
-	glLineWidth(1.0f);
+	glLineWidth(0.7f);
 
 	glBegin(GL_LINES);
 
-	float d = 200.0f;
+	float d = 20.0f;
 
 	for(float i = -d; i <= d; i += 1.0f)
 	{
