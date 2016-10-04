@@ -256,8 +256,8 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::Text(importResult.GetString());
 		}
 
-		if (ImGui::TreeNode("Scene"))
-		{
+		//if (ImGui::TreeNode("Scene"))
+		//{
 			std::vector<Node*>::iterator node = App->importGeometry->geometryNodes.begin();
 			while (node != App->importGeometry->geometryNodes.end())
 			{
@@ -269,8 +269,8 @@ update_status ModuleUI::PreUpdate(float dt)
 				}				
 				node++;
 			}
-			ImGui::TreePop();
-		}
+		//	ImGui::TreePop();
+		//}
 		ImGui::End();
 	}
 #pragma endregion
