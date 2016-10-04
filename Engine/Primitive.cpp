@@ -23,6 +23,7 @@ void Primitive::Render() const
 	if(axis == true)
 	{
 		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
 		// Draw Axis Grid
 		glLineWidth(2.0f);
 
@@ -51,6 +52,7 @@ void Primitive::Render() const
 		glEnd();
 
 		glLineWidth(1.0f);
+		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LIGHTING);
 	}
 

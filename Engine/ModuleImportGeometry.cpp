@@ -237,7 +237,7 @@ mesh::~mesh()
 
 void mesh::Draw()
 {
-	if (wires == false /*|| selected*/)
+	if (wires == false || selected)
 	{
 		RealRender();
 	}	
@@ -245,6 +245,7 @@ void mesh::Draw()
 	{
 		RealRender(true);
 	}
+
 }
 
 void mesh::RealRender(bool wired)
@@ -261,7 +262,7 @@ void mesh::RealRender(bool wired)
 	{
 		glDisable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glLineWidth(4);
+		glLineWidth(1.1f);
 		glColor4f(0, 1, 1, 1);
 	}
 	else
