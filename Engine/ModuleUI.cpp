@@ -157,11 +157,15 @@ update_status ModuleUI::PreUpdate(float dt)
 					App->camera->LookAt(vec3(camRef[0], camRef[1], camRef[2]));
 				}
 				ImGui::NewLine();
-				ImGui::Text("Distance to reference");
-				if (ImGui::DragFloat("##Distance to reference", &App->camera->distanceToRef, 1.0f, 1.0f))
+				ImGui::Text("Distance to reference");	
+				if(ImGui::DragFloat("##Distance to reference", &App->camera->distanceToRef, 1.0f, 1.0f))
 				{
 					App->camera->UpdateView();
 				}
+				ImGui::Text("Camera speed");
+				ImGui::DragFloat("##camSpeed", &App->camera->camSpeed, 0.1f);
+				ImGui::Text("Sprint speed multiplier");
+				ImGui::DragFloat("##camsprint", &App->camera->camSprintMultiplier, 0.1f);
 								
 			}
 

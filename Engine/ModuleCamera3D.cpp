@@ -70,6 +70,43 @@ update_status ModuleCamera3D::Update(float dt)
 		updatePos = true;
 	}
 
+#pragma region cameraMovementKeys
+	float speed = camSpeed;
+	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+	{
+		speed *= camSprintMultiplier;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+	{
+		Position -= Z * speed;
+		Reference -= Z * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+	{
+		Position += Z * speed;
+		Reference += Z * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+	{
+		Position -= X * speed;
+		Reference -= X * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+	{
+		Position += X * speed;
+		Reference += X * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+	{
+		Position += Y * speed;
+		Reference += Y * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
+	{
+		Position -= Y * speed;
+		Reference -= Y * speed;
+	}
+#pragma endregion
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT || updatePos)
 	{
 		int dx = -App->input->GetMouseXMotion();
@@ -101,9 +138,9 @@ update_status ModuleCamera3D::Update(float dt)
 				Y = cross(Z, X);
 			}
 		}
-
 		Position = Reference + Z * distanceToRef;// length(Position);
 	}
+	
 
 	// Recalculate matrix -------------
 	CalculateViewMatrix();

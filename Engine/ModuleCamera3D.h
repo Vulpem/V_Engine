@@ -33,6 +33,8 @@ public:
 	bool renderReference = true;
 	float distanceToRef = 20.f;
 	vec3 X, Y, Z, Position, Reference;
+	float camSpeed = 0.4f;
+	float camSprintMultiplier = 2.0f;
 
 private:
 
