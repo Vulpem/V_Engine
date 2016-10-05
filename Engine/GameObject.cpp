@@ -2,6 +2,7 @@
 
 #include "Transform.h"
 #include "Mesh.h"
+#include "Material.h"
 
 //WILL BE REMOVED WHEN WE CREATE TRANSFORM COMPONENT
 #include "OpenGL.h"
@@ -106,6 +107,10 @@ Component* GameObject::AddComponent(componentType type)
 	{
 		toAdd = new mesh(this, components.size()); break;
 	}
+	case C_material:
+	{
+		toAdd = new Material(this, components.size()); break;
+	}
 	}
 	if (toAdd != NULL)
 	{
@@ -127,4 +132,18 @@ std::vector<Component*> GameObject::GetComponent(componentType type)
 		it++;
 	}
 	return ret;
+}
+
+bool GameObject::HasComponent(componentType type)
+{
+	std::vector<Component*>::iterator it = components.begin();
+	while (it != components.end())
+	{
+		if ((*it)->GetType() == type)
+		{
+			return true;
+		}
+		it++;
+	}
+	return false;
 }

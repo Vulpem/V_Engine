@@ -33,6 +33,7 @@ public:
 
 	Component* AddComponent(componentType type);
 	std::vector<Component*> GetComponent(componentType type);
+	bool HasComponent(componentType type);
 };
 
 #endif

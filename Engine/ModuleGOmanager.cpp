@@ -27,6 +27,7 @@
 #include "Component.h"
 #include "Transform.h"
 #include "Mesh.h"
+#include "Material.h"
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
@@ -189,39 +190,6 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	
 }
 
-uint ModuleGoManager::LoadTexture(char* path)
-{
-	if (*path == '\0')
-	{
-		return 0;
-	}
-
-	char image[256] = "FBX/";
-	strcat(image, path);
-
-	//C_String image = "FBX/";
-	//image += path;
-
-	uint ret = ilutGLLoadImage(image);
-	
-
-	if (ret != 0)
-	{
-		id_textures.push_back(ret);
-		return ret;
-	}
-	else
-	{
-		LOG("Error loading texture %s", path);
-		for(ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
-		{
-			LOG("devIL got error %d", error);
-		//	LOG("%s", iluErrorString(error));
-		}
-		return 0;
-	}
-}
-
 GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent)
 {
 	GameObject* ret = new GameObject();
@@ -248,6 +216,8 @@ GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene*
 	trans->SetPos(pos.x, pos.y, pos.z);
 	trans->SetScale(scal.x, scal.y, scal.z);
 	trans->SetRot(rot.x, rot.y, rot.z, rot.w);
+
+	Material* mat = (Material*)ret->AddComponent(C_material);
 
 	//Loading meshes
 	for (int n = 0; n < toLoad->mNumMeshes; n++)

@@ -5,6 +5,7 @@
 #include "imGUI\imgui.h"
 
 #include "GameObject.h"
+#include "Material.h"
 
 #include "Assimp\include\cimport.h"
 #include "Assimp\include\scene.h"
@@ -77,8 +78,6 @@ void mesh::RealRender(bool wired)
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	glColor4f(r, g, b, a);
-
 	//Setting vertex
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
@@ -95,10 +94,20 @@ void mesh::RealRender(bool wired)
 		glEnable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		/*if (texture != 0)
+		if (object->HasComponent(C_material))
 		{
-			glBindTexture(GL_TEXTURE_2D, texture);
-		}*/
+			Material* mat = (Material*)(*object->GetComponent(C_material).begin());
+			glColor4f(mat->GetColor().x, mat->GetColor().y, mat->GetColor().z, mat->GetColor().w);
+			uint textureID = mat->GetTexture(texMaterialIndex);
+			if (textureID)
+			{
+				glBindTexture(GL_TEXTURE_2D, textureID);
+			}
+		}
+		else
+		{
+			glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+		}
 
 		if (num_textureCoords > 0)
 		{
@@ -180,8 +189,14 @@ bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 			glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_textureCoords * 2, textureCoords, GL_STATIC_DRAW);
 		}
+
 		aiString path;
 		scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
+		if (object->HasComponent(C_material))
+		{
+			Material* mat = (Material*)(*object->GetComponent(C_material).begin());
+			texMaterialIndex = mat->LoadTexture(path.data);
+		}
 
 		//Importing index (3 per face)
 		if (toLoad->HasFaces())

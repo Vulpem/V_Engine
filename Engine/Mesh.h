@@ -30,11 +30,7 @@ public:
 	uint num_textureCoords = 0;
 	float* textureCoords = nullptr;
 
-
-	float r = 0.5f;
-	float g = 0.5f;
-	float b = 0.5f;
-	float a = 1.0f;
+	int texMaterialIndex = -1;
 
 	bool init = false;
 

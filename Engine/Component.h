@@ -1,6 +1,7 @@
 #pragma once
 
 #include "C_String.h"
+#include "Math.h"
 
 enum componentType
 {
