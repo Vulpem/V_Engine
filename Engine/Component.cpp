@@ -34,7 +34,10 @@ void Component::Disable()
 
 void Component::DrawOnEditor()
 {
-	if(ImGui::CollapsingHeader(name.GetString()))
+	bool open = ImGui::CollapsingHeader(name.GetString());
+	ImGui::SameLine(ImGui::GetWindowWidth() - 60);
+	ImGui::Text("Id: %i", id);
+	if(open)
 	{
 		EditorContent();
 	}

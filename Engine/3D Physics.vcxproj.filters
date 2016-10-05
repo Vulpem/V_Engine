@@ -354,6 +354,9 @@
     <ClInclude Include="Transform.h">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -531,6 +534,9 @@
       <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
   </ItemGroup>
