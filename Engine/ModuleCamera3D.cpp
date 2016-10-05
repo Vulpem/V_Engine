@@ -6,6 +6,8 @@
 #include "ModuleInput.h"
 #include "ModuleGOmanager.h"
 
+#include "Transform.h"
+
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	name.create("ModuleCamera3D");
@@ -36,7 +38,6 @@ bool ModuleCamera3D::Start()
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
 	ref = App->GO->LoadFBX("FBX/Sphere.fbx");
-	ref->SetScale(0.25f, 0.25f, 0.25f);
 
 	return ret;
 }
@@ -55,7 +56,12 @@ update_status ModuleCamera3D::Update(float dt)
 	// Mouse motion ----------------
 	if (renderReference || true)
 	{
-		ref->SetPos(Reference.x, Reference.y, Reference.z);
+		std::vector<Component*> components = ref->GetComponent(C_transform);
+		if (components.empty() == false)
+		{
+			Transform* trans = (Transform*)*(components.begin());
+			trans->SetPos(Reference.x, Reference.y, Reference.z);
+		}
 	}
 
 	bool updatePos = false;
@@ -98,13 +104,13 @@ update_status ModuleCamera3D::Update(float dt)
 	}
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
-		Position += Y * speed;
-		Reference += Y * speed;
+		Position -= Y * speed;
+		Reference -= Y * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 	{
-		Position -= Y * speed;
-		Reference -= Y * speed;
+		Position += Y * speed;
+		Reference += Y * speed;
 	}
 #pragma endregion
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT || updatePos)

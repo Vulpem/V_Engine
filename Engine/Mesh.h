@@ -4,13 +4,15 @@
 #include "Globals.h"
 #include "Component.h"
 
+struct aiMesh;
+struct aiNode;
+struct aiScene;
+
 class mesh : public  Component
 {
 public:
-	mesh();
+	mesh(GameObject* linkedTo, int id);
 	~mesh();
-
-	char* name;
 
 	uint id_vertices = 0;
 	uint num_vertices = 0;
@@ -34,10 +36,13 @@ public:
 	float b = 0.5f;
 	float a = 1.0f;
 
-	uint texture = 0;
+	bool init = false;
 
 	bool wires = false;
-	bool selected = false;
+
+	void Update();
+	void EditorContent();
+	bool LoadMesh(const aiMesh* toLoad, const aiScene* scene);
 
 	void Draw();
 private:

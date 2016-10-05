@@ -1,5 +1,8 @@
 #include "GameObject.h"
 
+#include "Transform.h"
+#include "Mesh.h"
+
 //WILL BE REMOVED WHEN WE CREATE TRANSFORM COMPONENT
 #include "OpenGL.h"
 
@@ -36,32 +39,28 @@ GameObject::~GameObject()
 			}
 		}
 	}
-
-	if (meshes.empty() == false)
-	{
-		std::vector<mesh*>::iterator iterator = meshes.begin();
-		while (meshes.size() > 0 && iterator != meshes.end())
-		{
-			delete (*iterator);
-			if (meshes.size() > 1)
-			{
-				iterator = meshes.erase(iterator);
-			}
-			else
-			{
-				meshes.erase(iterator);
-			}
-
-		}
-	}
 }
 
 void GameObject::Update()
 {
+	glPushMatrix();
+
+	Transform* tmp2 = (Transform*)(*GetComponent(C_transform).begin());
+	glMultMatrixf(tmp2->GetTransformMatrix().ptr());
+
 	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
 	{
 		(*it)->Update();
 	}
+
+	std::vector<GameObject*>::iterator it = childs.begin();
+	while (it != childs.end())
+	{
+		(*it)->Update();
+		it++;
+	}
+
+	glPopMatrix();
 }
 
 void GameObject::DrawOnEditor()
@@ -72,46 +71,9 @@ void GameObject::DrawOnEditor()
 	}
 }
 
-void GameObject::Draw()
-{
-	glPushMatrix();
-
-	math::float4x4 transform = math::float4x4::FromTRS(position, rotation, scale);
-	transform.Transpose();
-
-	glMultMatrixf(transform.ptr());
-
-	if (childs.empty() == false)
-	{
-		std::vector<GameObject*>::iterator iterator = childs.begin();
-		while (iterator != childs.end())
-		{
-			(*iterator)->Draw();
-			iterator++;
-		}
-	}
-
-	if (meshes.empty() == false)
-	{
-		std::vector<mesh*>::iterator iterator = meshes.begin();
-		while (iterator != meshes.end())
-		{
-			(*iterator)->Draw();
-			iterator++;
-		}
-	}
-
-	glPopMatrix();
-}
-
 void GameObject::Select()
 {
-	std::vector<mesh*>::iterator it = meshes.begin();
-	while (it != meshes.end())
-	{
-		(*it)->selected = true;
-		it++;
-	}
+	selected = true;
 	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{
@@ -122,12 +84,7 @@ void GameObject::Select()
 
 void GameObject::Unselect()
 {
-	std::vector<mesh*>::iterator it = meshes.begin();
-	while (it != meshes.end())
-	{
-		(*it)->selected = false;
-		it++;
-	}
+	selected = false;
 	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{
@@ -136,63 +93,38 @@ void GameObject::Unselect()
 	}
 }
 
-void GameObject::SetPos(float x, float y, float z)
+Component* GameObject::AddComponent(componentType type)
 {
-	position.x = x;
-	position.y = y;
-	position.z = z;
-}
-
-void GameObject::ResetPos()
-{
-	SetPos(0, 0, 0);
-}
-
-math::float3 GameObject::GetPos()
-{
-	return position;
-}
-
-void GameObject::SetRot(float x, float y, float z)
-{
-	x *= DEGTORAD;
-	y *= DEGTORAD;
-	z *= DEGTORAD;
-	if (x == -0) { x = 0; }
-	if (y == -0) { y = 0; }
-	if (z == -0) { z = 0; }
-
-	rotation = math::Quat::FromEulerXYZ(x, y, z);
-}
-
-void GameObject::ResetRot()
-{
-	SetRot(0, 0, 0);
-}
-
-math::float3 GameObject::GetRot()
-{
-	math::float3 ret = rotation.ToEulerXYZ();
-	ret.x *= RADTODEG;
-	ret.y *= RADTODEG;
-	ret.z *= RADTODEG;
-	return ret;
-}
-
-void GameObject::SetScale(float x, float y, float z)
-{
-	if (x != 0 && y != 0 && z != 0)
+	Component* toAdd = NULL;
+	switch (type)
 	{
-		scale.Set(x, y, z);
+	case C_transform:
+	{
+		toAdd = new Transform(this, components.size()); break;
 	}
+	case C_mesh:
+	{
+		toAdd = new mesh(this, components.size()); break;
+	}
+	}
+	if (toAdd != NULL)
+	{
+		components.push_back(toAdd);
+	}
+	return toAdd;
 }
 
-void GameObject::ResetScale()
+std::vector<Component*> GameObject::GetComponent(componentType type)
 {
-	SetScale(1, 1, 1);
-}
-
-math::float3 GameObject::GetScale()
-{
-	return scale;
+	std::vector<Component*> ret;
+	std::vector<Component*>::iterator it = components.begin();
+	while (it != components.end())
+	{
+		if ((*it)->GetType() == type)
+		{
+			ret.push_back((*it));			
+		}
+		it++;
+	}
+	return ret;
 }

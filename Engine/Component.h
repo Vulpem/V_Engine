@@ -9,11 +9,12 @@ enum componentType
 	C_material
 };
 
+class GameObject;
 
 class Component
 {
 public:
-	Component();
+	Component(GameObject* linkedTo, int id);
 	~Component();
 
 	virtual void Enable();
@@ -23,6 +24,7 @@ public:
 	void DrawOnEditor();
 
 	componentType GetType();
+	bool IsEnabled() { return enabled; }
 
 protected:
 	virtual void Activate() {}
@@ -30,10 +32,14 @@ protected:
 
 	virtual void EditorContent() {};
 
+	componentType type;
 public:
 	C_String name;
+
+	GameObject* object;
+protected:
+	int id = -1;
 private:
-	componentType type;
 	bool enabled = true;
 
 };

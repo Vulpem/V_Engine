@@ -2,8 +2,10 @@
 
 #include "ImGui\imgui.h"
 
-Component::Component()
+Component::Component(GameObject* linkedTo, int _id)
 {
+	object = linkedTo;
+	id = _id;
 	name.create("EmptyComponent");
 }
 

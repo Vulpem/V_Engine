@@ -45,7 +45,6 @@ public:
 
 private:
 	GameObject* LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent = NULL);
-	mesh* LoadMesh(const aiMesh* toLoad, const aiScene* scene);
 
 	void CleanName(char* toClean);
 

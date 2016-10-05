@@ -296,23 +296,7 @@ update_status ModuleUI::PreUpdate(float dt)
 		if (selectedGameObject)
 		{
 			ImGui::InputText("Name", selectedGameObject->name, NAME_MAX_LEN);
-			if (ImGui::DragFloat3("Position", selectedPos, 1.0f))
-			{
-				selectedGameObject->SetPos(selectedPos[0], selectedPos[1], selectedPos[2]);
-			}
-			if (ImGui::DragFloat3("Rotation", selectedEuler, 1.0f, 0.0f, 360.0f))
-			{
-				selectedGameObject->SetRot(selectedEuler[0], selectedEuler[1], selectedEuler[2]);
-			}
-			if (ImGui::DragFloat3("Scale", selectedScale, 0.01f, 0.1f))
-			{
-				selectedGameObject->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
-			}
-			ImGui::NewLine();
-			if (ImGui::Button("Look at"))
-			{
-				App->camera->LookAt(vec3(selectedGameObject->GetPos().x, selectedGameObject->GetPos().y, selectedGameObject->GetPos().z));
-			}
+			selectedGameObject->DrawOnEditor();
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");
 			if (ImGui::Button("Delete"))
@@ -409,23 +393,4 @@ void ModuleUI::SelectGameObject(GameObject* node)
 		node->Select();
 	}
 	selectedGameObject = node;
-	if (selectedGameObject)
-	{
-		math::float3 pos, rot, scale;
-
-		pos = node->GetPos();
-		selectedPos[0] = pos.x;
-		selectedPos[1] = pos.y;
-		selectedPos[2] = pos.z;
-
-		rot = node->GetRot();
-		selectedEuler[0] = rot.x;
-		selectedEuler[1] = rot.y;
-		selectedEuler[2] = rot.z;
-
-		scale = node->GetScale();
-		selectedScale[0] = scale.x;
-		selectedScale[1] = scale.y;
-		selectedScale[2] = scale.z;
-	}
 }

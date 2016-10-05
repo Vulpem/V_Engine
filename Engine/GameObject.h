@@ -23,34 +23,16 @@ public:
 	GameObject* parent = nullptr;
 
 	std::vector<Component*> components;
+	bool selected = false;
 
 	void Update();
 	void DrawOnEditor();
 
-	//TO REMOVE
-	std::vector<mesh*> meshes;
-
-	math::Quat rotation = math::Quat::identity;
-	math::float3 position = math::float3::zero;
-	math::float3 scale = math::float3::zero;
-
-	void Draw();
-
 	void Select();
 	void Unselect();
 
-	void SetPos(float x, float y, float z);
-	void ResetPos();
-	math::float3 GetPos();
-
-	void SetRot(float x, float y, float z);
-	void ResetRot();
-	math::float3 GetRot();
-
-	void SetScale(float x, float y, float z);
-	void ResetScale();
-	math::float3 GetScale();
-
+	Component* AddComponent(componentType type);
+	std::vector<Component*> GetComponent(componentType type);
 };
 
 #endif
