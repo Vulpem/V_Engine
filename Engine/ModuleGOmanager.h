@@ -40,7 +40,6 @@ public:
 	GameObject* LoadFBX(char* path);
 	bool DeleteGameObject(GameObject* toErase);
 
-	uint LoadTexture(char* path);
 	uint GetCheckerID() { return id_checkerTexture; }
 
 private:
