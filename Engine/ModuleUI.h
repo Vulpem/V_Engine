@@ -59,6 +59,8 @@ public:
 	bool IsOpenOutliner = true;
 	bool IsOpenAttributes = true;
 
+	bool showPlane = true;
+
 	char* testConsoleInput;
 
 	float camRef[3] = { 0,0,0 };

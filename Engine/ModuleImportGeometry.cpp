@@ -311,6 +311,7 @@ void mesh::RealRender(bool wired)
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glEnable(GL_LIGHTING);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 

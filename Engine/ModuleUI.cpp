@@ -85,11 +85,13 @@ update_status ModuleUI::PreUpdate(float dt)
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			ImGui::Checkbox("Editor", &IsOpenEditor);
 			ImGui::Checkbox("Outliner", &IsOpenOutliner);
+			ImGui::Checkbox("Editor", &IsOpenEditor);
+			ImGui::Checkbox("Attribute Editor", &IsOpenAttributes);
 			ImGui::Checkbox("Console", &IsOpenConsole);
-			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
+			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);		
 			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
+			ImGui::Checkbox("InGame Plane", &showPlane);
 			ImGui::EndMenu();
 		}
 
@@ -332,6 +334,12 @@ update_status ModuleUI::Update(float dt)
 	if (IsOpenTestWindow)
 	{
 		ImGui::ShowTestWindow(&IsOpenTestWindow);
+	}
+	if (showPlane)
+	{
+		P_Plane p(0, 0, 0, 1);
+		p.axis = true;
+		p.Render();
 	}
 
 	return UPDATE_CONTINUE;
