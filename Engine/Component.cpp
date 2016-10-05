@@ -62,7 +62,7 @@ void Component::DrawOnEditor()
 		}
 	}
 
-	if(open)
+	if(open && enabled)
 	{
 		ImGui::Separator();
 		EditorContent();

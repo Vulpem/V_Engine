@@ -48,13 +48,16 @@ uint Material::NofTextures()
 
 uint Material::GetTexture(uint n)
 {
-	if (n >= 0 && n < textures.size() && IsEnabled())
+	if (IsEnabled())
 	{
-		return textures.at(n);
-	}
-	else
-	{
-		return 0;
+		if (n >= 0 && n < textures.size() && IsEnabled())
+		{
+			return textures.at(n);
+		}
+		else
+		{
+			return 0;
+		}
 	}
 }
 

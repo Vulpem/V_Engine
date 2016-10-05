@@ -196,6 +196,10 @@ bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 		{
 			Material* mat = (Material*)(*object->GetComponent(C_material).begin());
 			texMaterialIndex = mat->LoadTexture(path.data);
+
+			aiColor3D col;
+			scene->mMaterials[toLoad->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, col);
+			mat->SetColor(col.r, col.g, col.b);
 		}
 
 		//Importing index (3 per face)

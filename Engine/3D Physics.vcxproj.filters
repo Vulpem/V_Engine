@@ -114,9 +114,6 @@
     <ClInclude Include="imGUI\stb_truetype.h">
       <Filter>Sources\imGUI</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleUI.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="imGUI\imgui_impl_sdl_gl3.h">
       <Filter>Sources\imGUI</Filter>
     </ClInclude>
@@ -360,6 +357,9 @@
     <ClInclude Include="AllComponents.h">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleEditor.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -415,9 +415,6 @@
     </ClCompile>
     <ClCompile Include="imGUI\imgui_draw.cpp">
       <Filter>Sources\imGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleUI.cpp">
-      <Filter>Sources\Modules</Filter>
     </ClCompile>
     <ClCompile Include="imGUI\imgui_impl_sdl_gl3.cpp">
       <Filter>Sources\imGUI</Filter>
@@ -541,6 +538,9 @@
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Sources\GameObjectStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleEditor.cpp">
+      <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

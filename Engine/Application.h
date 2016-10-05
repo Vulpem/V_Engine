@@ -14,7 +14,7 @@ class ModuleInput;
 class ModuleAudio;
 class ModuleRenderer3D;
 class ModuleCamera3D;
-class ModuleUI;
+class ModuleEditor;
 class ModuleGoManager;
 class ModulePhysics3D;
 class ModuleScene;
@@ -33,7 +33,7 @@ public:
 	ModuleRenderer3D* renderer3D;
 	ModuleCamera3D* camera;
 
-	ModuleUI* UI;
+	ModuleEditor* UI;
 	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
 

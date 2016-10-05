@@ -8,7 +8,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
-#include "ModuleUI.h"
+#include "ModuleEditor.h"
 #include "ModuleGoManager.h"
 #include "ModuleScene.h"
 #include "ModuleFileSystem.h"
@@ -28,7 +28,7 @@ Application::Application()
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
 	physics = new ModulePhysics3D(this);
-	UI = new ModuleUI(this);
+	UI = new ModuleEditor(this);
 	GO = new ModuleGoManager(this);
 
 	scene = new ModuleScene(this);
