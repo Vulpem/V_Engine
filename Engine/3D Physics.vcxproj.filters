@@ -357,6 +357,9 @@
     <ClInclude Include="Material.h">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
+    <ClInclude Include="AllComponents.h">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">

@@ -24,10 +24,7 @@
 #pragma comment(lib, "Devil/libx86/ILU.lib")
 #pragma comment(lib, "Devil/libx86/ILUT.lib")
 
-#include "Component.h"
-#include "Transform.h"
-#include "Mesh.h"
-#include "Material.h"
+#include "AllComponents.h"
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 

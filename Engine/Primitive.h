@@ -1,5 +1,6 @@
+#ifndef __PRIMITIVE__
+#define __PRIMITIVE__
 
-#pragma once
 #include "Math.h"
 #include "Color.h"
 
@@ -94,3 +95,5 @@ public:
 	math::float3 normal;
 	float constant;
 };
+
+#endif

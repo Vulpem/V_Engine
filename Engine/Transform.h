@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __TRANSFORM__
+#define __TRANSFORM__
 
 #include "Component.h"
 
@@ -32,3 +33,5 @@ public:
 	math::float3 GetScale();
 
 };
+
+#endif

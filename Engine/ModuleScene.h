@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __SCENE0__
+#define __SCENE0__
+
 #include "Module.h"
 #include "Globals.h"
 #include "Primitive.h"
@@ -26,3 +28,5 @@ public:
 public:
 	bool reset = false;
 };
+
+#endif

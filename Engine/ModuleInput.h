@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __MODULE_INPUT__
+#define __MODULE_INPUT__
+
 #include "Module.h"
 #include "Globals.h"
 
@@ -73,3 +75,5 @@ public:
 	char dropped_file[1024];
 	mutable bool file_was_dropped;
 };
+
+#endif

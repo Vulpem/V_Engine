@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __MATERIAL__
+#define __MATERIAL__
 
 #include "Component.h"
 
@@ -25,3 +26,5 @@ private:
 	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
 
 };
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __MODULE_PHYSICS_3D__
+#define __MODULE_PHYSICS_3D__
+
 #include "Module.h"
 #include "Globals.h"
 #include "Primitive.h"
@@ -71,3 +73,5 @@ public:
 	P_Line line;
 	Primitive point;
 };
+
+#endif

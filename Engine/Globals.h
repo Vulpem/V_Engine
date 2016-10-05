@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __GLOBALS__
+#define __GLOBALS__
+
 #include <windows.h>
 #include <stdio.h>
 
@@ -35,3 +37,5 @@ enum update_status
 #define VSYNC true
 #define TITLE "3D Physics Playground"
 #define ORGANISATION "UPC"
+
+#endif

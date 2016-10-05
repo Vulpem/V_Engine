@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __COMPONENT__
+#define __COMPONENT__
 
 #include "C_String.h"
 #include "Math.h"
@@ -45,3 +46,5 @@ private:
 	bool enabled = true;
 
 };
+
+#endif

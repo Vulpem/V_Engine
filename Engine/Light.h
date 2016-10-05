@@ -1,5 +1,7 @@
 
-#pragma once
+#ifndef __LIGHT__
+#define __LIGHT__
+
 #include "Color.h"
 
 #include "Math.h"
@@ -20,3 +22,5 @@ struct Light
 	int ref;
 	bool on;
 };
+
+#endif

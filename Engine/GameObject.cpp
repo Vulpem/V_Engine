@@ -1,8 +1,6 @@
 #include "GameObject.h"
 
-#include "Transform.h"
-#include "Mesh.h"
-#include "Material.h"
+#include "AllComponents.h"
 
 //WILL BE REMOVED WHEN WE CREATE TRANSFORM COMPONENT
 #include "OpenGL.h"
