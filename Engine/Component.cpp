@@ -18,7 +18,7 @@ void Component::Enable()
 {
 	if (enabled == false)
 	{
-		Activate();
+		DoEnable();
 		enabled = true;
 	}
 }
@@ -27,18 +27,44 @@ void Component::Disable()
 { 
 	if (enabled == true)
 	{
-		Deactivate();
+		DoDisable();
 		enabled = false;
+	}
+}
+
+void Component::Update()
+{
+	if (enabled)
+	{
+		DoUpdate();
 	}
 }
 
 void Component::DrawOnEditor()
 {
 	bool open = ImGui::CollapsingHeader(name.GetString());
+	bool active = enabled;
+	char _id[56];
+	sprintf(_id, "Active##checkbox%i", id);
+
+	ImGui::Checkbox(_id, &active);
 	ImGui::SameLine(ImGui::GetWindowWidth() - 60);
-	ImGui::Text("Id: %i", id);
+	ImGui::Text("ID: %i", id);
+	if (active != enabled)
+	{
+		if (active)
+		{
+			Enable();
+		}
+		else
+		{
+			Disable();
+		}
+	}
+
 	if(open)
 	{
+		ImGui::Separator();
 		EditorContent();
 	}
 }

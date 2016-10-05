@@ -20,15 +20,16 @@ public:
 	virtual void Enable();
 	virtual void Disable();
 
-	virtual void Update() { }
+	void Update();
 	void DrawOnEditor();
 
 	componentType GetType();
 	bool IsEnabled() { return enabled; }
 
 protected:
-	virtual void Activate() {}
-	virtual void Deactivate() {}
+	virtual void DoUpdate() {}
+	virtual void DoEnable() {}
+	virtual void DoDisable() {}
 
 	virtual void EditorContent() {};
 

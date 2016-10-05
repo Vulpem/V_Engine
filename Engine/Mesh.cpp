@@ -46,7 +46,7 @@ mesh::~mesh()
 	}
 }
 
-void mesh::Update()
+void mesh::DoUpdate()
 {
 	if (init)
 	{

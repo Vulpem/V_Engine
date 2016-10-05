@@ -40,7 +40,7 @@ public:
 
 	bool wires = false;
 
-	void Update();
+	void DoUpdate();
 	void EditorContent();
 	bool LoadMesh(const aiMesh* toLoad, const aiScene* scene);
 
