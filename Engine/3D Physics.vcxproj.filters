@@ -348,6 +348,9 @@
     <ClInclude Include="ModuleGOmanager.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -520,6 +523,9 @@
     </ClCompile>
     <ClCompile Include="ModuleGOmanager.cpp">
       <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

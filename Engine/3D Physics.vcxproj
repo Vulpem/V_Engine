@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="C_String.h" />
     <ClInclude Include="Devil\include\config.h" />
     <ClInclude Include="Devil\include\devil_internal_exports.h" />
@@ -179,6 +180,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="glmath.cpp" />
     <ClCompile Include="imGUI\imgui.cpp" />

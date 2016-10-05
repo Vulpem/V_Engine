@@ -1,7 +1,10 @@
-#pragma once
-#include "Globals.h"
+#ifndef __MESH__
+#define __MESH__
 
-class mesh
+#include "Globals.h"
+#include "Component.h"
+
+class mesh : public  Component
 {
 public:
 	mesh();
@@ -40,3 +43,5 @@ public:
 private:
 	void RealRender(bool wired = false);
 };
+
+#endif

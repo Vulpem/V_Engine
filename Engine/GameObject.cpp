@@ -4,6 +4,11 @@
 #include "OpenGL.h"
 
 //------------------------- NODE --------------------------------------------------------------------------------
+GameObject::GameObject()
+{
+
+}
+
 
 GameObject::~GameObject()
 {
@@ -48,6 +53,22 @@ GameObject::~GameObject()
 			}
 
 		}
+	}
+}
+
+void GameObject::Update()
+{
+	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
+	{
+		(*it)->Update();
+	}
+}
+
+void GameObject::DrawOnEditor()
+{
+	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
+	{
+		(*it)->DrawOnEditor();
 	}
 }
 

@@ -1,30 +1,38 @@
-#pragma once
+#ifndef __GO__
+#define __GO__
 
 #define NAME_MAX_LEN 1024
 
 #include "Globals.h"
 
-#include "Mesh.h"
-
 #include<vector>
 #include "Math.h"
 
-
+#include "Component.h"
+#include "Mesh.h"
 
 class GameObject
 {
 public:
 	char name[NAME_MAX_LEN];
 
-	std::vector<mesh*> meshes;
+	GameObject();
+	~GameObject();
+
 	std::vector<GameObject*> childs;
 	GameObject* parent = nullptr;
+
+	std::vector<Component*> components;
+
+	void Update();
+	void DrawOnEditor();
+
+	//TO REMOVE
+	std::vector<mesh*> meshes;
 
 	math::Quat rotation = math::Quat::identity;
 	math::float3 position = math::float3::zero;
 	math::float3 scale = math::float3::zero;
-
-	~GameObject();
 
 	void Draw();
 
@@ -44,3 +52,5 @@ public:
 	math::float3 GetScale();
 
 };
+
+#endif
