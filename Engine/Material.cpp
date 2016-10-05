@@ -31,10 +31,14 @@ void Material::EditorContent()
 		sprintf(tmp, "%s", texturePaths.at(n).GetString());
 		if (ImGui::TreeNode(tmp))
 		{
-			//ImGui::Image();
+			glBindTexture(GL_TEXTURE_2D ,textures.at(n));
+			ImTextureID image = (void*)textures.at(n);
+
+			ImGui::Image(image, ImVec2(270,270));
 			ImGui::TreePop();
 		}		
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 uint Material::NofTextures()

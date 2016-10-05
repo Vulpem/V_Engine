@@ -22,6 +22,6 @@ public:
 private:
 	std::vector<uint> textures;
 	std::vector<C_String> texturePaths;
-	float color[4] = { 0.5f, 0.5f,0.5f,1.0f };
+	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
 
 };

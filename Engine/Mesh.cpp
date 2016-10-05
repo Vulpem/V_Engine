@@ -132,7 +132,7 @@ void mesh::RealRender(bool wired)
 
 	//Cleaning
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindBuffer(GL_NONE, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
