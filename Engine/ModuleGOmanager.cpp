@@ -151,6 +151,8 @@ GameObject* ModuleGoManager::LoadFBX(char* path)
 //	aiFileIO aiFile;
 //	aiFile.OpenProc(&aiFile, "App->fs->Load(path)", "this");
 
+
+
 	GameObject* ret = NULL;
 
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
@@ -201,7 +203,7 @@ GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene*
 	//Setting parent
 	ret->parent = parent;
 
-	Transform* trans = (Transform*)ret->AddComponent(C_transform);
+	Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
 	//Setting transform
 	aiQuaternion rot;
 	aiVector3D scal;
@@ -213,12 +215,12 @@ GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene*
 	trans->SetScale(scal.x, scal.y, scal.z);
 	trans->SetRot(rot.x, rot.y, rot.z, rot.w);
 
-	Material* mat = (Material*)ret->AddComponent(C_material);
+	Material* mat = (Material*)ret->AddComponent(Component::Type::C_material);
 
 	//Loading meshes
 	for (int n = 0; n < toLoad->mNumMeshes; n++)
 	{   
-		mesh* addedMesh = (mesh*)ret->AddComponent(C_mesh);
+		mesh* addedMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
 		addedMesh->LoadMesh(scene->mMeshes[toLoad->mMeshes[n]], scene);
 	}
 

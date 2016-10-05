@@ -4,6 +4,9 @@
 
 #include "PhysFS/include/physfs.h"
 
+#include "Assimp/include/cfileio.h"
+#include "Assimp/include/types.h"
+
 #pragma comment( lib, "PhysFS/libx86/physfs.lib" )
 
 ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -65,6 +68,11 @@ bool ModuleFileSystem::Init()
 bool ModuleFileSystem::CleanUp()
 {
 	//LOG("Freeing File System subsystem");
+	if (AssimpIO)
+	{
+		delete AssimpIO;
+	}
+
 	return true;
 }
 
@@ -110,6 +118,15 @@ bool ModuleFileSystem::EraseFile(const char* file)
 	}
 	LOG("Tried to erase %s, which could not be found", file);
 	return false;
+}
+
+
+unsigned int ModuleFileSystem::Load(const char* path, const char* file, char** buffer) const
+{
+	C_String fullPath(path);
+	fullPath += file;
+
+	return Load(fullPath.GetString(), buffer);
 }
 
 // Read a whole file and put it in a new buffer
@@ -166,6 +183,7 @@ SDL_RWops* ModuleFileSystem::Load(const char* file) const
 		return NULL;
 }
 
+
 int close_sdl_rwops(SDL_RWops *rw)
 {
 	if (rw->hidden.mem.base)
@@ -203,3 +221,115 @@ unsigned int ModuleFileSystem::Save(const char* file, const char* buffer, unsign
 
 	return ret;
 }
+
+
+
+
+
+// -----------------------------------------------------
+// ASSIMP IO
+// -----------------------------------------------------
+
+size_t AssimpWrite(aiFile* file, const char* data, size_t size, size_t chunks)
+{
+	PHYSFS_sint64 ret = PHYSFS_write((PHYSFS_File*)file->UserData, (void*)data, size, chunks);
+	if (ret == -1)
+		LOG("File System error while WRITE via assimp: %s", PHYSFS_getLastError());
+
+	return (size_t)ret;
+}
+
+size_t AssimpRead(aiFile* file, char* data, size_t size, size_t chunks)
+{
+	PHYSFS_sint64 ret = PHYSFS_read((PHYSFS_File*)file->UserData, (void*)data, size, chunks);
+	if (ret == -1)
+		LOG("File System error while READ via assimp: %s", PHYSFS_getLastError());
+
+	return (size_t)ret;
+}
+
+size_t AssimpTell(aiFile* file)
+{
+	PHYSFS_sint64 ret = PHYSFS_tell((PHYSFS_File*)file->UserData);
+	if (ret == -1)
+		LOG("File System error while TELL via assimp: %s", PHYSFS_getLastError());
+
+	return (size_t)ret;
+}
+
+size_t AssimpSize(aiFile* file)
+{
+	PHYSFS_sint64 ret = PHYSFS_fileLength((PHYSFS_File*)file->UserData);
+	if (ret == -1)
+		LOG("File System error while SIZE via assimp: %s", PHYSFS_getLastError());
+
+	return (size_t)ret;
+}
+
+void AssimpFlush(aiFile* file)
+{
+	if (PHYSFS_flush((PHYSFS_File*)file->UserData) == 0)
+		LOG("File System error while FLUSH via assimp: %s", PHYSFS_getLastError());
+}
+
+aiReturn AssimpSeek(aiFile* file, size_t pos, aiOrigin from)
+{
+	int res = 0;
+
+	switch (from)
+	{
+	case aiOrigin_SET:
+		res = PHYSFS_seek((PHYSFS_File*)file->UserData, pos);
+		break;
+	case aiOrigin_CUR:
+		res = PHYSFS_seek((PHYSFS_File*)file->UserData, PHYSFS_tell((PHYSFS_File*)file->UserData) + pos);
+		break;
+	case aiOrigin_END:
+		res = PHYSFS_seek((PHYSFS_File*)file->UserData, PHYSFS_fileLength((PHYSFS_File*)file->UserData) + pos);
+		break;
+	}
+
+	if (res == 0)
+		LOG("File System error while SEEK via assimp: %s", PHYSFS_getLastError());
+
+	return (res != 0) ? aiReturn_SUCCESS : aiReturn_FAILURE;
+}
+
+aiFile* AssimpOpen(aiFileIO* io, const char* name, const char* format)
+{
+	static aiFile file;
+
+	file.UserData = (char*)PHYSFS_openRead(name);
+	file.ReadProc = AssimpRead;
+	file.WriteProc = AssimpWrite;
+	file.TellProc = AssimpTell;
+	file.FileSizeProc = AssimpSize;
+	file.FlushProc = AssimpFlush;
+	file.SeekProc = AssimpSeek;
+
+	return &file;
+}
+
+void AssimpClose(aiFileIO* io, aiFile* file)
+{
+	if (PHYSFS_close((PHYSFS_File*)file->UserData) == 0)
+		LOG("File System error while CLOSE via assimp: %s", PHYSFS_getLastError());
+}
+
+void ModuleFileSystem::CreateAssimpIO()
+{
+	if (AssimpIO)
+	{
+		delete AssimpIO;
+	}
+
+	AssimpIO = new aiFileIO;
+	AssimpIO->OpenProc = AssimpOpen;
+	AssimpIO->CloseProc = AssimpClose;
+}
+
+aiFileIO * ModuleFileSystem::GetAssimpIO()
+{
+	return AssimpIO;
+}
+

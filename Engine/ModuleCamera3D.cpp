@@ -56,7 +56,7 @@ update_status ModuleCamera3D::Update(float dt)
 	// Mouse motion ----------------
 	if (renderReference || true)
 	{
-		std::vector<Component*> components = ref->GetComponent(C_transform);
+		std::vector<Component*> components = ref->GetComponent(Component::Type::C_transform);
 		if (components.empty() == false)
 		{
 			Transform* trans = (Transform*)*(components.begin());

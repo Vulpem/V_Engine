@@ -32,9 +32,9 @@ public:
 	void Select(bool renderNormals = false);
 	void Unselect();
 
-	Component* AddComponent(componentType type);
-	std::vector<Component*> GetComponent(componentType type);
-	bool HasComponent(componentType type);
+	Component* AddComponent(Component::Type type);
+	std::vector<Component*> GetComponent(Component::Type type);
+	bool HasComponent(Component::Type type);
 };
 
 #endif

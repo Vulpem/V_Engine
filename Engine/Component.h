@@ -4,18 +4,20 @@
 #include "C_String.h"
 #include "Math.h"
 
-enum componentType
-{
-	C_transform,
-	C_mesh,
-	C_material
-};
-
 class GameObject;
 
 class Component
 {
 public:
+	enum Type
+	{
+		C_transform,
+		C_mesh,
+		C_material
+	};
+
+
+
 	Component(GameObject* linkedTo, int id);
 	~Component();
 
@@ -25,7 +27,7 @@ public:
 	void Update();
 	void DrawOnEditor();
 
-	componentType GetType();
+	Type GetType();
 	bool IsEnabled() { return enabled; }
 
 protected:
@@ -35,7 +37,7 @@ protected:
 
 	virtual void EditorContent() {};
 
-	componentType type;
+	Type type;
 public:
 	C_String name;
 

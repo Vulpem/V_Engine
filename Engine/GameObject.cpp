@@ -44,7 +44,7 @@ void GameObject::Update()
 {
 	glPushMatrix();
 
-	Transform* tmp2 = (Transform*)(*GetComponent(C_transform).begin());
+	Transform* tmp2 = (Transform*)(*GetComponent(Component::Type::C_transform).begin());
 	glMultMatrixf(tmp2->GetTransformMatrix().ptr());
 
 	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
@@ -94,24 +94,25 @@ void GameObject::Unselect()
 	}
 }
 
-Component* GameObject::AddComponent(componentType type)
+Component* GameObject::AddComponent(Component::Type type)
 {
 	Component* toAdd = NULL;
 	switch (type)
 	{
-	case C_transform:
+	case Component::Type::C_transform:
 	{
 		toAdd = new Transform(this, components.size()); break;
 	}
-	case C_mesh:
+	case Component::Type::C_mesh:
 	{
 		toAdd = new mesh(this, components.size()); break;
 	}
-	case C_material:
+	case Component::Type::C_material:
 	{
 		toAdd = new Material(this, components.size()); break;
 	}
 	}
+
 	if (toAdd != NULL)
 	{
 		components.push_back(toAdd);
@@ -119,7 +120,7 @@ Component* GameObject::AddComponent(componentType type)
 	return toAdd;
 }
 
-std::vector<Component*> GameObject::GetComponent(componentType type)
+std::vector<Component*> GameObject::GetComponent(Component::Type type)
 {
 	std::vector<Component*> ret;
 	std::vector<Component*>::iterator it = components.begin();
@@ -134,7 +135,7 @@ std::vector<Component*> GameObject::GetComponent(componentType type)
 	return ret;
 }
 
-bool GameObject::HasComponent(componentType type)
+bool GameObject::HasComponent(Component::Type type)
 {
 	std::vector<Component*>::iterator it = components.begin();
 	while (it != components.end())
