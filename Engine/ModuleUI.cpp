@@ -9,7 +9,7 @@
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
 #include "ModuleScene.h"
-#include "ModuleImportGeometry.h"
+#include "ModuleGOmanager.h"
 
 
 #include "Imgui/imgui_impl_sdl_gl3.h"
@@ -255,10 +255,10 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::InputText("Load:", toImport, 256);
 			if (ImGui::Button("Import"))
 			{
-				GameObject* import = App->importGeometry->LoadFBX(toImport);
+				GameObject* import = App->GO->LoadFBX(toImport);
 				if (import != NULL)
 				{
-					geometries.push_back(App->importGeometry->LoadFBX(toImport));
+					geometries.push_back(App->GO->LoadFBX(toImport));
 					importResult = "Import successful!";
 				}
 				else
@@ -273,8 +273,8 @@ update_status ModuleUI::PreUpdate(float dt)
 
 		//if (ImGui::TreeNode("Scene"))
 		//{
-			std::vector<GameObject*>::iterator node = App->importGeometry->root->childs.begin();
-			while (node != App->importGeometry->root->childs.end())
+			std::vector<GameObject*>::iterator node = App->GO->root->childs.begin();
+			while (node != App->GO->root->childs.end())
 			{
 				std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
 				while (childNodes != (*node)->childs.end())
@@ -315,7 +315,7 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::Text("Danger Zone:");
 			if (ImGui::Button("Delete"))
 			{
-				App->importGeometry->DeleteGameObject(selectedGameObject);
+				App->GO->DeleteGameObject(selectedGameObject);
 				selectedGameObject = NULL;
 			}
 

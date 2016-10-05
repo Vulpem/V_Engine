@@ -5,7 +5,7 @@
 #include "PhysBody3D.h"
 #include "ModuleCamera3D.h"
 
-#include "ModuleImportGeometry.h"
+#include "ModuleGOmanager.h"
 
 
 ModuleScene::ModuleScene(Application* app, bool start_enabled) : Module(app, start_enabled)

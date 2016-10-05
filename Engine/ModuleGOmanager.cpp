@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 
-#include "ModuleImportGeometry.h"
+#include "ModuleGOmanager.h"
 
 #include "ModuleFileSystem.h"
 #include "ModuleInput.h"
@@ -26,19 +26,19 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleImportGeometry::ModuleImportGeometry(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	name.create("ModuleGeometry");
 }
 
 // DestructorF
-ModuleImportGeometry::~ModuleImportGeometry()
+ModuleGoManager::~ModuleGoManager()
 {
 
 }
 
 // Called before render is available
-bool ModuleImportGeometry::Init()
+bool ModuleGoManager::Init()
 {
 	bool ret = true;
 
@@ -61,7 +61,7 @@ bool ModuleImportGeometry::Init()
 	return ret;
 }
 
-bool ModuleImportGeometry::Start()
+bool ModuleGoManager::Start()
 {
 
 	//Generating checker texture
@@ -95,14 +95,14 @@ bool ModuleImportGeometry::Start()
 }
 
 // Called every draw update
-update_status ModuleImportGeometry::PreUpdate(float dt)
+update_status ModuleGoManager::PreUpdate(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
 	return ret;
 }
 
-update_status ModuleImportGeometry::Update(float dt)
+update_status ModuleGoManager::Update(float dt)
 {
 	if (App->input->file_was_dropped)
 	{
@@ -123,14 +123,14 @@ update_status ModuleImportGeometry::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleImportGeometry::PostUpdate(float dt)
+update_status ModuleGoManager::PostUpdate(float dt)
 {
 	
 	return UPDATE_CONTINUE;
 }
 
 // Called before quitting
-bool ModuleImportGeometry::CleanUp()
+bool ModuleGoManager::CleanUp()
 {
 	aiDetachAllLogStreams();
 
@@ -142,7 +142,7 @@ bool ModuleImportGeometry::CleanUp()
 	return true;
 }
 
-GameObject* ModuleImportGeometry::LoadFBX(char* path)
+GameObject* ModuleGoManager::LoadFBX(char* path)
 {
 //	SDL_RWops* file = App->fs->Load(path);
 
@@ -173,7 +173,7 @@ GameObject* ModuleImportGeometry::LoadFBX(char* path)
 	return ret;
 }
 
-bool ModuleImportGeometry::DeleteGameObject(GameObject* toErase)
+bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 {
 	if (toErase)
 	{
@@ -185,7 +185,7 @@ bool ModuleImportGeometry::DeleteGameObject(GameObject* toErase)
 	
 }
 
-uint ModuleImportGeometry::LoadTexture(char* path)
+uint ModuleGoManager::LoadTexture(char* path)
 {
 	if (*path == '\0')
 	{
@@ -218,7 +218,7 @@ uint ModuleImportGeometry::LoadTexture(char* path)
 	}
 }
 
-GameObject* ModuleImportGeometry::LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent)
+GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent)
 {
 	GameObject* ret = new GameObject();
 
@@ -270,7 +270,7 @@ GameObject* ModuleImportGeometry::LoadGameObject(const aiNode* toLoad, const aiS
 	return ret;
 }
 
-mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
+mesh* ModuleGoManager::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 {
 	mesh* toPush = new mesh;
 
@@ -324,7 +324,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 	aiString path;
 	scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
 
-	toPush->texture = App->importGeometry->LoadTexture(path.data);
+	toPush->texture = App->GO->LoadTexture(path.data);
 
 	//Importing index (3 per face)
 	if (toLoad->HasFaces())
@@ -355,7 +355,7 @@ mesh* ModuleImportGeometry::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 
 }
 
-void ModuleImportGeometry::CleanName(char* toClean)
+void ModuleGoManager::CleanName(char* toClean)
 {
 	char* searcher = toClean;
 	int n = 0;
@@ -375,7 +375,7 @@ void ModuleImportGeometry::CleanName(char* toClean)
 	}
 }
 
-void ModuleImportGeometry::CreateRootGameObject()
+void ModuleGoManager::CreateRootGameObject()
 {
 	GameObject* ret = new GameObject();
 

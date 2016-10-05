@@ -21,12 +21,12 @@ class GameObject;
 //TO_REMOVE
 class mesh;
 
-class ModuleImportGeometry : public Module
+class ModuleGoManager : public Module
 {
 public:
 	
-	ModuleImportGeometry(Application* app, bool start_enabled = true);
-	~ModuleImportGeometry();
+	ModuleGoManager(Application* app, bool start_enabled = true);
+	~ModuleGoManager();
 
 	bool Init();
 

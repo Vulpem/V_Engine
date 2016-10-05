@@ -309,9 +309,6 @@
     <ClInclude Include="OpenGL.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleImportGeometry.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleFileSystem.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
@@ -347,6 +344,9 @@
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleGOmanager.h">
+      <Filter>Sources\Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -509,9 +509,6 @@
     <ClCompile Include="ModuleScene.cpp">
       <Filter>Sources\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleImportGeometry.cpp">
-      <Filter>Sources\Modules</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleFileSystem.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
@@ -520,6 +517,9 @@
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Sources\GameObjectStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleGOmanager.cpp">
+      <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 #include "Primitive.h"
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
-#include "ModuleImportGeometry.h"
+#include "ModuleGOmanager.h"
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -35,7 +35,7 @@ bool ModuleCamera3D::Start()
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
-	ref = App->importGeometry->LoadFBX("FBX/Sphere.fbx");
+	ref = App->GO->LoadFBX("FBX/Sphere.fbx");
 	ref->SetScale(0.25f, 0.25f, 0.25f);
 
 	return ret;

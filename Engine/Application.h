@@ -14,7 +14,7 @@ class ModuleAudio;
 class ModuleRenderer3D;
 class ModuleCamera3D;
 class ModuleUI;
-class ModuleImportGeometry;
+class ModuleGoManager;
 class ModulePhysics3D;
 class ModuleScene;
 class ModuleFileSystem;
@@ -33,7 +33,7 @@ public:
 	ModuleCamera3D* camera;
 
 	ModuleUI* UI;
-	ModuleImportGeometry* importGeometry;
+	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
 
 	ModuleScene* scene;
