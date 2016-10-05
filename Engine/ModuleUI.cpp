@@ -15,8 +15,6 @@
 #include "Imgui/imgui_impl_sdl_gl3.h"
 #include "OpenGL.h"
 
-
-
 ModuleUI::ModuleUI(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	name.create("ModuleUI");
@@ -275,8 +273,8 @@ update_status ModuleUI::PreUpdate(float dt)
 
 		//if (ImGui::TreeNode("Scene"))
 		//{
-			std::vector<GameObject*>::iterator node = App->importGeometry->geometryNodes.begin();
-			while (node != App->importGeometry->geometryNodes.end())
+			std::vector<GameObject*>::iterator node = App->importGeometry->root->childs.begin();
+			while (node != App->importGeometry->root->childs.end())
 			{
 				std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
 				while (childNodes != (*node)->childs.end())

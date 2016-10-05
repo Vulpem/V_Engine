@@ -7,87 +7,19 @@
 #include "Math.h"
 #include <vector>
 
+#include "GameObject.h"
+
 #define CHECKERS_HEIGHT 128
 #define CHECKERS_WIDTH 128
-
-#define NAME_MAX_LEN 1024
 
 struct aiMesh;
 struct aiNode;
 struct aiScene;
 
-class mesh
-{
-public:
-	~mesh();
+class GameObject;
 
-	char name[NAME_MAX_LEN];
-
-	uint id_vertices = 0;
-	uint num_vertices = 0;
-	float* vertices = nullptr;
-
-	uint id_indices = 0;
-	uint num_indices = 0;
-	uint* indices = nullptr;
-
-	uint id_normals = 0;
-	uint num_normals;
-	float* normals = nullptr;
-
-	uint id_textureCoords = 0;
-	uint num_textureCoords = 0;
-	float* textureCoords = nullptr;
-
-
-	float r = 0.5f;
-	float g = 0.5f;
-	float b = 0.5f;
-	float a = 1.0f;
-
-	uint texture = 0;
-
-	bool wires = false;
-	bool selected = false;
-
-	void Draw();
-private:
-	void RealRender(bool wired = false);
-};
-
-class GameObject
-{
-public:
-	char name[NAME_MAX_LEN];
-
-	std::vector<mesh*> meshes;
-	std::vector<GameObject*> childs;
-	GameObject* parent = nullptr;
-
-	math::Quat rotation = math::Quat::identity;
-	math::float3 position = math::float3::zero;
-	math::float3 scale = math::float3::zero;
-
-	~GameObject();
-
-	void Draw();
-
-	void Select();
-	void Unselect();
-
-	void SetPos(float x, float y, float z);
-	void ResetPos();
-	math::float3 GetPos();
-
-	void SetRot(float x, float y, float z);
-	void ResetRot();
-	math::float3 GetRot();
-
-	void SetScale(float x, float y, float z);
-	void ResetScale();
-	math::float3 GetScale();
-
-};
+//TO_REMOVE
+class mesh;
 
 class ModuleImportGeometry : public Module
 {
@@ -116,15 +48,13 @@ private:
 	mesh* LoadMesh(const aiMesh* toLoad, const aiScene* scene);
 
 	void CleanName(char* toClean);
+
+	void CreateRootGameObject();
 public:
 	uint id_checkerTexture;
 	std::vector<uint> id_textures;
 
-public:
-
-	std::vector<GameObject*> geometryNodes;
-
-
+	GameObject* root = NULL;
 };
 
 #endif

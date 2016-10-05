@@ -24,296 +24,6 @@
 #pragma comment(lib, "Devil/libx86/ILU.lib")
 #pragma comment(lib, "Devil/libx86/ILUT.lib")
 
-
-//------------------------- NODE --------------------------------------------------------------------------------
-
-GameObject::~GameObject()
-{
-	
-	if (parent != nullptr)
-	{
-		std::vector<GameObject*>::iterator it = parent->childs.begin();
-		while ((*it) != this)
-		{
-			it++;
-		}
-		parent->childs.erase(it);
-	}
-	else
-	{
-		std::vector<GameObject*>::iterator it = App->importGeometry->geometryNodes.begin();
-		while (it != App->importGeometry->geometryNodes.end())
-		{
-			if ((*it) == this)
-			{
-				App->importGeometry->geometryNodes.erase(it);
-				break;
-			}
-			it++;
-		}
-	}
-
-	if (childs.empty() == false)
-	{
-		std::vector<GameObject*>::iterator iterator = childs.begin();
-		while (childs.size() > 0 && iterator != childs.end())
-		{
-			delete (*iterator);
-			//Erasing a Node will already remove it from the child list in its destructor, so we don't have to empty the list here, it will be done automatically
-			iterator = childs.begin();
-		}
-	}
-
-	if (meshes.empty() == false)
-	{
-		std::vector<mesh*>::iterator iterator = meshes.begin();
-		while (meshes.size() > 0 && iterator != meshes.end())
-		{
-			delete (*iterator);
-			if (meshes.size() > 1)
-			{
-				iterator = meshes.erase(iterator);
-			}
-			else
-			{
-				meshes.erase(iterator);
-			}
-			
-		}
-	}
-}
-
-void GameObject::Draw()
-{
-	glPushMatrix();
-
-	math::float4x4 transform = math::float4x4::FromTRS(position, rotation, scale);
-	transform.Transpose();
-
-	glMultMatrixf(transform.ptr());
-
-	if (childs.empty() == false)
-	{
-		std::vector<GameObject*>::iterator iterator = childs.begin();
-		while (iterator != childs.end())
-		{
-			(*iterator)->Draw();
-			iterator++;
-		}
-	}
-
-	if (meshes.empty() == false)
-	{
-		std::vector<mesh*>::iterator iterator = meshes.begin();
-		while (iterator != meshes.end())
-		{
-			(*iterator)->Draw();
-			iterator++;
-		}
-	}
-
-	glPopMatrix();
-}
-
-void GameObject::Select()
-{
-	std::vector<mesh*>::iterator it = meshes.begin();
-	while (it != meshes.end())
-	{
-		(*it)->selected = true;
-		it++;
-	}
-	std::vector<GameObject*>::iterator childIt = childs.begin();
-	while (childIt != childs.end())
-	{
-		(*childIt)->Select();
-		childIt++;
-	}
-}
-
-void GameObject::Unselect()
-{
-	std::vector<mesh*>::iterator it = meshes.begin();
-	while (it != meshes.end())
-	{
-		(*it)->selected = false;
-		it++;
-	}
-	std::vector<GameObject*>::iterator childIt = childs.begin();
-	while (childIt != childs.end())
-	{
-		(*childIt)->Unselect();
-		childIt++;
-	}
-}
-
-void GameObject::SetPos(float x, float y, float z)
-{
-	position.x = x;
-	position.y = y;
-	position.z = z;
-}
-
-void GameObject::ResetPos()
-{
-	SetPos(0, 0, 0);
-}
-
-math::float3 GameObject::GetPos()
-{
-	return position;
-}
-
-void GameObject::SetRot(float x, float y, float z)
-{
-	x *= DEGTORAD;
-	y *= DEGTORAD;
-	z *= DEGTORAD;
-	if (x == -0) { x = 0; }
-	if (y == -0) { y = 0; }
-	if (z == -0) { z = 0; }
-	
-	rotation = math::Quat::FromEulerXYZ(x, y, z);
-}
-
-void GameObject::ResetRot()
-{
-	SetRot(0, 0, 0);
-}
-
-math::float3 GameObject::GetRot()
-{
-	math::float3 ret = rotation.ToEulerXYZ();
-	ret.x *= RADTODEG;
-	ret.y *= RADTODEG;
-	ret.z *= RADTODEG;
-	return ret;
-}
-
-void GameObject::SetScale(float x, float y, float z)
-{
-	if (x != 0 && y != 0 && z != 0)
-	{
-		scale.Set(x, y, z);
-	}
-}
-
-void GameObject::ResetScale()
-{
-	SetScale(1, 1, 1);
-}
-
-math::float3 GameObject::GetScale()
-{
-	return scale;
-}
-
-
-//------------------------- MESH --------------------------------------------------------------------------------
-mesh::~mesh()
-{
-	if (indices) { delete[] indices; }
-	if (vertices) { delete[] vertices; }
-	if (textureCoords) { delete[] textureCoords; }
-	if (normals) { delete[] normals; }
-
-	if (id_indices != 0)
-	{
-		glDeleteBuffers(1, &id_indices);
-	}
-	if (id_normals != 0)
-	{
-		glDeleteBuffers(1, &id_normals);
-	}
-	if (id_textureCoords != 0)
-	{
-		glDeleteBuffers(1, &id_textureCoords);
-	}
-	if (id_vertices != 0)
-	{
-		glDeleteBuffers(1, &id_vertices);
-	}
-}
-
-void mesh::Draw()
-{
-	if (wires == false || selected)
-	{
-		RealRender();
-	}	
-	if (wires == true || selected)
-	{
-		RealRender(true);
-	}
-
-}
-
-void mesh::RealRender(bool wired)
-{
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glColor4f(r, g, b, a);
-
-	//Setting vertex
-	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-	if (wired)
-	{
-		glDisable(GL_LIGHTING);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glLineWidth(1.1f);
-		glColor4f(0, 1, 1, 1);
-	}
-	else
-	{
-		glEnable(GL_LIGHTING);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		if (texture != 0)
-		{
-			glBindTexture(GL_TEXTURE_2D, texture);
-		}
-		else
-		{
-			glBindTexture(GL_TEXTURE_2D, App->importGeometry->GetCheckerID());
-		}
-
-		if (num_textureCoords > 0)
-		{
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			//Setting texture coords
-			glBindBuffer(GL_ARRAY_BUFFER, id_textureCoords);
-			glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-		}
-
-		if (num_normals > 0)
-		{
-			glEnableClientState(GL_NORMAL_ARRAY);
-			//Setting Normals
-			glBindBuffer(GL_ARRAY_BUFFER, id_normals);
-			glNormalPointer(GL_FLOAT, 0, NULL);
-		}
-	}
-
-	//Setting index
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_indices);
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, NULL);
-
-	//Cleaning
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindBuffer(GL_NONE, 0);
-
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glEnable(GL_LIGHTING);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-
 //------------------------- MODULE --------------------------------------------------------------------------------
 
 ModuleImportGeometry::ModuleImportGeometry(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -346,12 +56,14 @@ bool ModuleImportGeometry::Init()
 		exit(2);
 	}
 
+	CreateRootGameObject();
 		
 	return ret;
 }
 
 bool ModuleImportGeometry::Start()
 {
+
 	//Generating checker texture
 	ilutRenderer(ILUT_OPENGL);
 
@@ -401,8 +113,8 @@ update_status ModuleImportGeometry::Update(float dt)
 		}
 	}
 
-	std::vector<GameObject*>::iterator it = geometryNodes.begin();
-	while (it != geometryNodes.end())
+	std::vector<GameObject*>::iterator it = root->childs.begin();
+	while (it != root->childs.end())
 	{
 		(*it)->Draw();
 		it++;
@@ -422,15 +134,20 @@ bool ModuleImportGeometry::CleanUp()
 {
 	aiDetachAllLogStreams();
 
-	std::vector<GameObject*>::iterator it = geometryNodes.begin();
-	while (geometryNodes.size() > 0)
+	if (root)
+	{
+		delete root;
+	}
+
+	/*std::vector<GameObject*>::iterator it = root->childs.begin();
+	while (root->childs.size() > 0)
 	{
 		GameObject* tmp = *it;
-		it = geometryNodes.erase(it);
+		it = root->childs.erase(it);
 		delete (tmp);
 		
 		
-	}
+	}*/
 
 	return true;
 }
@@ -449,8 +166,8 @@ GameObject* ModuleImportGeometry::LoadFBX(char* path)
 	{
 		if (scene->HasMeshes())
 		{
-			ret = LoadGameObject(scene->mRootNode, scene);
-			geometryNodes.push_back(ret);
+			ret = LoadGameObject(scene->mRootNode, scene, root);
+			root->childs.push_back(ret);
 		}
 		if (scene)
 		{
@@ -468,20 +185,14 @@ GameObject* ModuleImportGeometry::LoadFBX(char* path)
 
 bool ModuleImportGeometry::DeleteGameObject(GameObject* toErase)
 {
-	std::vector<GameObject*>::iterator it = geometryNodes.begin();
-	while (it != geometryNodes.end())
+	if (toErase)
 	{
-		if ((*it) == toErase)
-		{
-			geometryNodes.erase(it);
-			break;
-		}
-		it++;
+		delete toErase;
+		return true;
 	}
+	return false;
 
-	delete toErase;
-
-	return true;
+	
 }
 
 uint ModuleImportGeometry::LoadTexture(char* path)
@@ -672,4 +383,33 @@ void ModuleImportGeometry::CleanName(char* toClean)
 		n++;
 		searcher++;
 	}
+}
+
+void ModuleImportGeometry::CreateRootGameObject()
+{
+	GameObject* ret = new GameObject();
+
+	//Setting Name
+	strcpy(ret->name, "Root");
+
+	//Setting parent
+	ret->parent = nullptr;
+
+	//Setting transform
+	math::Quat rot = math::Quat::identity;
+
+	ret->scale.x = 1;
+	ret->scale.y = 1;
+	ret->scale.z = 1;
+
+	ret->position.x = 0;
+	ret->position.y = 0;
+	ret->position.z = 0;
+
+	ret->rotation.x = rot.x;
+	ret->rotation.y = rot.y;
+	ret->rotation.z = rot.z;
+	ret->rotation.w = rot.w;
+
+	root = ret;
 }

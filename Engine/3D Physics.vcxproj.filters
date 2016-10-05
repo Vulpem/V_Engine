@@ -46,6 +46,9 @@
     <Filter Include="Sources\devIL">
       <UniqueIdentifier>{b8694ff7-7cc8-4cdd-8254-75d0b4ec3916}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\GameObjectStuff">
+      <UniqueIdentifier>{3e399d53-bf8a-4fd1-9004-dbcf29af7956}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -339,6 +342,12 @@
     <ClInclude Include="Devil\include\ilut_config.h">
       <Filter>Sources\devIL</Filter>
     </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -505,6 +514,12 @@
     </ClCompile>
     <ClCompile Include="ModuleFileSystem.cpp">
       <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
