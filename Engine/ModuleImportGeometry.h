@@ -55,20 +55,20 @@ private:
 	void RealRender(bool wired = false);
 };
 
-class Node
+class GameObject
 {
 public:
 	char name[NAME_MAX_LEN];
 
 	std::vector<mesh*> meshes;
-	std::vector<Node*> childs;
-	Node* parent = nullptr;
+	std::vector<GameObject*> childs;
+	GameObject* parent = nullptr;
 
 	math::Quat rotation = math::Quat::identity;
 	math::float3 position = math::float3::zero;
 	math::float3 scale = math::float3::zero;
 
-	~Node();
+	~GameObject();
 
 	void Draw();
 
@@ -105,14 +105,14 @@ public:
 
 	bool CleanUp();
 
-	Node* LoadFBX(char* path);
-	bool DeleteNode(Node* toErase);
+	GameObject* LoadFBX(char* path);
+	bool DeleteGameObject(GameObject* toErase);
 
 	uint LoadTexture(char* path);
 	uint GetCheckerID() { return id_checkerTexture; }
 
 private:
-	Node* LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent = NULL);
+	GameObject* LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent = NULL);
 	mesh* LoadMesh(const aiMesh* toLoad, const aiScene* scene);
 
 	void CleanName(char* toClean);
@@ -122,7 +122,7 @@ public:
 
 public:
 
-	std::vector<Node*> geometryNodes;
+	std::vector<GameObject*> geometryNodes;
 
 
 };

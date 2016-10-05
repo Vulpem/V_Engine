@@ -49,7 +49,7 @@ bool ModuleUI::Start()
 
 	strcpy(toImport, "FBX/-.fbx");
 
-	selectedGeometry = NULL;
+	selectedGameObject = NULL;
 
 	return true;
 }
@@ -123,8 +123,8 @@ update_status ModuleUI::PreUpdate(float dt)
 #pragma region Editor
 	if (IsOpenEditor)
 	{
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 300));
-		ImGui::SetNextWindowSize(ImVec2(330, screenH -300));
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 530));
+		ImGui::SetNextWindowSize(ImVec2(330, screenH -530));
 
 		ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0);
 
@@ -257,7 +257,7 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::InputText("Load:", toImport, 256);
 			if (ImGui::Button("Import"))
 			{
-				Node* import = App->importGeometry->LoadFBX(toImport);
+				GameObject* import = App->importGeometry->LoadFBX(toImport);
 				if (import != NULL)
 				{
 					geometries.push_back(App->importGeometry->LoadFBX(toImport));
@@ -275,13 +275,13 @@ update_status ModuleUI::PreUpdate(float dt)
 
 		//if (ImGui::TreeNode("Scene"))
 		//{
-			std::vector<Node*>::iterator node = App->importGeometry->geometryNodes.begin();
+			std::vector<GameObject*>::iterator node = App->importGeometry->geometryNodes.begin();
 			while (node != App->importGeometry->geometryNodes.end())
 			{
-				std::vector<Node*>::iterator childNodes = (*node)->childs.begin();
+				std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
 				while (childNodes != (*node)->childs.end())
 				{
-					SceneTreeNodes((*childNodes));
+					SceneTreeGameObject((*childNodes));
 					childNodes++;
 				}				
 				node++;
@@ -296,29 +296,29 @@ update_status ModuleUI::PreUpdate(float dt)
 	if (IsOpenAttributes)
 	{
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(330, 280));
+		ImGui::SetNextWindowSize(ImVec2(330, 510));
 		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
-		if (selectedGeometry)
+		if (selectedGameObject)
 		{
-			ImGui::InputText("Name", selectedGeometry->name, NAME_MAX_LEN);
+			ImGui::InputText("Name", selectedGameObject->name, NAME_MAX_LEN);
 			if (ImGui::DragFloat3("Position", selectedPos, 1.0f))
 			{
-				selectedGeometry->SetPos(selectedPos[0], selectedPos[1], selectedPos[2]);
+				selectedGameObject->SetPos(selectedPos[0], selectedPos[1], selectedPos[2]);
 			}
 			if (ImGui::DragFloat3("Rotation", selectedEuler, 1.0f, 0.0f, 360.0f))
 			{
-				selectedGeometry->SetRot(selectedEuler[0], selectedEuler[1], selectedEuler[2]);
+				selectedGameObject->SetRot(selectedEuler[0], selectedEuler[1], selectedEuler[2]);
 			}
 			if (ImGui::DragFloat3("Scale", selectedScale, 0.01f, 0.1f))
 			{
-				selectedGeometry->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
+				selectedGameObject->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
 			}
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");
 			if (ImGui::Button("Delete"))
 			{
-				App->importGeometry->DeleteNode(selectedGeometry);
-				selectedGeometry = NULL;
+				App->importGeometry->DeleteGameObject(selectedGameObject);
+				selectedGameObject = NULL;
 			}
 
 		}
@@ -379,37 +379,37 @@ void ModuleUI::ClearConsole()
 	scrollToBottom = true;
 }
 
-void ModuleUI::SceneTreeNodes(Node* node)
+void ModuleUI::SceneTreeGameObject(GameObject* node)
 {
 	if (ImGui::TreeNode(node->name))
 	{
 		if (ImGui::IsItemClicked())
 		{
-			SelectNode(node);
+			SelectGameObject(node);
 		}
 
-		std::vector<Node*>::iterator it = node->childs.begin();
+		std::vector<GameObject*>::iterator it = node->childs.begin();
 		while (it != node->childs.end())
 		{
-			SceneTreeNodes((*it));
+			SceneTreeGameObject((*it));
 			it++;
 		}
 		ImGui::TreePop();
 	}
 }
 
-void ModuleUI::SelectNode(Node* node)
+void ModuleUI::SelectGameObject(GameObject* node)
 {
-	if (selectedGeometry)
+	if (selectedGameObject)
 	{
-		selectedGeometry->Unselect();
+		selectedGameObject->Unselect();
 	}
 	if (node)
 	{
 		node->Select();
 	}
-	selectedGeometry = node;
-	if (selectedGeometry)
+	selectedGameObject = node;
+	if (selectedGameObject)
 	{
 		math::float3 pos, rot, scale;
 

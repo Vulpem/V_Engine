@@ -27,12 +27,12 @@
 
 //------------------------- NODE --------------------------------------------------------------------------------
 
-Node::~Node()
+GameObject::~GameObject()
 {
 	
 	if (parent != nullptr)
 	{
-		std::vector<Node*>::iterator it = parent->childs.begin();
+		std::vector<GameObject*>::iterator it = parent->childs.begin();
 		while ((*it) != this)
 		{
 			it++;
@@ -41,7 +41,7 @@ Node::~Node()
 	}
 	else
 	{
-		std::vector<Node*>::iterator it = App->importGeometry->geometryNodes.begin();
+		std::vector<GameObject*>::iterator it = App->importGeometry->geometryNodes.begin();
 		while (it != App->importGeometry->geometryNodes.end())
 		{
 			if ((*it) == this)
@@ -55,7 +55,7 @@ Node::~Node()
 
 	if (childs.empty() == false)
 	{
-		std::vector<Node*>::iterator iterator = childs.begin();
+		std::vector<GameObject*>::iterator iterator = childs.begin();
 		while (childs.size() > 0 && iterator != childs.end())
 		{
 			delete (*iterator);
@@ -83,7 +83,7 @@ Node::~Node()
 	}
 }
 
-void Node::Draw()
+void GameObject::Draw()
 {
 	glPushMatrix();
 
@@ -94,7 +94,7 @@ void Node::Draw()
 
 	if (childs.empty() == false)
 	{
-		std::vector<Node*>::iterator iterator = childs.begin();
+		std::vector<GameObject*>::iterator iterator = childs.begin();
 		while (iterator != childs.end())
 		{
 			(*iterator)->Draw();
@@ -115,7 +115,7 @@ void Node::Draw()
 	glPopMatrix();
 }
 
-void Node::Select()
+void GameObject::Select()
 {
 	std::vector<mesh*>::iterator it = meshes.begin();
 	while (it != meshes.end())
@@ -123,7 +123,7 @@ void Node::Select()
 		(*it)->selected = true;
 		it++;
 	}
-	std::vector<Node*>::iterator childIt = childs.begin();
+	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{
 		(*childIt)->Select();
@@ -131,7 +131,7 @@ void Node::Select()
 	}
 }
 
-void Node::Unselect()
+void GameObject::Unselect()
 {
 	std::vector<mesh*>::iterator it = meshes.begin();
 	while (it != meshes.end())
@@ -139,7 +139,7 @@ void Node::Unselect()
 		(*it)->selected = false;
 		it++;
 	}
-	std::vector<Node*>::iterator childIt = childs.begin();
+	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{
 		(*childIt)->Unselect();
@@ -147,24 +147,24 @@ void Node::Unselect()
 	}
 }
 
-void Node::SetPos(float x, float y, float z)
+void GameObject::SetPos(float x, float y, float z)
 {
 	position.x = x;
 	position.y = y;
 	position.z = z;
 }
 
-void Node::ResetPos()
+void GameObject::ResetPos()
 {
 	SetPos(0, 0, 0);
 }
 
-math::float3 Node::GetPos()
+math::float3 GameObject::GetPos()
 {
 	return position;
 }
 
-void Node::SetRot(float x, float y, float z)
+void GameObject::SetRot(float x, float y, float z)
 {
 	x *= DEGTORAD;
 	y *= DEGTORAD;
@@ -176,12 +176,12 @@ void Node::SetRot(float x, float y, float z)
 	rotation = math::Quat::FromEulerXYZ(x, y, z);
 }
 
-void Node::ResetRot()
+void GameObject::ResetRot()
 {
 	SetRot(0, 0, 0);
 }
 
-math::float3 Node::GetRot()
+math::float3 GameObject::GetRot()
 {
 	math::float3 ret = rotation.ToEulerXYZ();
 	ret.x *= RADTODEG;
@@ -190,7 +190,7 @@ math::float3 Node::GetRot()
 	return ret;
 }
 
-void Node::SetScale(float x, float y, float z)
+void GameObject::SetScale(float x, float y, float z)
 {
 	if (x != 0 && y != 0 && z != 0)
 	{
@@ -198,12 +198,12 @@ void Node::SetScale(float x, float y, float z)
 	}
 }
 
-void Node::ResetScale()
+void GameObject::ResetScale()
 {
 	SetScale(1, 1, 1);
 }
 
-math::float3 Node::GetScale()
+math::float3 GameObject::GetScale()
 {
 	return scale;
 }
@@ -300,10 +300,9 @@ void mesh::RealRender(bool wired)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_indices);
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, NULL);
 
-
 	//Cleaning
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	glBindBuffer(GL_NONE, 0);
 
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
@@ -402,7 +401,7 @@ update_status ModuleImportGeometry::Update(float dt)
 		}
 	}
 
-	std::vector<Node*>::iterator it = geometryNodes.begin();
+	std::vector<GameObject*>::iterator it = geometryNodes.begin();
 	while (it != geometryNodes.end())
 	{
 		(*it)->Draw();
@@ -423,10 +422,10 @@ bool ModuleImportGeometry::CleanUp()
 {
 	aiDetachAllLogStreams();
 
-	std::vector<Node*>::iterator it = geometryNodes.begin();
+	std::vector<GameObject*>::iterator it = geometryNodes.begin();
 	while (geometryNodes.size() > 0)
 	{
-		Node* tmp = *it;
+		GameObject* tmp = *it;
 		it = geometryNodes.erase(it);
 		delete (tmp);
 		
@@ -436,21 +435,21 @@ bool ModuleImportGeometry::CleanUp()
 	return true;
 }
 
-Node* ModuleImportGeometry::LoadFBX(char* path)
+GameObject* ModuleImportGeometry::LoadFBX(char* path)
 {
 //	SDL_RWops* file = App->fs->Load(path);
 
 //	aiFileIO aiFile;
 //	aiFile.OpenProc(&aiFile, "App->fs->Load(path)", "this");
 
-	Node* ret = NULL;
+	GameObject* ret = NULL;
 
 	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 	if (scene != nullptr)
 	{
 		if (scene->HasMeshes())
 		{
-			ret = LoadNode(scene->mRootNode, scene);
+			ret = LoadGameObject(scene->mRootNode, scene);
 			geometryNodes.push_back(ret);
 		}
 		if (scene)
@@ -467,9 +466,9 @@ Node* ModuleImportGeometry::LoadFBX(char* path)
 	return ret;
 }
 
-bool ModuleImportGeometry::DeleteNode(Node* toErase)
+bool ModuleImportGeometry::DeleteGameObject(GameObject* toErase)
 {
-	std::vector<Node*>::iterator it = geometryNodes.begin();
+	std::vector<GameObject*>::iterator it = geometryNodes.begin();
 	while (it != geometryNodes.end())
 	{
 		if ((*it) == toErase)
@@ -518,9 +517,9 @@ uint ModuleImportGeometry::LoadTexture(char* path)
 	}
 }
 
-Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene, Node* parent)
+GameObject* ModuleImportGeometry::LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent)
 {
-	Node* ret = new Node();
+	GameObject* ret = new GameObject();
 
 	//Setting Name
 	char tmpName[MAXLEN];
@@ -564,7 +563,7 @@ Node* ModuleImportGeometry::LoadNode(const aiNode* toLoad, const aiScene* scene,
 	//Loading child nodes
 	for (int n = 0; n < toLoad->mNumChildren; n++)
 	{
-		ret->childs.push_back(LoadNode(toLoad->mChildren[n], scene, ret));
+		ret->childs.push_back(LoadGameObject(toLoad->mChildren[n], scene, ret));
 	}
 
 	return ret;

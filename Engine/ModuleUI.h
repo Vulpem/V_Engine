@@ -8,7 +8,7 @@
 
 #include "ImGui\imgui.h"
 
-class Node;
+class GameObject;
 
 union SDL_Event;
 
@@ -43,8 +43,8 @@ public:
 	void ModuleUI::Log(const char* input);
 	void ClearConsole();
 private:
-	void SceneTreeNodes(Node* node);
-	void SelectNode(Node* node);
+	void SceneTreeGameObject(GameObject* node);
+	void SelectGameObject(GameObject* node);
 
 public:
 
@@ -69,12 +69,12 @@ private:
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;
 
-	std::vector<Node*> geometries;
+	std::vector<GameObject*> geometries;
 	char toImport[256];
 	C_String importResult;
 	math::float3 changeGeometryPos;
 
-	Node* selectedGeometry = nullptr;
+	GameObject* selectedGameObject = nullptr;
 	float selectedPos[3] = { 0,0,0 };
 	float selectedScale[3] = { 1,1,1 };
 	float selectedEuler[3] = { 0,0,0 };
