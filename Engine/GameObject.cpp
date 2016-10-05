@@ -42,10 +42,13 @@ GameObject::~GameObject()
 
 void GameObject::Update()
 {
-	glPushMatrix();
+	if (HasComponent(Component::Type::C_transform))
+	{
+		glPushMatrix();
 
-	Transform* tmp2 = (Transform*)(*GetComponent(Component::Type::C_transform).begin());
-	glMultMatrixf(tmp2->GetTransformMatrix().ptr());
+		Transform* transform = (Transform*)(*GetComponent(Component::Type::C_transform).begin());
+		glMultMatrixf(transform->GetTransformMatrix().ptr());
+	}
 
 	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
 	{
@@ -58,8 +61,10 @@ void GameObject::Update()
 		(*it)->Update();
 		it++;
 	}
-
-	glPopMatrix();
+	if (HasComponent(Component::Type::C_transform))
+	{
+		glPopMatrix();
+	}
 }
 
 void GameObject::DrawOnEditor()

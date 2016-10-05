@@ -33,7 +33,7 @@ public:
 	ModuleRenderer3D* renderer3D;
 	ModuleCamera3D* camera;
 
-	ModuleEditor* UI;
+	ModuleEditor* Editor;
 	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
 

@@ -90,6 +90,8 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);		
 			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
 			ImGui::Checkbox("InGame Plane", &showPlane);
+			ImGui::Checkbox("Reference Axis", &showAxis);
+			
 			if (ImGui::Checkbox("Render Normals", &renderNormals))
 			{
 				SelectGameObject(selectedGameObject);
@@ -329,6 +331,51 @@ update_status ModuleEditor::Update(float dt)
 		p.axis = true;
 		p.Render();
 	}
+
+#pragma region Axis
+
+	if (showAxis == true)
+	{
+		math::float3 axisPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
+		math::float3 front(App->camera->Z.x, App->camera->Z.y, App->camera->Z.z);
+		math::float3 right(App->camera->X.x, App->camera->X.y, App->camera->X.z);
+		math::float3 up(App->camera->Y.x, App->camera->Y.y, App->camera->Y.z);
+		axisPos = axisPos - (front)+right * 0.35f - up*0.2f;
+
+		glDisable(GL_LIGHTING);
+		// Draw Axis Grid
+		glLineWidth(1.0f);
+
+		glBegin(GL_LINES);
+
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+
+		glVertex3f(axisPos.x, axisPos.y, axisPos.z);					glVertex3f(axisPos.x + 0.1f, axisPos.y, axisPos.z);
+		glVertex3f(axisPos.x + 0.1f, axisPos.y + 0.01f, axisPos.z);		glVertex3f(axisPos.x + 0.11f, axisPos.y - 0.01f, axisPos.z);
+		glVertex3f(axisPos.x + 0.11f, axisPos.y + 0.01f, axisPos.z);	glVertex3f(axisPos.x + 0.10f, axisPos.y - 0.01f, axisPos.z);
+
+		glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+
+		glVertex3f(axisPos.x, axisPos.y, axisPos.z);					glVertex3f(axisPos.x, axisPos.y + 0.1f, axisPos.z);
+		glVertex3f(axisPos.x - 0.005f, axisPos.y + 0.125f, axisPos.z);	glVertex3f(axisPos.x, axisPos.y + 0.115f, axisPos.z);
+		glVertex3f(axisPos.x + 0.005f, axisPos.y + 0.125f, axisPos.z);	glVertex3f(axisPos.x, axisPos.y + 0.115f, axisPos.z);
+		glVertex3f(axisPos.x, axisPos.y + 0.115f, axisPos.z);				glVertex3f(axisPos.x, axisPos.y + 0.105f, axisPos.z);
+
+		glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+
+		glVertex3f(axisPos.x, axisPos.y, axisPos.z);					glVertex3f(axisPos.x, axisPos.y, axisPos.z + 0.1f);
+
+		glVertex3f(axisPos.x - 0.005f, axisPos.y + 0.01, axisPos.z + 0.105f);			glVertex3f(axisPos.x + 0.005f, axisPos.y + 0.01f, axisPos.z + 0.105f);
+		glVertex3f(axisPos.x + 0.005f, axisPos.y + 0.01f, axisPos.z + 0.105f);	glVertex3f(axisPos.x - 0.005f, axisPos.y - 0.01f, axisPos.z + 0.105f);
+		glVertex3f(axisPos.x - 0.005f, axisPos.y - 0.01f, axisPos.z + 0.105f);		glVertex3f(axisPos.x + 0.005f, axisPos.y - 0.01f, axisPos.z + 0.105f);
+
+		glEnd();
+
+		glLineWidth(1.0f);
+		glEnable(GL_LIGHTING);
+	}
+
+#pragma endregion
 
 	return UPDATE_CONTINUE;
 }

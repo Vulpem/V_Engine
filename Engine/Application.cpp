@@ -28,7 +28,7 @@ Application::Application()
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
 	physics = new ModulePhysics3D(this);
-	UI = new ModuleEditor(this);
+	Editor = new ModuleEditor(this);
 	GO = new ModuleGoManager(this);
 
 	scene = new ModuleScene(this);
@@ -39,12 +39,12 @@ Application::Application()
 
 	// Main Modules
 	AddModule(window);
+	AddModule(Editor);
 	AddModule(camera);
 	AddModule(input);
 	AddModule(fs);
 	AddModule(audio);
 	AddModule(physics);
-	AddModule(UI);
 	AddModule(GO);
 	
 	// Scenes
@@ -231,9 +231,9 @@ void Application::Log(char* str)
 {
 	if (gameRunning == true)
 	{
-		if (UI != NULL && UI->IsEnabled())
+		if (Editor != NULL && Editor->IsEnabled())
 		{
-			UI->Log(str);
+			Editor->Log(str);
 		}
 	}
 }
