@@ -183,7 +183,6 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 		return true;
 	}
 	return false;
-
 	
 }
 

@@ -22,8 +22,9 @@ Material::~Material()
 
 void Material::EditorContent()
 {
-	ImGui::Text("Color:");
-	ImGui::DragFloat4("##MatColor", color, 0.005f, 0.0f, 1.0f);
+	ImGui::ColorEdit3("Color", color);
+	//ImGui::SameLine();
+
 	for (int n = 0; n < textures.size(); n++)
 	{
 		ImGui::Separator();
