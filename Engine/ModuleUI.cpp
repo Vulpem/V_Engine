@@ -271,8 +271,6 @@ update_status ModuleUI::PreUpdate(float dt)
 			ImGui::Text(importResult.GetString());
 		}
 
-		//if (ImGui::TreeNode("Scene"))
-		//{
 			std::vector<GameObject*>::iterator node = App->GO->root->childs.begin();
 			while (node != App->GO->root->childs.end())
 			{
@@ -284,8 +282,7 @@ update_status ModuleUI::PreUpdate(float dt)
 				}				
 				node++;
 			}
-		//	ImGui::TreePop();
-		//}
+
 		ImGui::End();
 	}
 #pragma endregion
@@ -310,6 +307,11 @@ update_status ModuleUI::PreUpdate(float dt)
 			if (ImGui::DragFloat3("Scale", selectedScale, 0.01f, 0.1f))
 			{
 				selectedGameObject->SetScale(selectedScale[0], selectedScale[1], selectedScale[2]);
+			}
+			ImGui::NewLine();
+			if (ImGui::Button("Look at"))
+			{
+				App->camera->LookAt(vec3(selectedGameObject->GetPos().x, selectedGameObject->GetPos().y, selectedGameObject->GetPos().z));
 			}
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");
@@ -425,7 +427,5 @@ void ModuleUI::SelectGameObject(GameObject* node)
 		selectedScale[0] = scale.x;
 		selectedScale[1] = scale.y;
 		selectedScale[2] = scale.z;
-
-		App->camera->LookAt(vec3(pos.x, pos.y, pos.z));
 	}
 }
