@@ -139,16 +139,6 @@ bool ModuleImportGeometry::CleanUp()
 		delete root;
 	}
 
-	/*std::vector<GameObject*>::iterator it = root->childs.begin();
-	while (root->childs.size() > 0)
-	{
-		GameObject* tmp = *it;
-		it = root->childs.erase(it);
-		delete (tmp);
-		
-		
-	}*/
-
 	return true;
 }
 
