@@ -91,6 +91,10 @@ void mesh::RealRender(bool wired)
 	}
 	else
 	{
+		if (object->renderNormals)
+		{
+			RenderNormals();
+		}
 		glEnable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -141,6 +145,30 @@ void mesh::RealRender(bool wired)
 
 	glEnable(GL_LIGHTING);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void mesh::RenderNormals()
+{
+	glDisable(GL_LIGHTING);
+	// Draw Axis Grid
+	glLineWidth(0.7f);
+
+	glBegin(GL_LINES);
+
+	glColor4f(0.54f, 0.0f, 0.54f, 1.0f);
+
+	for (int n = 0; n < num_vertices; n++)
+	{
+		glVertex3f(vertices[n * 3], vertices[n * 3 + 1], vertices[n * 3 + 2]);
+		
+		glVertex3f(vertices[n * 3] + normals[n * 3], vertices[n * 3 + 1] + normals[n * 3 + 1], vertices[n * 3 + 2] + normals[n * 3 + 2]);
+	}
+
+	glEnd();
+
+	glLineWidth(1.0f);
+	glEnable(GL_LIGHTING);
+
 }
 
 bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)

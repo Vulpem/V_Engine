@@ -70,9 +70,10 @@ void GameObject::DrawOnEditor()
 	}
 }
 
-void GameObject::Select()
+void GameObject::Select(bool _renderNormals)
 {
 	selected = true;
+	renderNormals = _renderNormals;
 	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{
@@ -84,6 +85,7 @@ void GameObject::Select()
 void GameObject::Unselect()
 {
 	selected = false;
+	renderNormals = false;
 	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{

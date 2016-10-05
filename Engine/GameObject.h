@@ -24,11 +24,12 @@ public:
 
 	std::vector<Component*> components;
 	bool selected = false;
+	bool renderNormals = false;
 
 	void Update();
 	void DrawOnEditor();
 
-	void Select();
+	void Select(bool renderNormals = false);
 	void Unselect();
 
 	Component* AddComponent(componentType type);

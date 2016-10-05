@@ -43,6 +43,7 @@ public:
 	void Draw();
 private:
 	void RealRender(bool wired = false);
+	void RenderNormals();
 };
 
 #endif

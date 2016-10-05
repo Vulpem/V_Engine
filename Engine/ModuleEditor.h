@@ -60,6 +60,7 @@ public:
 	bool IsOpenAttributes = true;
 
 	bool showPlane = true;
+	bool renderNormals = false;
 
 	char* testConsoleInput;
 

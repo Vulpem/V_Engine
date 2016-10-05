@@ -90,6 +90,10 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);		
 			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
 			ImGui::Checkbox("InGame Plane", &showPlane);
+			if (ImGui::Checkbox("Render Normals", &renderNormals))
+			{
+				SelectGameObject(selectedGameObject);
+			}
 			ImGui::EndMenu();
 		}
 
@@ -390,7 +394,7 @@ void ModuleEditor::SelectGameObject(GameObject* node)
 	}
 	if (node)
 	{
-		node->Select();
+		node->Select(renderNormals);
 	}
 	selectedGameObject = node;
 }
