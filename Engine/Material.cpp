@@ -23,7 +23,6 @@ Material::~Material()
 void Material::EditorContent()
 {
 	ImGui::ColorEdit3("Color", color);
-	//ImGui::SameLine();
 
 	for (int n = 0; n < textures.size(); n++)
 	{

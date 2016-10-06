@@ -54,16 +54,34 @@ void mesh::DoUpdate()
 		Draw();
 	}
 }
+
 void mesh::EditorContent()
 {
-	ImGui::Text("Vertex: %i", num_indices);
-	ImGui::Text("Vertex in memory: %i", num_vertices);
+	ImGui::Checkbox("Wireframe", &wires);
+
+	ImGui::Text("Vertices in memory: %i", num_vertices);
+	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
+	ImGui::Text("Buffer: %i", id_vertices);
+
+	ImGui::Text("Indices in memory: %i", num_indices);
+	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
+	ImGui::Text("Buffer: %i", id_indices);
+
+	ImGui::Text("Normals in memory: %i", num_normals);
+	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
+	ImGui::Text("Buffer: %i", id_normals);
+
+	ImGui::Text("UV_Coords in memory: %i", num_textureCoords);
+	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
+	ImGui::Text("Buffer: %i", id_textureCoords);
+	ImGui::Separator();
+	ImGui::Text("Texture index material: %i", texMaterialIndex);
 }
 
 void mesh::Draw()
 {
 	bool selected = object->selected;
-	if (wires == false || selected)
+	if (wires == false)
 	{
 		RealRender();
 	}
@@ -88,6 +106,14 @@ void mesh::RealRender(bool wired)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glLineWidth(1.1f);
 		glColor4f(0, 1, 1, 1);
+		if (wires)
+		{
+			//glDisable(GL_DEPTH_TEST);
+			if (object->selected == false)
+			{
+				glColor4f(0.7f, 0.7f, 0.7, 1.0f);
+			}
+		}
 	}
 	else
 	{
@@ -144,6 +170,7 @@ void mesh::RealRender(bool wired)
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glEnable(GL_LIGHTING);
+	//glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
