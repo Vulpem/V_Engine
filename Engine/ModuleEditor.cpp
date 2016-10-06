@@ -301,7 +301,9 @@ update_status ModuleEditor::PreUpdate(float dt)
 		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
 		if (selectedGameObject)
 		{
-			ImGui::InputText("Name", selectedGameObject->name, NAME_MAX_LEN);
+			ImGui::Text("Name:");
+			ImGui::SameLine();
+			ImGui::InputText("##Name", selectedGameObject->name, NAME_MAX_LEN);
 			selectedGameObject->DrawOnEditor();
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");

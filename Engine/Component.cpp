@@ -42,12 +42,13 @@ void Component::Update()
 
 void Component::DrawOnEditor()
 {
-	bool open = ImGui::CollapsingHeader(name.GetString());
 	bool active = enabled;
 	char _id[56];
-	sprintf(_id, "Active##checkbox%i", id);
-
+	sprintf(_id, "##checkbox%i", id);
 	ImGui::Checkbox(_id, &active);
+	ImGui::SameLine();
+	bool open = ImGui::CollapsingHeader(name.GetString());
+	
 	ImGui::SameLine(ImGui::GetWindowWidth() - 60);
 	ImGui::Text("ID: %i", id);
 	if (active != enabled)
@@ -64,7 +65,6 @@ void Component::DrawOnEditor()
 
 	if(open && enabled)
 	{
-		ImGui::Separator();
 		EditorContent();
 	}
 }
