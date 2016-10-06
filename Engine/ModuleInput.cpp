@@ -122,6 +122,7 @@ update_status ModuleInput::PreUpdate(float dt)
 				strcpy_s(dropped_file, e.drop.file);
 				SDL_free(e.drop.file);
 				file_was_dropped = true;
+				LOG("Dropped %s", dropped_file);
 				break;
 
 			case SDL_QUIT:

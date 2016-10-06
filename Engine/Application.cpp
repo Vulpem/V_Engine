@@ -39,9 +39,9 @@ Application::Application()
 
 	// Main Modules
 	AddModule(window);
+	AddModule(input);
 	AddModule(Editor);
 	AddModule(camera);
-	AddModule(input);
 	AddModule(fs);
 	AddModule(audio);
 	AddModule(physics);
