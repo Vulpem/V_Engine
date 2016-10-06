@@ -108,11 +108,15 @@ void mesh::RealRender(bool wired)
 		glColor4f(0, 1, 1, 1);
 		if (wires)
 		{
-			//glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
 			if (object->selected == false)
 			{
 				glColor4f(0.7f, 0.7f, 0.7, 1.0f);
 			}
+		}
+		if(object->selected)
+		{
+			glDepthRange(0, 0.01);
 		}
 	}
 	else
@@ -170,7 +174,8 @@ void mesh::RealRender(bool wired)
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glEnable(GL_LIGHTING);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthRange(0.01, 1.0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
