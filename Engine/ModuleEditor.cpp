@@ -323,15 +323,6 @@ update_status ModuleEditor::PreUpdate(float dt)
 	{
 		capture_mouse = true;
 	}
-	if (ImGui::IsRootWindowOrAnyChildFocused())
-	{
-		bool aha = true;
-		ImGui::Begin("yayyyyyyyyyyy");
-
-		ImGui::Text("ItWorks!");
-
-		ImGui::End();
-	}
 
 	return ret;
 }
