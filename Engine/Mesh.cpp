@@ -104,19 +104,16 @@ void mesh::RealRender(bool wired)
 	{
 		glDisable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glLineWidth(1.1f);
-		glColor4f(0, 1, 1, 1);
+		glLineWidth(1.0f);
+		glColor4f(0.7f, 0.7f, 0.7, 1.0f);
 		if (wires)
 		{
 			glDisable(GL_CULL_FACE);
-			if (object->selected == false)
-			{
-				glColor4f(0.7f, 0.7f, 0.7, 1.0f);
-			}
 		}
 		if(object->selected)
 		{
-			glDepthRange(0, 0.01);
+			glLineWidth(0.1f);
+			glColor4f(0, 0.8f, 0.8f, 1);
 		}
 	}
 	else
@@ -175,7 +172,6 @@ void mesh::RealRender(bool wired)
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_CULL_FACE);
-	glDepthRange(0.01, 1.0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 

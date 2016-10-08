@@ -424,7 +424,17 @@ void ModuleEditor::ClearConsole()
 
 void ModuleEditor::SceneTreeGameObject(GameObject* node)
 {
-	if (ImGui::TreeNode(node->name))
+	ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+	if (selectedGameObject == node)
+	{
+		node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Selected;
+	}
+	if (node->childs.empty())
+	{
+		node_flags += ImGuiTreeNodeFlags_Leaf;
+	}
+
+	if (ImGui::TreeNodeEx(node->name, node_flags))
 	{
 		if (ImGui::IsItemClicked())
 		{

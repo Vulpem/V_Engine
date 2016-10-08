@@ -3,7 +3,9 @@
 
 #include "Component.h"
 
-#include "Math.h"
+
+class math::float3;
+class math::Quat;
 
 class Transform : public Component
 {

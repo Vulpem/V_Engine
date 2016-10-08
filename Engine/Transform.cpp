@@ -3,6 +3,8 @@
 
 #include "GameObject.h"
 
+#include "Math.h"
+
 #include "imGUI\imgui.h"
 
 
@@ -12,6 +14,10 @@ Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
 	sprintf(tmp, "Transform##%i", id);
 	name = tmp;
 	type = C_transform;
+
+	//position.Set(0, 0, 0);
+	//scale.Set(1, 1, 1);
+	//rotation = math::Quat::identity;
 }
 Transform::~Transform()
 {
@@ -33,8 +39,20 @@ void Transform::EditorContent()
 	tmp[0] = rot.x;
 	tmp[1] = rot.y;
 	tmp[2] = rot.z;
-	if (ImGui::DragFloat3("Rotation", tmp, 1.0f, 0.0f, 360.0f))
+	if (ImGui::DragFloat3("Rotation", tmp, 1.0f))
 	{
+		for (int n = 0; n < 3; n++)
+		{
+			while (rot[n] >= 360)
+			{
+				rot[n] -= 360;
+			}
+			while (rot[n] < 0)
+			{
+				rot[n] += 360;
+			}
+		}
+
 		SetRot(tmp[0], tmp[1], tmp[2]);
 	}
 
@@ -49,6 +67,7 @@ void Transform::EditorContent()
 
 math::float4x4 Transform::GetTransformMatrix()
 {
+
 	math::float4x4 transform = math::float4x4::FromTRS(position, rotation, scale);
 	transform.Transpose();
 	return transform;
