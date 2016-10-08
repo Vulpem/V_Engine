@@ -259,16 +259,27 @@ bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 				
 				strcpy(tmp, path.data);
 				char* it = tmp;
+				int size = 0;
 				while (*it != '\0')
 				{
+					size++;
 					it++;
 				}
 				while (*it != '/' && *it != '\\')
 				{
+					size--;
 					it--;
+					if (size <= 0)
+					{
+						break;
+					}
 				}
-				it++;
-				strcpy(tmp, it);
+				
+				if (size > 0)
+				{
+					it++;
+					strcpy(tmp, it);
+				}
 			}
 			//End
 
