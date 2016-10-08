@@ -37,7 +37,7 @@ public:
 
 	bool CleanUp();
 
-	GameObject* LoadFBX(char* path);
+	GameObject* LoadFBX(char* file, bool defaultLocation = true);
 	bool DeleteGameObject(GameObject* toErase);
 
 	uint GetCheckerID() { return id_checkerTexture; }

@@ -15,6 +15,10 @@ class GameObject
 {
 public:
 	char name[NAME_MAX_LEN];
+private:
+	bool active = true;
+	bool publicActive = true;
+public:
 
 	GameObject();
 	~GameObject();
@@ -31,6 +35,9 @@ public:
 
 	void Select(bool renderNormals = false);
 	void Unselect();
+
+	void SetActive(bool state, bool justPublic = false);
+	bool IsActive() { return publicActive; }
 
 	Component* AddComponent(Component::Type type);
 	std::vector<Component*> GetComponent(Component::Type type);

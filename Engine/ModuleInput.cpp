@@ -123,6 +123,7 @@ update_status ModuleInput::PreUpdate(float dt)
 				SDL_free(e.drop.file);
 				file_was_dropped = true;
 				LOG("Dropped %s", dropped_file);
+				LOG("File was detected as a %s", DroppedFileFormat().GetString());
 				break;
 
 			case SDL_QUIT:

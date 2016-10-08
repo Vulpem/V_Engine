@@ -32,7 +32,7 @@ private:
 
 public:
 	
-	bool renderReference = true;
+	bool renderReference = false;
 	float distanceToRef = 20.f;
 	vec3 X, Y, Z, Position, Reference;
 	float camSpeed = 0.4f;

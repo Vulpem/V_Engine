@@ -316,6 +316,41 @@ void AssimpClose(aiFileIO* io, aiFile* file)
 		LOG("File System error while CLOSE via assimp: %s", PHYSFS_getLastError());
 }
 
+C_String ModuleFileSystem::GetFileFormat(char* fullPath)
+{
+	int size = 0;
+	while (*fullPath != '\0')
+	{
+		fullPath++;
+		size++;
+	}
+	while (*fullPath != '.')
+	{
+		fullPath--;
+		size--;
+		if (size <= 1)
+		{
+			return C_String("Couldn't find a format");
+		}
+	}
+	return C_String(fullPath);
+}
+
+C_String ModuleFileSystem::RemoveFilePath(char * fileWithPath)
+{
+	char* it = fileWithPath;
+	while (*it != '\0')
+	{
+		it++;
+	}
+	while (*it != '/'&& *it != '\\')
+	{
+		it--;
+	}
+	it++;
+	return C_String(it);
+}
+
 void ModuleFileSystem::CreateAssimpIO()
 {
 	if (AssimpIO)

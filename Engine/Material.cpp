@@ -81,8 +81,11 @@ int Material::LoadTexture(char* path)
 		n++;
 	}
 
-	char image[256] = "FBX/";
+	char image[256] = "Assets/Textures/";
 	strcat(image, path);
+
+	LOG("Loading Texture %s", path);
+	LOG("from %s \n", image);
 
 	uint ID = ilutGLLoadImage(image);
 

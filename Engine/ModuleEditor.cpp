@@ -45,7 +45,7 @@ bool ModuleEditor::Start()
 	testConsoleInput = new char[64];
 	strcpy(testConsoleInput, "InputTextHere");
 
-	strcpy(toImport, "FBX/-.fbx");
+	strcpy(toImport, ".fbx");
 
 	selectedGameObject = NULL;
 
@@ -301,6 +301,13 @@ update_status ModuleEditor::PreUpdate(float dt)
 		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
 		if (selectedGameObject)
 		{
+			bool isActive = selectedGameObject->IsActive();
+			ImGui::Checkbox("", &isActive);
+			if (isActive != selectedGameObject->IsActive())
+			{
+				selectedGameObject->SetActive(isActive);
+			}
+
 			ImGui::Text("Name:");
 			ImGui::SameLine();
 			ImGui::InputText("##Name", selectedGameObject->name, NAME_MAX_LEN);
@@ -427,7 +434,7 @@ void ModuleEditor::SceneTreeGameObject(GameObject* node)
 	ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 	if (selectedGameObject == node)
 	{
-		node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Selected;
+		node_flags += ImGuiTreeNodeFlags_Selected;
 	}
 	if (node->childs.empty())
 	{

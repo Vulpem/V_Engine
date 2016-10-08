@@ -251,7 +251,28 @@ bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 		if (object->HasComponent(C_material))
 		{
 			Material* mat = (Material*)(*object->GetComponent(C_material).begin());
-			texMaterialIndex = mat->LoadTexture(path.data);
+
+			//Keeping only the file name
+			char tmp[1024] = "";
+			if (path.length > 0)
+			{
+				
+				strcpy(tmp, path.data);
+				char* it = tmp;
+				while (*it != '\0')
+				{
+					it++;
+				}
+				while (*it != '/' && *it != '\\')
+				{
+					it--;
+				}
+				it++;
+				strcpy(tmp, it);
+			}
+			//End
+
+			texMaterialIndex = mat->LoadTexture(tmp);
 
 			aiColor3D col;
 			scene->mMaterials[toLoad->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, col);

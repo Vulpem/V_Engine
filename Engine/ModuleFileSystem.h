@@ -47,6 +47,8 @@ public:
 		return "save/";
 	}
 
+	C_String GetFileFormat(char* fullPath);
+	C_String RemoveFilePath(char* fileWithPath);
 
 private:
 

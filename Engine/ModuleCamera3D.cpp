@@ -37,7 +37,7 @@ bool ModuleCamera3D::Start()
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
-	ref = App->GO->LoadFBX("FBX/Sphere.fbx");
+	ref = App->GO->LoadFBX("Sphere.fbx");
 
 	return ret;
 }
@@ -54,13 +54,22 @@ bool ModuleCamera3D::CleanUp()
 update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
-	if (renderReference || true)
+	if (ref)
 	{
-		std::vector<Component*> components = ref->GetComponent(Component::Type::C_transform);
-		if (components.empty() == false)
+		if (renderReference)
 		{
-			Transform* trans = (Transform*)*(components.begin());
-			trans->SetPos(Reference.x, Reference.y, Reference.z);
+			ref->SetActive(true);
+
+			std::vector<Component*> components = ref->GetComponent(Component::Type::C_transform);
+			if (components.empty() == false)
+			{
+				Transform* trans = (Transform*)*(components.begin());
+				trans->SetPos(Reference.x, Reference.y, Reference.z);
+			}
+		}
+		else
+		{
+			ref->SetActive(false);
 		}
 	}
 

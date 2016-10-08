@@ -42,28 +42,31 @@ GameObject::~GameObject()
 
 void GameObject::Update()
 {
-	if (HasComponent(Component::Type::C_transform))
+	if (active)
 	{
-		glPushMatrix();
+		if (HasComponent(Component::Type::C_transform))
+		{
+			glPushMatrix();
 
-		Transform* transform = (Transform*)(*GetComponent(Component::Type::C_transform).begin());
-		glMultMatrixf(transform->GetTransformMatrix().ptr());
-	}
+			Transform* transform = (Transform*)(*GetComponent(Component::Type::C_transform).begin());
+			glMultMatrixf(transform->GetTransformMatrix().ptr());
+		}
 
-	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
-	{
-		(*it)->Update();
-	}
+		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
+		{
+			(*it)->Update();
+		}
 
-	std::vector<GameObject*>::iterator it = childs.begin();
-	while (it != childs.end())
-	{
-		(*it)->Update();
-		it++;
-	}
-	if (HasComponent(Component::Type::C_transform))
-	{
-		glPopMatrix();
+		std::vector<GameObject*>::iterator it = childs.begin();
+		while (it != childs.end())
+		{
+			(*it)->Update();
+			it++;
+		}
+		if (HasComponent(Component::Type::C_transform))
+		{
+			glPopMatrix();
+		}
 	}
 }
 
@@ -96,6 +99,34 @@ void GameObject::Unselect()
 	{
 		(*childIt)->Unselect();
 		childIt++;
+	}
+}
+
+void GameObject::SetActive(bool state, bool justPublic)
+{
+	if (state == publicActive)
+	{
+		return;
+	}
+	publicActive = state;
+	if (state == false)
+	{
+		std::vector<GameObject*>::iterator childIt = childs.begin();
+		while (childIt != childs.end())
+		{
+			(*childIt)->SetActive(state, true);
+			childIt++;
+		}
+	}
+	if (justPublic)
+	{		
+		return;
+	}
+	active = state;
+
+	if(state == true && parent)
+	{
+		parent->SetActive(true);
 	}
 }
 

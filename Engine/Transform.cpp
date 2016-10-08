@@ -39,19 +39,19 @@ void Transform::EditorContent()
 	tmp[0] = rot.x;
 	tmp[1] = rot.y;
 	tmp[2] = rot.z;
-	if (ImGui::DragFloat3("Rotation", tmp, 1.0f))
+	if (ImGui::DragFloat("Rotation", tmp, 1.0f))
 	{
-		for (int n = 0; n < 3; n++)
+		/*for (int n = 0; n < 3; n++)
 		{
-			while (rot[n] >= 360)
+			while (tmp[n] >= 360)
 			{
-				rot[n] -= 360;
+				tmp[n] -= 360;
 			}
-			while (rot[n] < 0)
+			while (tmp[n] < 0)
 			{
-				rot[n] += 360;
+				tmp[n] += 360;
 			}
-		}
+		}*/
 
 		SetRot(tmp[0], tmp[1], tmp[2]);
 	}
@@ -67,7 +67,6 @@ void Transform::EditorContent()
 
 math::float4x4 Transform::GetTransformMatrix()
 {
-
 	math::float4x4 transform = math::float4x4::FromTRS(position, rotation, scale);
 	transform.Transpose();
 	return transform;
@@ -92,12 +91,13 @@ math::float3 Transform::GetPos()
 
 void Transform::SetRot(float x, float y, float z)
 {
+	while (x < 0) { x += 360; }
+	while (y < 0) { y += 360; }
+	while (z < 0) { z += 360; }
+
 	x *= DEGTORAD;
 	y *= DEGTORAD;
 	z *= DEGTORAD;
-	if (x == -0) { x = 0; }
-	if (y == -0) { y = 0; }
-	if (z == -0) { z = 0; }
 
 	rotation = math::Quat::FromEulerXYZ(x, y, z);
 }
@@ -118,6 +118,11 @@ math::float3 Transform::GetRot()
 	ret.x *= RADTODEG;
 	ret.y *= RADTODEG;
 	ret.z *= RADTODEG;
+
+	while (ret.x < 0) { ret.x += 360; }
+	while (ret.y < 0) { ret.y += 360; }
+	while (ret.z < 0) { ret.z += 360; }
+
 	return ret;
 }
 

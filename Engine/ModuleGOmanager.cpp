@@ -111,7 +111,7 @@ update_status ModuleGoManager::Update(float dt)
 		C_String format = App->input->DroppedFileFormat();
 		if ( format == ".fbx" || format == ".FBX")
 		{
-			LoadFBX(App->input->dropped_file);
+			LoadFBX(App->input->dropped_file, false);
 		}
 	}
 
@@ -144,19 +144,24 @@ bool ModuleGoManager::CleanUp()
 	return true;
 }
 
-GameObject* ModuleGoManager::LoadFBX(char* path)
+GameObject* ModuleGoManager::LoadFBX(char* file, bool defaultLocation)
 {
-//	SDL_RWops* file = App->fs->Load(path);
+	char* fullPath = new char[526];
+	strcpy(fullPath, "");
+	if (defaultLocation)
+	{
+		strcpy(fullPath, "Assets/FBX/");
+	}
+	strcat(fullPath, file);
 
-//	aiFileIO aiFile;
-//	aiFile.OpenProc(&aiFile, "App->fs->Load(path)", "this");
+	LOG("Loading mesh: %s", file);
+	LOG("from %s \n", fullPath);
 
-
+	const aiScene* scene = aiImportFileEx(fullPath, aiProcessPreset_TargetRealtime_MaxQuality, App->fs->GetAssimpIO());
 
 	GameObject* ret = NULL;
 
-	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
-	if (scene != nullptr)
+	if (scene != NULL)
 	{
 		if (scene->HasMeshes())
 		{
@@ -171,9 +176,10 @@ GameObject* ModuleGoManager::LoadFBX(char* path)
 	}
 	else
 	{
-		LOG("Error loading scene %s", path);
+		LOG("Error loading scene %s", fullPath);
 	}
 
+	delete[] fullPath;
 	return ret;
 }
 
