@@ -39,9 +39,20 @@ void Transform::EditorContent()
 	tmp[0] = rot.x;
 	tmp[1] = rot.y;
 	tmp[2] = rot.z;
-	if (ImGui::DragFloat("Rotation", tmp, 1.0f))
+	for (int n = 0; n < 3; n++)
 	{
-		/*for (int n = 0; n < 3; n++)
+		while (tmp[n] >= 360)
+		{
+			tmp[n] -= 360;
+		}
+		while (tmp[n] < 0)
+		{
+			tmp[n] += 360;
+		}
+	}
+	if (ImGui::DragFloat3("Rotation", tmp, 1.0f))
+	{
+		for (int n = 0; n < 3; n++)
 		{
 			while (tmp[n] >= 360)
 			{
@@ -51,7 +62,7 @@ void Transform::EditorContent()
 			{
 				tmp[n] += 360;
 			}
-		}*/
+		}
 
 		SetRot(tmp[0], tmp[1], tmp[2]);
 	}
@@ -67,7 +78,7 @@ void Transform::EditorContent()
 
 math::float4x4 Transform::GetTransformMatrix()
 {
-	math::float4x4 transform = math::float4x4::FromTRS(position, rotation, scale);
+	math::float4x4 transform = math::float4x4::FromTRS(position, rotation.ToFloat3x3(), scale);
 	transform.Transpose();
 	return transform;
 }

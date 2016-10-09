@@ -11,6 +11,7 @@
 #include "ModuleScene.h"
 #include "ModuleGOmanager.h"
 
+#include "AllComponents.h"
 
 #include "Imgui/imgui_impl_sdl_gl3.h"
 #include "OpenGL.h"
@@ -307,11 +308,18 @@ update_status ModuleEditor::PreUpdate(float dt)
 			{
 				selectedGameObject->SetActive(isActive);
 			}
-
+			ImGui::SameLine();
 			ImGui::Text("Name:");
 			ImGui::SameLine();
 			ImGui::InputText("##Name", selectedGameObject->name, NAME_MAX_LEN);
 			selectedGameObject->DrawOnEditor();
+			ImGui::Separator();
+			if (ImGui::Button("Look at"))
+			{
+				Transform* trans = (Transform*)*selectedGameObject->GetComponent(Component::C_transform).begin();
+
+				App->camera->LookAt(vec3(trans->GetPos().x, trans->GetPos().y, trans->GetPos().z));
+			}
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");
 			if (ImGui::Button("Delete"))
