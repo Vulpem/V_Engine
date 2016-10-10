@@ -12,6 +12,7 @@
 #include "ModuleGoManager.h"
 #include "ModuleScene.h"
 #include "ModuleFileSystem.h"
+#include "ModuleImporter.h"
 
 Application::Application()
 {
@@ -30,6 +31,7 @@ Application::Application()
 	physics = new ModulePhysics3D(this);
 	Editor = new ModuleEditor(this);
 	GO = new ModuleGoManager(this);
+	importer = new ModuleImporter(this);
 
 	scene = new ModuleScene(this);
 
@@ -45,6 +47,7 @@ Application::Application()
 	AddModule(fs);
 	AddModule(audio);
 	AddModule(physics);
+	AddModule(importer);
 	AddModule(GO);
 	
 	// Scenes

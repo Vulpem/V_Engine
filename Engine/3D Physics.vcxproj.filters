@@ -363,6 +363,9 @@
     <ClInclude Include="Math.h">
       <Filter>Sources\Libraries</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleImporter.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -543,6 +546,9 @@
       <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
     <ClCompile Include="ModuleEditor.cpp">
+      <Filter>Sources\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleImporter.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>

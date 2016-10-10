@@ -120,6 +120,27 @@ bool ModuleFileSystem::IsDirectory(const char* file) const
 	return PHYSFS_isDirectory(file) != 0;
 }
 
+void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files)
+{
+	char** f = PHYSFS_enumerateFiles(directory);
+	char** it;
+
+	for (it = f; *it != NULL; it++)
+	{
+		std::string toPush(*it);
+		if (GetFileFormat(*it).Length() > 0)
+		{
+			files->push_back(toPush);
+		}
+		else
+		{
+			folders->push_back(toPush);
+		}
+	}
+
+	PHYSFS_freeList(f);
+}
+
 
 bool ModuleFileSystem::EraseFile(const char* file)
 {
@@ -346,7 +367,7 @@ C_String ModuleFileSystem::GetFileFormat(char* fullPath)
 		size--;
 		if (size <= 1)
 		{
-			return C_String("Couldn't find a format");
+			return C_String("");
 		}
 	}
 	return C_String(fullPath);

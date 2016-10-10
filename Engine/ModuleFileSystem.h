@@ -31,6 +31,8 @@ public:
 	bool CreateDir(const char* dir);
 	bool IsDirectory(const char* file) const;
 
+	void GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files);
+
 	bool EraseFile(const char* file);
 
 	// Open for Read/Write

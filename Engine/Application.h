@@ -19,6 +19,7 @@ class ModuleGoManager;
 class ModulePhysics3D;
 class ModuleScene;
 class ModuleFileSystem;
+class ModuleImporter;
 
 #include "MathGeoLib\include\MathGeoLibFwd.h"
 
@@ -34,6 +35,7 @@ public:
 	ModuleCamera3D* camera;
 
 	ModuleEditor* Editor;
+	ModuleImporter* importer;
 	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
 
