@@ -46,7 +46,7 @@ uint Material::NofTextures()
 	return textures.size();
 }
 
-uint Material::GetTexture(uint n)
+int Material::GetTexture(uint n)
 {
 	if (IsEnabled())
 	{
@@ -54,11 +54,8 @@ uint Material::GetTexture(uint n)
 		{
 			return textures.at(n);
 		}
-		else
-		{
-			return 0;
-		}
 	}
+	return -1;
 }
 
 int Material::LoadTexture(char* path)

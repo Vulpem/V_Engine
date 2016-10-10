@@ -15,7 +15,7 @@ public:
 
 	int LoadTexture(char* path);
 	uint NofTextures();
-	uint GetTexture(uint n);
+	int GetTexture(uint n);
 
 	void SetColor(float r, float g, float b, float a = 1.0f);
 	math::float4 GetColor();
