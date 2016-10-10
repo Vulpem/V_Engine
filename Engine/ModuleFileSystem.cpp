@@ -35,6 +35,7 @@ ModuleFileSystem::~ModuleFileSystem()
 //bool ModuleFileSystem::Awake(pugi::xml_node& config)
 bool ModuleFileSystem::Init()
 {
+
 	LOG("Loading File System");
 	bool ret = true;
 
@@ -60,6 +61,10 @@ bool ModuleFileSystem::Init()
 
 	SDL_free(write_path);
 	PHYSFS_addToSearchPath(GetSaveDirectory(), 0);
+
+	CreateDir("Library");
+	CreateDir("Library/Meshes");
+	CreateDir("Library/Textures");
 
 	return ret;
 }
@@ -99,11 +104,22 @@ bool ModuleFileSystem::Exists(const char* file) const
 	return PHYSFS_exists(file) != 0;
 }
 
+bool ModuleFileSystem::CreateDir(const char * dir)
+{
+	if (IsDirectory(dir) == false)
+	{
+		PHYSFS_mkdir(dir);
+		return true;
+	}
+	return false;
+}
+
 // Check if a file is a directory
 bool ModuleFileSystem::IsDirectory(const char* file) const
 {
 	return PHYSFS_isDirectory(file) != 0;
 }
+
 
 bool ModuleFileSystem::EraseFile(const char* file)
 {
