@@ -18,6 +18,7 @@ public:
 private:
 	bool active = true;
 	bool publicActive = true;
+	bool hiddenOnOutliner = false;
 public:
 
 	GameObject();
@@ -32,6 +33,10 @@ public:
 
 	void Update();
 	void DrawOnEditor();
+
+	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
+	void HideFromOutliner() { hiddenOnOutliner = true; }
+	bool HiddenFromOutliner() { return hiddenOnOutliner; }
 
 	void Select(bool renderNormals = false);
 	void Unselect();

@@ -281,12 +281,12 @@ update_status ModuleEditor::PreUpdate(float dt)
 			std::vector<GameObject*>::iterator node = App->GO->root->childs.begin();
 			while (node != App->GO->root->childs.end())
 			{
-				std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
-				while (childNodes != (*node)->childs.end())
-				{
-					SceneTreeGameObject((*childNodes));
-					childNodes++;
-				}				
+					std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
+					while (childNodes != (*node)->childs.end())
+					{
+						SceneTreeGameObject((*childNodes));
+						childNodes++;
+					}
 				node++;
 			}
 
@@ -439,30 +439,33 @@ void ModuleEditor::ClearConsole()
 
 void ModuleEditor::SceneTreeGameObject(GameObject* node)
 {
-	ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-	if (selectedGameObject == node)
+	if (node->HiddenFromOutliner() == false)
 	{
-		node_flags += ImGuiTreeNodeFlags_Selected;
-	}
-	if (node->childs.empty())
-	{
-		node_flags += ImGuiTreeNodeFlags_Leaf;
-	}
-
-	if (ImGui::TreeNodeEx(node->name, node_flags))
-	{
-		if (ImGui::IsItemClicked())
+		ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		if (selectedGameObject == node)
 		{
-			SelectGameObject(node);
+			node_flags += ImGuiTreeNodeFlags_Selected;
+		}
+		if (node->childs.empty())
+		{
+			node_flags += ImGuiTreeNodeFlags_Leaf;
 		}
 
-		std::vector<GameObject*>::iterator it = node->childs.begin();
-		while (it != node->childs.end())
+		if (ImGui::TreeNodeEx(node->name, node_flags))
 		{
-			SceneTreeGameObject((*it));
-			it++;
+			if (ImGui::IsItemClicked())
+			{
+				SelectGameObject(node);
+			}
+
+			std::vector<GameObject*>::iterator it = node->childs.begin();
+			while (it != node->childs.end())
+			{
+				SceneTreeGameObject((*it));
+				it++;
+			}
+			ImGui::TreePop();
 		}
-		ImGui::TreePop();
 	}
 }
 

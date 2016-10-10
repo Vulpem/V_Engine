@@ -38,6 +38,7 @@ bool ModuleCamera3D::Start()
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
 	ref = App->GO->LoadFBX("Sphere.fbx");
+	ref->HideFromOutliner();
 
 	return ret;
 }
