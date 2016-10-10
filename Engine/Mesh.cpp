@@ -49,7 +49,7 @@ mesh::~mesh()
 
 void mesh::DoUpdate()
 {
-	if (init)
+	if (init && IsEnabled())
 	{
 		Draw();
 	}

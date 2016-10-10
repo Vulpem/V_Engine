@@ -15,9 +15,10 @@ Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
 	name = tmp;
 	type = C_transform;
 
-	//position.Set(0, 0, 0);
-	//scale.Set(1, 1, 1);
-	//rotation = math::Quat::identity;
+	position.Set(0, 0, 0);
+	scale.Set(1, 1, 1);
+	rotation = math::Quat::identity;
+	editorRot = GetRot();
 }
 Transform::~Transform()
 {
@@ -35,10 +36,10 @@ void Transform::EditorContent()
 		SetPos(tmp[0], tmp[1], tmp[2]);
 	}
 
-	math::float3 rot = GetRot();
-	tmp[0] = rot.x;
-	tmp[1] = rot.y;
-	tmp[2] = rot.z;
+	//math::float3 rot = GetRot();
+	tmp[0] = editorRot.x;
+	tmp[1] = editorRot.y;
+	tmp[2] = editorRot.z;
 	for (int n = 0; n < 3; n++)
 	{
 		while (tmp[n] >= 360)
@@ -52,19 +53,10 @@ void Transform::EditorContent()
 	}
 	if (ImGui::DragFloat3("Rotation", tmp, 1.0f))
 	{
-		for (int n = 0; n < 3; n++)
-		{
-			while (tmp[n] >= 360)
-			{
-				tmp[n] -= 360;
-			}
-			while (tmp[n] < 0)
-			{
-				tmp[n] += 360;
-			}
-		}
-
 		SetRot(tmp[0], tmp[1], tmp[2]);
+		editorRot.x = tmp[0];
+		editorRot.y = tmp[1];
+		editorRot.z = tmp[2];
 	}
 
 	tmp[0] = scale.x;
@@ -78,9 +70,16 @@ void Transform::EditorContent()
 
 math::float4x4 Transform::GetTransformMatrix()
 {
-	math::float4x4 transform = math::float4x4::FromTRS(position, rotation.ToFloat3x3(), scale);
-	transform.Transpose();
-	return transform;
+	if (IsEnabled())
+	{
+		math::float4x4 transform = math::float4x4::FromTRS(position, rotation.ToFloat3x3(), scale);
+		transform.Transpose();
+		return transform;
+	}
+	else
+	{
+		return math::float4x4::identity;
+	}
 }
 
 void Transform::SetPos(float x, float y, float z)

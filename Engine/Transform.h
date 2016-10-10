@@ -16,6 +16,8 @@ private:
 	math::Quat rotation = math::Quat::identity;
 	math::float3 position = math::float3::zero;
 	math::float3 scale = math::float3::zero;
+	//TMP - Needed to fix the attribute editor display
+	math::float3 editorRot = math::float3::zero;
 
 	void EditorContent();
 public:
