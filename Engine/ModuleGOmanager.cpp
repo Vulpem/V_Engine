@@ -165,7 +165,7 @@ GameObject* ModuleGoManager::LoadFBX(char* file, bool defaultLocation)
 	{
 		if (scene->HasMeshes())
 		{
-			ret = LoadGameObject(scene->mRootNode, scene, root);
+			ret = LoadGameObject(file, scene->mRootNode, scene, root);
 			root->childs.push_back(ret);
 		}
 		if (scene)
@@ -194,7 +194,7 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	
 }
 
-GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent)
+GameObject* ModuleGoManager::LoadGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, GameObject* parent)
 {
 	GameObject* ret = new GameObject();
 
@@ -227,13 +227,13 @@ GameObject* ModuleGoManager::LoadGameObject(const aiNode* toLoad, const aiScene*
 	for (int n = 0; n < toLoad->mNumMeshes; n++)
 	{   
 		mesh* addedMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
-		addedMesh->LoadMesh(scene->mMeshes[toLoad->mMeshes[n]], scene);
+		addedMesh->LoadMesh(scene->mMeshes[toLoad->mMeshes[n]], scene, path);
 	}
 
 	//Loading child nodes
 	for (int n = 0; n < toLoad->mNumChildren; n++)
 	{
-		ret->childs.push_back(LoadGameObject(toLoad->mChildren[n], scene, ret));
+		ret->childs.push_back(LoadGameObject(path, toLoad->mChildren[n], scene, ret));
 	}
 
 	return ret;

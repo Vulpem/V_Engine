@@ -78,13 +78,9 @@ int Material::LoadTexture(char* path)
 		n++;
 	}
 
-	char image[256] = "Assets/Textures/";
-	strcat(image, path);
-
 	LOG("Loading Texture %s", path);
-	LOG("from %s \n", image);
 
-	uint ID = ilutGLLoadImage(image);
+	uint ID = ilutGLLoadImage(path);
 
 
 	if (ID != 0)
@@ -104,6 +100,20 @@ int Material::LoadTexture(char* path)
 		}
 		return -1;
 	}
+}
+
+int Material::LoadTexture(char * path, char * file)
+{
+	//Checking we've actually recieved a file
+	if (*file == '\0')
+	{
+		return -1;
+	}
+
+	char tmp[1024];
+	strcpy(tmp, path);
+	strcat(tmp, file);
+	return LoadTexture(tmp);
 }
 
 void Material::SetColor(float r, float g, float b, float a)

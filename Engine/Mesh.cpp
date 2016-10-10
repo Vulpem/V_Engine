@@ -199,7 +199,7 @@ void mesh::RenderNormals()
 
 }
 
-bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
+bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene, const char* path)
 {
 	if (init == false)
 	{
@@ -246,44 +246,45 @@ bool mesh::LoadMesh(const aiMesh* toLoad, const aiScene* scene)
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_textureCoords * 2, textureCoords, GL_STATIC_DRAW);
 		}
 
-		aiString path;
-		scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &path);
+		aiString filePath;
+		scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &filePath);
 		if (object->HasComponent(C_material))
 		{
 			Material* mat = (Material*)(*object->GetComponent(C_material).begin());
 
-			//Keeping only the file name
+			//Getting the path to the fbx file WITHOUT the fbx name
 			char tmp[1024] = "";
-			if (path.length > 0)
+			strcpy(tmp, path);
+			char* it = tmp;
+			int size = 0;
+			while (*it != '\0')
 			{
-				
-				strcpy(tmp, path.data);
-				char* it = tmp;
-				int size = 0;
-				while (*it != '\0')
+				size++;
+				it++;
+			}
+			while (*it != '/' && *it != '\\')
+			{
+				size--;
+				it--;
+				if (size <= 0)
 				{
-					size++;
-					it++;
-				}
-				while (*it != '/' && *it != '\\')
-				{
-					size--;
-					it--;
-					if (size <= 0)
-					{
-						break;
-					}
-				}
-				
-				if (size > 0)
-				{
-					it++;
-					strcpy(tmp, it);
+					break;
 				}
 			}
-			//End
 
-			texMaterialIndex = mat->LoadTexture(tmp);
+			if (size > 0)
+			{
+				it++;
+				*it = '\0';
+				texMaterialIndex = mat->LoadTexture(tmp, filePath.data);
+			}
+			else
+			{
+				texMaterialIndex = mat->LoadTexture(filePath.data);
+			}
+			//endof Getting path
+
+			
 
 			aiColor3D col;
 			scene->mMaterials[toLoad->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, col);

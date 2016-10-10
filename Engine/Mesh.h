@@ -38,7 +38,7 @@ public:
 
 	void DoUpdate();
 	void EditorContent();
-	bool LoadMesh(const aiMesh* toLoad, const aiScene* scene);
+	bool LoadMesh(const aiMesh* toLoad, const aiScene* scene, const char* path);
 
 	void Draw();
 private:

@@ -14,6 +14,7 @@ public:
 	void EditorContent();
 
 	int LoadTexture(char* path);
+	int LoadTexture(char* path, char* file);
 	uint NofTextures();
 	int GetTexture(uint n);
 

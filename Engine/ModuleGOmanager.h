@@ -43,7 +43,7 @@ public:
 	uint GetCheckerID() { return id_checkerTexture; }
 
 private:
-	GameObject* LoadGameObject(const aiNode* toLoad, const aiScene* scene, GameObject* parent = NULL);
+	GameObject* LoadGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, GameObject* parent = NULL);
 
 	void CleanName(char* toClean);
 
