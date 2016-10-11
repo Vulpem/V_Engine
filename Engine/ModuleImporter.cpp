@@ -139,7 +139,7 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	}
 }
 
-void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene)
+void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild)
 {
 	//Setting Name
 	char name[MAXLEN];
@@ -182,6 +182,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	file_0It += bytes;
 
 	char** meshes = new char*[nMeshes];
+	uint* meshSize = new uint[nMeshes];
 
 	for (int n = 0; n < nMeshes; n++)
 	{
@@ -257,7 +258,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			}
 
 							
-			uint meshSize =
+			meshSize[n] =
 				//Mesh size
 				sizeof(uint) +
 
@@ -270,7 +271,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				//colors								num indices								indices
 				+ sizeof(float) * 3 +					sizeof(uint) +							sizeof(uint) * num_indices;
 
-			meshes[n] = new char[meshSize];
+			meshes[n] = new char[meshSize[n]];
 			char* meshIt = meshes[n];
 
 			//Mesh size
@@ -365,6 +366,57 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		childsIt += bytes;
 	}
 
+	uint realFileSize = 0;
+	realFileSize += file_0Size;
+	for (int n = 0; n < nMeshes; n++)
+	{
+		realFileSize += meshSize[n];
+	}
+	realFileSize += childFileSize;
+
+	char* realFile = new char[realFileSize];
+	char* realIt = realFile;
+
+	//file_0
+	bytes = file_0Size;
+	memcpy(realIt, file_0, bytes);
+	childsIt += bytes;
+
+	for (int n = 0; n < nMeshes; n++)
+	{
+		//each mesh
+		bytes = meshSize[n];
+		memcpy(realIt, meshes[n], bytes);
+		childsIt += bytes;
+	}
+
+	//file_0
+	bytes = childFileSize;
+	memcpy(realIt, file_childs, bytes);
+	childsIt += bytes;
+
+
+
+	// ---------------- Creating the save file and writting it -----------------------------------------
+
+	std::string toCreate("Library/Meshes/");
+	if (isChild)
+	{
+		//toCreate += name;
+		//toCreate += "/";
+	}
+
+	toCreate += name;
+	toCreate += ".vmesh";
+	App->fs->Save(toCreate.data(), realFile, realFileSize);
+
+	//Importing also all the childs
+	for (int n = 0; n < nChilds; n++)
+	{
+		ImportGameObject(path, NodetoLoad->mChildren[n], scene, true);
+	}
+
+
 	//TMP FOR LOAD AND CHECKING
 	char* toLoad = file_0;
 	file_0It = toLoad;
@@ -380,13 +432,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	file_0It += bytes;
 
 	//END FOR TMP LOAD
-
-
-	//Importing also all the childs
-	for (int n = 0; n < nChilds; n++)
-	{
-		ImportGameObject(path, NodetoLoad->mChildren[n], scene);
-	}
 
 }
 
