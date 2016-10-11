@@ -146,19 +146,12 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
 	CleanName(name);
 
-	std::string strName(name);
-	uint nameLen = strName.length() + 1;
+	uint bytes = 0;
 
-	//					nameLen			name						rot + scal + pos				nMeshes
-	uint file_0Size =	sizeof(uint) +	sizeof(char) * nameLen +	sizeof(float) * (4 + 3 + 3) +	sizeof(uint) * 1;
+	//					rot + scal + pos				nMeshes
+	uint file_0Size =	sizeof(float) * (4 + 3 + 3) +	sizeof(uint) * 1;
 	char* file_0 = new char[file_0Size];
 	char* file_0It = file_0;
-
-	memcpy(file_0It, &nameLen, sizeof(uint));
-	file_0It += sizeof(uint);
-
-	memcpy(file_0It, name, sizeof(char) * nameLen);
-	file_0It+= sizeof(char) * nameLen;
 
 	aiQuaternion rot;
 	aiVector3D scal;
@@ -178,32 +171,15 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	transform[8] = pos.y;
 	transform[9] = pos.z;
 
-	memcpy(file_0It, transform, sizeof(float) * 10);
-	file_0It += sizeof(float) * 10;
+	bytes = sizeof(float) * 10;
+	memcpy(file_0It, transform, bytes);
+	file_0It += bytes;
 
-	const uint nMeshes = NodetoLoad->mNumMeshes;
+	const uint nMeshes =  NodetoLoad->mNumMeshes;
 
-	memcpy(file_0It, &nMeshes, sizeof(uint));
-
-	//TMP FOR LOAD AND CHECKING
-	char* toLoad = file_0;
-
-	uint _nameLen = 0;
-	memcpy(&_nameLen, toLoad, sizeof(uint));
-	toLoad += sizeof(uint);
-
-	char _name[MAXLEN];
-	memcpy(_name, toLoad, sizeof(char) * _nameLen);
-	file_0It+= sizeof(char) * nameLen;
-
-	float _transform[10];
-	memcpy(_transform, toLoad, sizeof(float) * 10);
-	file_0It += sizeof(float) * 10;
-
-	uint _nMeshes = 0;
-	memcpy(&_nMeshes, tolower, sizeof(uint));
-
-	//END FOR TMP LOAD
+	bytes = sizeof(uint);
+	memcpy(file_0It, &nMeshes, bytes);
+	file_0It += bytes;
 
 	char** meshes = new char*[nMeshes];
 
@@ -248,6 +224,9 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		strcpy(textureName, texturePath.data);
 		CleanName(textureName);
 
+		std::string tmp(textureName);
+		uint textureNameLen = tmp.length() + 1;
+
 		//Importing color for this mesh
 		aiColor3D col;
 		scene->mMaterials[toLoad->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, col);
@@ -276,17 +255,139 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				}
 				currentFace++;
 			}
-		}
 
-		uint nChilds = NodetoLoad->mNumChildren;
-		std::vector<std::string> childs;
-		//Loading child nodes
-		for (int n = 0; n < nChilds; n++)
-		{
-			std::string toPush(NodetoLoad->mChildren[n]->mName.data);
-			childs.push_back(toPush);
+							
+			uint meshSize =
+				//Mesh size
+				sizeof(uint) +
+
+				//num_vertices							vertices								normals
+				sizeof(uint) +							sizeof(float) * num_vertices * 3 +		sizeof(float) * num_vertices * 3
+
+				//texture Coords						texture name length						tetxture name
+				+ sizeof(float) * num_vertices * 2 +	sizeof(uint) +							sizeof(char) * textureNameLen
+
+				//colors								num indices								indices
+				+ sizeof(float) * 3 +					sizeof(uint) +							sizeof(uint) * num_indices;
+
+			meshes[n] = new char[meshSize];
+			char* meshIt = meshes[n];
+
+			//Mesh size
+			bytes = sizeof(uint);
+			memcpy(meshIt, &meshSize, bytes);
+			meshIt += bytes;
+
+			//Num vertices
+			bytes = sizeof(uint);
+			memcpy(meshIt, &num_vertices, bytes);
+			meshIt += bytes;
+
+			//Vertices
+			bytes = sizeof(float) * num_vertices * 3;
+			memcpy(meshIt, vertices, bytes);
+			meshIt += bytes;
+
+			//Normals
+			bytes = sizeof(float) * num_vertices * 3;
+			memcpy(meshIt, normals, bytes);
+			meshIt += bytes;
+
+			//texture coords
+			bytes = sizeof(float) * num_vertices * 2;
+			memcpy(meshIt, textureCoords, bytes);
+			meshIt += bytes;
+
+			//Texture name len
+			bytes = sizeof(uint);
+			memcpy(meshIt, &textureNameLen, bytes);
+			meshIt += bytes;
+
+			//Texture name
+			bytes = sizeof(char) * textureNameLen;
+			memcpy(meshIt, textureName, bytes);
+			meshIt += bytes;
+
+			//Color
+			bytes = sizeof(float) * 3;
+			memcpy(meshIt, color, bytes);
+			meshIt += bytes;
+
+			//num_indices
+			bytes = sizeof(uint);
+			memcpy(meshIt, &num_indices, bytes);
+			meshIt += bytes;
+
+			//indices
+			bytes = sizeof(uint) * num_indices;
+			memcpy(meshIt, indices, bytes);
+			meshIt += bytes;
 		}
 	}
+
+	uint nChilds = NodetoLoad->mNumChildren;
+	uint* childsSize = new uint[nChilds];
+	std::vector<std::string> childs;
+
+
+	uint childFileSize =
+		//nChilds			each child size
+		sizeof(uint) +		sizeof(uint) * nChilds;
+
+
+	//Loading child nodes
+	for (int n = 0; n < nChilds; n++)
+	{
+		std::string toPush(NodetoLoad->mChildren[n]->mName.data);
+		childs.push_back(toPush);
+		childsSize[n] = toPush.length() + 1;
+		childFileSize += sizeof(char) * childsSize[n];
+	}
+
+	char* file_childs = new char[childFileSize];
+	char* childsIt = file_childs;
+
+	//nCHilds
+	bytes = sizeof(uint);
+	memcpy(childsIt, &nChilds, bytes);
+	childsIt += bytes;
+
+	//size of each child
+	bytes = sizeof(uint) * nChilds;
+	memcpy(childsIt, childsSize, bytes);
+	childsIt += bytes;
+
+	for (int n = 0; n < nChilds; n++)
+	{
+		//a child
+		bytes = sizeof(char) * childsSize[n];
+		memcpy(childsIt, childs[n].data(), bytes);
+		childsIt += bytes;
+	}
+
+	//TMP FOR LOAD AND CHECKING
+	char* toLoad = file_0;
+	file_0It = toLoad;
+
+	float _transform[10];
+	bytes = sizeof(float) * 10;
+	memcpy(_transform, toLoad, bytes);
+	file_0It += bytes;
+
+	uint _nMeshes = 0;
+	bytes = sizeof(uint);
+	memcpy(&_nMeshes, file_0It, bytes);
+	file_0It += bytes;
+
+	//END FOR TMP LOAD
+
+
+	//Importing also all the childs
+	for (int n = 0; n < nChilds; n++)
+	{
+		ImportGameObject(path, NodetoLoad->mChildren[n], scene);
+	}
+
 }
 
 
