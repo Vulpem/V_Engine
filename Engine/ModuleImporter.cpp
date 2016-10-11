@@ -139,13 +139,23 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	}
 }
 
-void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild)
+void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
 {
 	//Setting Name
-	char name[MAXLEN];
-	memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
-	CleanName(name);
 
+	char name[MAXLEN];
+	if (isChild)
+	{
+		//If it isn't the root node, the file name will be the object's name
+		memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
+		CleanName(name);
+	}
+	else
+	{
+		//If it's the root node, the file name will be the FBX's name
+		strcpy(name, FileName(path).data());
+	}
+	
 	uint bytes = 0;
 
 	//					rot + scal + pos				nMeshes
@@ -402,8 +412,14 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	std::string toCreate("Library/Meshes/");
 	if (isChild)
 	{
-		//toCreate += name;
-		//toCreate += "/";
+		toCreate += RootName;
+		toCreate += "/";
+	}
+	else
+	{
+		std::string dir("Library/Meshes/");
+		dir += name;
+		App->fs->CreateDir(dir.data());
 	}
 
 	toCreate += name;
@@ -413,7 +429,14 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	//Importing also all the childs
 	for (int n = 0; n < nChilds; n++)
 	{
-		ImportGameObject(path, NodetoLoad->mChildren[n], scene, true);
+		if (isChild)
+		{
+			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, RootName);
+		}
+		else
+		{
+			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, name);
+		}
 	}
 
 
@@ -470,6 +493,30 @@ std::string ModuleImporter::FileFormat(const char * file)
 			tmp--;
 		}
 		return std::string(tmp);
+}
+
+std::string ModuleImporter::FileName(const char * file)
+{
+	char name[1024];
+	strcpy(name, file);
+	char* start = name;
+	char* end = name;
+	while (*start != '\0')
+	{
+		start++;
+	}
+	end = start;
+	while (*start != '/' && *start != '\\')
+	{
+		start--;
+	}
+	start++;
+	while (*end != '.')
+	{
+		end--;
+	}
+	*end = '\0';
+	return std::string(start);
 }
 
 // Called before quitting
