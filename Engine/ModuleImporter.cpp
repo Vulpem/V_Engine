@@ -112,13 +112,22 @@ void ModuleImporter::ImportFromFolder(const char * path)
 
 void ModuleImporter::Import3dScene(const char * filePath)
 {
-	if (FileFormat(filePath).compare(".fbx"))
+	//Making sure the file recieved is supported by the assimp library
+	std::string fmt = FileFormat(filePath);
+	std::string supportedFormats;
+	for (int n = 0; n < aiGetImportFormatCount(); n++)
+	{
+		supportedFormats += " ";
+		supportedFormats += aiGetImportFormatDescription(n)->mFileExtensions;		
+	}
+	if (supportedFormats.find(fmt) == std::string::npos)
 	{
 		return;
 	}
 
 	LOG("Importing mesh: %s", filePath);
 
+	//Loading the aiScene from Assimp
 	const aiScene* scene = aiImportFileEx(filePath, aiProcessPreset_TargetRealtime_MaxQuality, App->fs->GetAssimpIO());
 
 	if (scene != NULL)
@@ -148,18 +157,17 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	{
 		//If it isn't the root node, the file name will be the object's name
 		memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
-		CleanName(name);
 	}
 	else
 	{
 		//If it's the root node, the file name will be the FBX's name
 		strcpy(name, FileName(path).data());
 	}
-	
+
 	uint bytes = 0;
 
 	//					rot + scal + pos				nMeshes
-	uint file_0Size =	sizeof(float) * (4 + 3 + 3) +	sizeof(uint) * 1;
+	uint file_0Size = sizeof(float) * (4 + 3 + 3) + sizeof(uint) * 1;
 	char* file_0 = new char[file_0Size];
 	char* file_0It = file_0;
 
@@ -185,7 +193,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	memcpy(file_0It, transform, bytes);
 	file_0It += bytes;
 
-	const uint nMeshes =  NodetoLoad->mNumMeshes;
+	const uint nMeshes = NodetoLoad->mNumMeshes;
 
 	bytes = sizeof(uint);
 	memcpy(file_0It, &nMeshes, bytes);
@@ -206,26 +214,20 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		float* normals = NULL;
 		//Importing normals
 		//Num normals = num_vertices
-		if (toLoad->HasNormals())
-		{
-			normals = new float[num_vertices * 3];
-			memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
-		}
+		normals = new float[num_vertices * 3];
+		memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
 
 		float* textureCoords = NULL;
 		//Importing texture coords
 		//Num texture Coords = num_vertices
-		if (toLoad->HasTextureCoords(0))
-		{
-			textureCoords = new float[num_vertices * 2];
+		textureCoords = new float[num_vertices * 2];
 
-			aiVector3D* tmp = toLoad->mTextureCoords[0];
-			for (int n = 0; n < num_vertices * 2; n += 2)
-			{
-				textureCoords[n] = tmp->x;
-				textureCoords[n + 1] = tmp->y;
-				tmp++;
-			}
+		aiVector3D* tmpVect = toLoad->mTextureCoords[0];
+		for (int n = 0; n < num_vertices * 2; n += 2)
+		{
+			textureCoords[n] = tmpVect->x;
+			textureCoords[n + 1] = tmpVect->y;
+			tmpVect++;
 		}
 
 		//Importing texture path for this mesh
@@ -246,8 +248,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		//Importing index (3 per face)
 		uint num_indices = 0;
 		uint* indices = NULL;
-		if (toLoad->HasFaces())
-		{
+
 			aiFace* currentFace = toLoad->mFaces;
 
 			num_indices = toLoad->mNumFaces * 3;
@@ -267,19 +268,19 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				currentFace++;
 			}
 
-							
+
 			meshSize[n] =
 				//Mesh size
 				sizeof(uint) +
 
 				//num_vertices							vertices								normals
-				sizeof(uint) +							sizeof(float) * num_vertices * 3 +		sizeof(float) * num_vertices * 3
+				sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(float) * num_vertices * 3
 
 				//texture Coords						texture name length						tetxture name
-				+ sizeof(float) * num_vertices * 2 +	sizeof(uint) +							sizeof(char) * textureNameLen
+				+ sizeof(float) * num_vertices * 2 + sizeof(uint) + sizeof(char) * textureNameLen
 
 				//colors								num indices								indices
-				+ sizeof(float) * 3 +					sizeof(uint) +							sizeof(uint) * num_indices;
+				+ sizeof(float) * 3 + sizeof(uint) + sizeof(uint) * num_indices;
 
 			meshes[n] = new char[meshSize[n]];
 			char* meshIt = meshes[n];
@@ -333,7 +334,12 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			bytes = sizeof(uint) * num_indices;
 			memcpy(meshIt, indices, bytes);
 			meshIt += bytes;
-		}
+
+			RELEASE_ARRAY(vertices);
+			RELEASE_ARRAY(normals);
+			RELEASE_ARRAY(textureCoords);
+			RELEASE_ARRAY(indices);
+
 	}
 
 	uint nChilds = NodetoLoad->mNumChildren;
@@ -343,7 +349,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 	uint childFileSize =
 		//nChilds			each child size
-		sizeof(uint) +		sizeof(uint) * nChilds;
+		sizeof(uint) + sizeof(uint) * nChilds;
 
 
 	//Loading child nodes
@@ -406,6 +412,15 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	childsIt += bytes;
 
 
+	RELEASE_ARRAY(file_0);
+	for (int n = nMeshes - 1; n >= 0; n--)
+	{
+		RELEASE_ARRAY(meshes[n]);
+	}
+	RELEASE_ARRAY(meshes);
+	RELEASE_ARRAY(meshSize);
+	RELEASE_ARRAY(childsSize);
+	RELEASE_ARRAY(file_childs);
 
 	// ---------------- Creating the save file and writting it -----------------------------------------
 
@@ -439,9 +454,10 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		}
 	}
 
+	RELEASE_ARRAY(realFile);
 
 	//TMP FOR LOAD AND CHECKING
-	char* toLoad = file_0;
+	/*char* toLoad = file_0;
 	file_0It = toLoad;
 
 	float _transform[10];
@@ -452,7 +468,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	uint _nMeshes = 0;
 	bytes = sizeof(uint);
 	memcpy(&_nMeshes, file_0It, bytes);
-	file_0It += bytes;
+	file_0It += bytes;*/
 
 	//END FOR TMP LOAD
 
@@ -492,6 +508,7 @@ std::string ModuleImporter::FileFormat(const char * file)
 		{
 			tmp--;
 		}
+		tmp++;
 		return std::string(tmp);
 }
 

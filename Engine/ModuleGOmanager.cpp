@@ -108,11 +108,7 @@ update_status ModuleGoManager::Update(float dt)
 {
 	if (App->input->file_was_dropped)
 	{
-		C_String format = App->input->DroppedFileFormat();
-		//if ( format == ".fbx" || format == ".FBX")
-		//{
 			LoadFBX(App->input->dropped_file, false);
-		//}
 	}
 
 	std::vector<GameObject*>::iterator it = root->childs.begin();

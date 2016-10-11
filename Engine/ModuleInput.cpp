@@ -167,6 +167,7 @@ C_String ModuleInput::DroppedFileFormat()
 		{
 			tmp--;
 		}
+		tmp++;
 		return C_String(tmp);
 
 	}

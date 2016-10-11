@@ -355,22 +355,24 @@ void AssimpClose(aiFileIO* io, aiFile* file)
 
 C_String ModuleFileSystem::GetFileFormat(char* fullPath)
 {
+	char* tmp = fullPath;
 	int size = 0;
-	while (*fullPath != '\0')
+	while (*tmp != '\0')
 	{
-		fullPath++;
+		tmp++;
 		size++;
 	}
-	while (*fullPath != '.')
+	while (*tmp != '.')
 	{
-		fullPath--;
+		tmp--;
 		size--;
 		if (size <= 1)
 		{
 			return C_String("");
 		}
 	}
-	return C_String(fullPath);
+	tmp++;
+	return C_String(tmp);
 }
 
 C_String ModuleFileSystem::RemoveFilePath(char * fileWithPath)

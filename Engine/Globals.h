@@ -16,6 +16,28 @@ void log(const char file[], int line, const char* format, ...);
 
 #define EDITOR_FRAME_SAMPLES 50
 
+#define CAP(n) ((n <= 0.0f) ? n=0.0f : (n >= 1.0f) ? n=1.0f : n=n)
+#define MIN(a,b) ((a)<(b)) ? (a) : (b)
+#define MAX(a,b) ((a)>(b)) ? (a) : (b)
+
+
+#define RELEASE( x )\
+    {\
+       if( x != nullptr )\
+       {\
+         delete x;\
+	     x = nullptr;\
+       }\
+    }
+
+#define RELEASE_ARRAY( x )\
+	{\
+       if( x != nullptr )\
+       {\
+           delete[] x;\
+	       x = nullptr;\
+		 }\
+	 }
 
 typedef unsigned int uint;
 
@@ -25,6 +47,7 @@ enum update_status
 	UPDATE_STOP,
 	UPDATE_ERROR
 };
+
 
 // Configuration -----------
 #define SCREEN_WIDTH 1456
