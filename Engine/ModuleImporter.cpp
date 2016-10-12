@@ -5,6 +5,9 @@
 
 #include "ModuleFileSystem.h"
 
+#include "GameObject.h"
+#include "AllComponents.h"
+
 #include "OpenGL.h"
 
 #include "Devil\include\il.h"
@@ -146,6 +149,56 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	{
 		LOG("Error loading scene %s", filePath);
 	}
+}
+
+GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObject* parent)
+{
+	char* file = NULL;
+	std::string path("Library/Meshes/");
+	path += fileName_NoFileType;
+	path += ".vmesh";
+
+	if (App->fs->Exists(path.data()))
+	{
+		int size = App->fs->Load(path.data(), &file);
+		if (file != NULL && size > 0)
+		{
+			std::string fileName = FileName(fileName_NoFileType);
+			char* file_0It = file;
+
+			//Creating basic components for a GameObject
+			GameObject* ret = new GameObject;
+			Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
+			Material* mat = (Material*)ret->AddComponent(Component::Type::C_material);
+
+			//Setting transform
+			float _transform[10];
+			uint bytes = sizeof(float) * 10;
+			memcpy(_transform, file, bytes);
+			file_0It += bytes;
+
+			trans->SetRot(_transform[0], _transform[1], _transform[2], _transform[3]);
+			trans->SetScale(_transform[4], _transform[5], _transform[6]);
+			trans->SetPos(_transform[7], _transform[8], _transform[9]);
+
+			//Number of meshes
+			uint _nMeshes = 0;
+			bytes = sizeof(uint);
+			memcpy(&_nMeshes, file_0It, bytes);
+			file_0It += bytes;
+
+			//Loading each mesh
+			for (int n = 0; n < _nMeshes; n++)
+			{
+
+			}
+
+			//Releasing the buffer
+			delete[] file;
+		}
+	}
+
+	return nullptr;
 }
 
 void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
@@ -382,6 +435,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		childsIt += bytes;
 	}
 
+	//Getting the total size of the real file
 	uint realFileSize = 0;
 	realFileSize += file_0Size;
 	for (int n = 0; n < nMeshes; n++)
@@ -390,26 +444,27 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	}
 	realFileSize += childFileSize;
 
+	//Copying all the buffers we created into a single bigger buffer
 	char* realFile = new char[realFileSize];
 	char* realIt = realFile;
 
 	//file_0
 	bytes = file_0Size;
 	memcpy(realIt, file_0, bytes);
-	childsIt += bytes;
+	realIt += bytes;
 
 	for (int n = 0; n < nMeshes; n++)
 	{
 		//each mesh
 		bytes = meshSize[n];
 		memcpy(realIt, meshes[n], bytes);
-		childsIt += bytes;
+		realIt += bytes;
 	}
 
 	//file_0
 	bytes = childFileSize;
 	memcpy(realIt, file_childs, bytes);
-	childsIt += bytes;
+	realIt += bytes;
 
 
 	RELEASE_ARRAY(file_0);
@@ -518,21 +573,27 @@ std::string ModuleImporter::FileName(const char * file)
 	strcpy(name, file);
 	char* start = name;
 	char* end = name;
+	int size = 0;
 	while (*start != '\0')
 	{
+		size++;
 		start++;
 	}
 	end = start;
-	while (*start != '/' && *start != '\\')
+	while (size >= 0  && *start != '/' && *start != '\\')
 	{
+		size--;
 		start--;
 	}
 	start++;
-	while (*end != '.')
+	while (*end != '.' && end != start)
 	{
 		end--;
 	}
-	*end = '\0';
+	if (end != start)
+	{
+		*end = '\0';
+	}
 	return std::string(start);
 }
 

@@ -45,6 +45,10 @@ bool ModuleFileSystem::Init()
 //		AddPath(path.child_value());
 //	}
 
+	CreateDir("Library");
+	CreateDir("Library/Meshes");
+	CreateDir("Library/Textures");
+
 	// Ask SDL for a write dir
 	char* write_path = SDL_GetPrefPath(App->GetOrganization(), App->GetTitle());
 
@@ -56,15 +60,11 @@ bool ModuleFileSystem::Init()
 	{
 		// We add the writing directory as a reading directory too with speacial mount point
 		LOG("Writing directory is %s", write_path);
-		AddPath(write_path, GetSaveDirectory());
+		AddPath(write_path);
 	}
 
 	SDL_free(write_path);
-	PHYSFS_addToSearchPath(GetSaveDirectory(), 0);
-
-	CreateDir("Library");
-	CreateDir("Library/Meshes");
-	CreateDir("Library/Textures");
+	PHYSFS_addToSearchPath("Library/", 0);
 
 	return ret;
 }

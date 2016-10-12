@@ -26,6 +26,8 @@
 
 #include "AllComponents.h"
 
+#include "ModuleImporter.h"
+
 //------------------------- MODULE --------------------------------------------------------------------------------
 
 ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -92,6 +94,8 @@ bool ModuleGoManager::Start()
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	App->importer->LoadVMesh("MechaT");
 
 	return true;
 }

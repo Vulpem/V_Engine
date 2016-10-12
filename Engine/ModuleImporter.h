@@ -9,6 +9,7 @@
 
 class aiScene;
 class aiNode;
+class GameObject;
 
 class ModuleImporter : public Module
 {
@@ -26,6 +27,9 @@ public:
 
 	void ImportFromFolder(const char* path);
 	void Import3dScene(const char* filePath);
+
+	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL
+	GameObject* LoadVMesh(const char* fileName_NoFileType, GameObject* parent = NULL);
 
 private:
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = NULL);
