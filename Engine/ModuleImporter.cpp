@@ -151,7 +151,7 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	}
 }
 
-GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObject* parent)
+GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
 {
 	char* file = NULL;
 	std::string path("Library/Meshes/");
@@ -164,18 +164,23 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 		if (file != NULL && size > 0)
 		{
 			std::string fileName = FileName(fileName_NoFileType);
-			char* file_0It = file;
+			char* It = file;
 
 			//Creating basic components for a GameObject
 			GameObject* ret = new GameObject;
 			Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
 			Material* mat = (Material*)ret->AddComponent(Component::Type::C_material);
 
+			//Setting name
+			strcpy(ret->name, fileName.data());
+			//Setting parent
+			ret->parent = parent;
+
 			//Setting transform
 			float _transform[10];
 			uint bytes = sizeof(float) * 10;
 			memcpy(_transform, file, bytes);
-			file_0It += bytes;
+			It += bytes;
 
 			trans->SetRot(_transform[0], _transform[1], _transform[2], _transform[3]);
 			trans->SetScale(_transform[4], _transform[5], _transform[6]);
@@ -184,17 +189,125 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 			//Number of meshes
 			uint _nMeshes = 0;
 			bytes = sizeof(uint);
-			memcpy(&_nMeshes, file_0It, bytes);
-			file_0It += bytes;
+			memcpy(&_nMeshes, It, bytes);
+			It += bytes;
 
 			//Loading each mesh
 			for (int n = 0; n < _nMeshes; n++)
 			{
+				mesh* newMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
 
+				//Total mesh size (just in case)
+				uint _meshSize = 0;
+				bytes = sizeof(uint);
+				memcpy(&_meshSize, It, bytes);
+				It += bytes;
+
+				//Num vertices
+				bytes = sizeof(uint);
+				memcpy(&newMesh->num_vertices, It, bytes);
+				It += bytes;
+
+				//Actual vertices
+				newMesh->vertices = new float[newMesh->num_vertices * 3];
+				bytes = sizeof(float) * newMesh->num_vertices * 3;
+				memcpy(newMesh->vertices, It, bytes);
+				It += bytes;
+
+				//Normals
+				newMesh->num_normals = newMesh->num_vertices;
+				newMesh->normals = new float[newMesh->num_vertices * 3];
+				bytes = sizeof(float) * newMesh->num_normals * 3;
+				memcpy(newMesh->normals, It, bytes);
+				It += bytes;
+
+				//Texture coords
+				newMesh->num_textureCoords = newMesh->num_vertices;
+				newMesh->textureCoords = new float[newMesh->num_vertices * 2];
+				bytes = sizeof(float) * newMesh->num_normals * 2;
+				memcpy(newMesh->textureCoords, It, bytes);
+				It += bytes;
+
+				//Texture name Len
+				uint textureNameLen = 0;
+				bytes = sizeof(uint);
+				memcpy(&textureNameLen, It, bytes);
+				It += bytes;
+
+				//TODO pendant to load texture from name
+				//Texture name
+				char* textureName = new char[textureNameLen]; //TO DELETE
+				bytes = sizeof(char) * textureNameLen;
+				memcpy(textureName, It, bytes);
+				It += bytes;
+
+				//Color
+				float color[3];
+				bytes = sizeof(float) * 3;
+				memcpy(color, It, bytes);
+				It += bytes;
+				mat->SetColor(color[0], color[1], color[2]);
+
+				//Num indices
+				bytes = sizeof(uint);
+				memcpy(&newMesh->num_indices, It, bytes);
+				It += bytes;
+
+				//Actual indices
+				newMesh->indices = new uint[newMesh->num_indices];
+				bytes = sizeof(uint) * newMesh->num_indices;
+				memcpy(newMesh->indices, It, bytes);
+				It += bytes;
+			}
+
+			//Num childs
+			uint nChilds = 0;
+			bytes = sizeof(uint);
+			memcpy(&nChilds, It, bytes);
+			It += bytes;
+
+			//Length of each child string (in chars)
+			uint* sizeOfChilds = new uint[nChilds]; //TO DELETE
+			bytes = sizeof(uint) * nChilds;
+			memcpy(sizeOfChilds, It, bytes);
+			It += bytes;
+
+			std::vector<std::string> childs;
+			//Loading each child name into a separate string
+			for (int n = 0; n < nChilds; n++)
+			{
+				char* name = new char[sizeOfChilds[n]];
+				bytes = sizeof(char) * sizeOfChilds[n];
+				memcpy(name, It, bytes);
+				It += bytes;
+
+				childs.push_back(std::string(name));
+				delete[] name;
 			}
 
 			//Releasing the buffer
 			delete[] file;
+
+			if (parent == NULL)
+			{
+				meshesFolder = new char[fileName.length() + 1];
+				memcpy(meshesFolder, fileName.data(), sizeof(char) * (fileName.length() + 1));
+			}
+
+			std::vector<std::string>::iterator childNames = childs.begin();
+			while (childNames != childs.end())
+			{
+				std::string thisChild(meshesFolder);
+				thisChild += "/";
+				thisChild += (*childNames);
+				LoadVMesh(thisChild.data(), ret);
+				childNames++;
+			}
+			if (parent == NULL)
+			{
+				RELEASE(meshesFolder);
+			}
+
 		}
 	}
 

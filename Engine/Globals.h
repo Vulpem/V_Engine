@@ -147,11 +147,6 @@ bytes = sizeof(uint) * num_indices;
 memcpy(meshIt, indices, bytes);
 meshIt += bytes;
 
-RELEASE_ARRAY(vertices);
-RELEASE_ARRAY(normals);
-RELEASE_ARRAY(textureCoords);
-RELEASE_ARRAY(indices);
-
 }
 
 uint nChilds = NodetoLoad->mNumChildren;
