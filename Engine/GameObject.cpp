@@ -137,7 +137,15 @@ Component* GameObject::AddComponent(Component::Type type)
 	{
 	case Component::Type::C_transform:
 	{
-		toAdd = new Transform(this, components.size()); break;
+		if (HasComponent(Component::C_transform) == false)
+		{
+			toAdd = new Transform(this, components.size()); 
+		}
+		else
+		{
+			return *GetComponent(Component::C_transform).begin();
+		}
+		break;
 	}
 	case Component::Type::C_mesh:
 	{
@@ -145,7 +153,15 @@ Component* GameObject::AddComponent(Component::Type type)
 	}
 	case Component::Type::C_material:
 	{
-		toAdd = new Material(this, components.size()); break;
+		if (HasComponent(Component::C_material) == false)
+		{
+			toAdd = new Material(this, components.size());
+		}
+		else
+		{
+			return *GetComponent(Component::C_material).begin();
+		}
+		break;
 	}
 	}
 

@@ -27,7 +27,10 @@ public:
 	void ImportFromFolder(const char* path);
 	void Import3dScene(const char* filePath);
 
+private:
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = NULL);
+
+public:
 	void CleanName(char* toClean);
 	std::string FileFormat(const char* file);
 	std::string FileName(const char* file);
