@@ -11,6 +11,7 @@ https://github.com/Vulpem/V_Engine/
 
 The editor will import all the 3d scenes and textures located inside of the "Assets" folder at the beggining of execution.     
 Any changes done to those files during execution or files from outside this folder won't be handled by the engine.         
+Note that importing all files may take some time. The application may take a few seconds before initializing.
 
 Drop any 3dFile into the scene to load it.    
 Alternatively, you can use the "Import Geometry" menu. To do so, just input the geometry you want to import.
