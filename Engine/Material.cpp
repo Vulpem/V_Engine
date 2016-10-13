@@ -4,9 +4,7 @@
 
 #include "imGUI\imgui.h"
 
-#include "Devil\include\il.h"
-#include "Devil\include\ilu.h"
-#include "Devil\include\ilut.h"
+#include "OpenGL.h"
 
 Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id)
 {

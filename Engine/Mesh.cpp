@@ -7,11 +7,6 @@
 #include "GameObject.h"
 #include "Material.h"
 
-#include "Assimp\include\cimport.h"
-#include "Assimp\include\scene.h"
-#include "Assimp\include\postprocess.h"
-#include "Assimp\include\cfileio.h"
-
 //------------------------- MESH --------------------------------------------------------------------------------
 
 mesh::mesh(GameObject* linkedTo, int id):Component(linkedTo, id)

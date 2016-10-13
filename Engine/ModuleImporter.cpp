@@ -64,6 +64,8 @@ bool ModuleImporter::Init()
 
 bool ModuleImporter::Start()
 {
+	ilutRenderer(ILUT_OPENGL);
+
 	ImportFromFolder("Assets");
 
 	return true;

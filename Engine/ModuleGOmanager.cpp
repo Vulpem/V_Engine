@@ -3,30 +3,12 @@
 
 #include "ModuleGOmanager.h"
 
-#include "ModuleFileSystem.h"
 #include "ModuleInput.h"
-
-#include "OpenGL.h"
-
-#include "Devil\include\il.h"
-#include "Devil\include\ilu.h"
-#include "Devil\include\ilut.h"
-
-
-#include "Assimp\include\cimport.h"
-#include "Assimp\include\scene.h"
-#include "Assimp\include\postprocess.h"
-#include "Assimp\include\cfileio.h"
-
-#pragma comment(lib, "Assimp/libx86/assimp.lib")
-
-#pragma comment(lib, "Devil/libx86/DevIL.lib")
-#pragma comment(lib, "Devil/libx86/ILU.lib")
-#pragma comment(lib, "Devil/libx86/ILUT.lib")
+#include "ModuleImporter.h"
 
 #include "AllComponents.h"
 
-#include "ModuleImporter.h"
+
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
@@ -46,20 +28,6 @@ bool ModuleGoManager::Init()
 {
 	bool ret = true;
 
-	struct aiLogStream stream;
-	stream = aiGetPredefinedLogStream(aiDefaultLogStream_DEBUGGER, nullptr);
-	aiAttachLogStream(&stream);
-
-	ilInit();
-
-	ILuint devilError = ilGetError();
-
-	if (devilError != IL_NO_ERROR)
-	{
-		printf("Devil Error (ilInit: %s\n", iluErrorString(devilError));
-		exit(2);
-	}
-
 	CreateRootGameObject();
 		
 	return ret;
@@ -67,33 +35,6 @@ bool ModuleGoManager::Init()
 
 bool ModuleGoManager::Start()
 {
-
-	//Generating checker texture
-	ilutRenderer(ILUT_OPENGL);
-
-	int a = 0;
-	GLubyte checkImage[CHECKERS_HEIGHT][CHECKERS_WIDTH][4];
-	for (int i = 0; i < CHECKERS_HEIGHT; i++) {
-		for (int j = 0; j < CHECKERS_WIDTH; j++) {
-			int c = ((((i & 0x8) == 0) ^ (((j & 0x8)) == 0))) * 255;
-			checkImage[i][j][0] = (GLubyte)c;
-			checkImage[i][j][1] = (GLubyte)c;
-			checkImage[i][j][2] = (GLubyte)c;
-			checkImage[i][j][3] = (GLubyte)255;
-		}
-	}
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &id_checkerTexture);
-	glBindTexture(GL_TEXTURE_2D, id_checkerTexture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return true;
 }
@@ -135,8 +76,6 @@ update_status ModuleGoManager::PostUpdate(float dt)
 // Called before quitting
 bool ModuleGoManager::CleanUp()
 {
-	aiDetachAllLogStreams();
-
 	if (root)
 	{
 		delete root;
