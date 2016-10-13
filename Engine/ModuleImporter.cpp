@@ -118,6 +118,7 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	//Making sure the file recieved is supported by the assimp library
 	std::string fmt = FileFormat(filePath);
 	std::string supportedFormats;
+	supportedFormats += " FBX";
 	for (int n = 0; n < aiGetImportFormatCount(); n++)
 	{
 		supportedFormats += " ";
@@ -225,31 +226,45 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
 				//endof Generating vertices buffer
 
-				//Normals
-				newMesh->num_normals = newMesh->num_vertices;
-				newMesh->normals = new float[newMesh->num_vertices * 3];
-				bytes = sizeof(float) * newMesh->num_normals * 3;
-				memcpy(newMesh->normals, It, bytes);
+				//Num normals
+				bytes = sizeof(uint);
+				memcpy(&newMesh->num_normals, It, bytes);
 				It += bytes;
 
-				//Generating normals buffer
-				glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
-				glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
-				//endOf Generating normals buffer
+				if (newMesh->num_normals > 0)
+				{
+					//Normals
+					newMesh->normals = new float[newMesh->num_vertices * 3];
+					bytes = sizeof(float) * newMesh->num_normals * 3;
+					memcpy(newMesh->normals, It, bytes);
+					It += bytes;
 
-				//Texture coords
-				newMesh->num_textureCoords = newMesh->num_vertices;
-				newMesh->textureCoords = new float[newMesh->num_vertices * 2];
-				bytes = sizeof(float) * newMesh->num_normals * 2;
-				memcpy(newMesh->textureCoords, It, bytes);
+					//Generating normals buffer
+					glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
+					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
+					//endOf Generating normals buffer
+				}
+
+				//Num texture coords
+				bytes = sizeof(uint);
+				memcpy(&newMesh->num_textureCoords, It, bytes);
 				It += bytes;
 
-				//Generating UVs buffer
-				glGenBuffers(1, (GLuint*) &(newMesh->id_textureCoords));
-				glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, newMesh->textureCoords, GL_STATIC_DRAW);
-				//endOF Generatinv UVs buffer
+				if (newMesh->num_textureCoords > 0)
+				{
+					//Texture coords
+					newMesh->textureCoords = new float[newMesh->num_vertices * 2];
+					bytes = sizeof(float) * newMesh->num_normals * 2;
+					memcpy(newMesh->textureCoords, It, bytes);
+					It += bytes;
+
+					//Generating UVs buffer
+					glGenBuffers(1, (GLuint*) &(newMesh->id_textureCoords));
+					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, newMesh->textureCoords, GL_STATIC_DRAW);
+					//endOF Generatinv UVs buffer
+				}
 
 				//Texture name Len
 				uint textureNameLen = 0;
@@ -412,23 +427,31 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		float* vertices = new float[num_vertices * 3];
 		memcpy_s(vertices, sizeof(float) * num_vertices * 3, toLoad->mVertices, sizeof(float) * num_vertices * 3);
 
-		float* normals = NULL;
 		//Importing normals
-		//Num normals = num_vertices
-		normals = new float[num_vertices * 3];
-		memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
+			float* normals = NULL;
+			uint numNormals = 0;
+			if (toLoad->HasNormals())
+			{
+				numNormals = num_vertices;
+				normals = new float[num_vertices * 3];
+				memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
+			}
 
-		float* textureCoords = NULL;
 		//Importing texture coords
-		//Num texture Coords = num_vertices
-		textureCoords = new float[num_vertices * 2];
-
-		aiVector3D* tmpVect = toLoad->mTextureCoords[0];
-		for (int n = 0; n < num_vertices * 2; n += 2)
+		float* textureCoords = NULL;
+		uint numTextureCoords = 0;
+		if (toLoad->HasTextureCoords(0))
 		{
-			textureCoords[n] = tmpVect->x;
-			textureCoords[n + 1] = tmpVect->y;
-			tmpVect++;
+			numTextureCoords = num_vertices;
+			textureCoords = new float[num_vertices * 2];
+
+			aiVector3D* tmpVect = toLoad->mTextureCoords[0];
+			for (int n = 0; n < num_vertices * 2; n += 2)
+			{
+				textureCoords[n] = tmpVect->x;
+				textureCoords[n + 1] = tmpVect->y;
+				tmpVect++;
+			}
 		}
 
 		//Importing texture path for this mesh
@@ -474,11 +497,11 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				//Mesh size
 				sizeof(uint) +
 
-				//num_vertices							vertices								normals
-				sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(float) * num_vertices * 3
+				//num_vertices				   vertices				num_normals   normals
+				sizeof(uint) + sizeof(float) * num_vertices * 3 +  sizeof(uint) + sizeof(float) * num_vertices * 3
 
-				//texture Coords						texture name length						tetxture name
-				+ sizeof(float) * num_vertices * 2 + sizeof(uint) + sizeof(char) * textureNameLen
+				//num_texture coords  texture Coords						texture name length						tetxture name
+				+ sizeof(uint) + sizeof(float) * num_vertices * 2 + sizeof(uint) + sizeof(char) * textureNameLen
 
 				//colors								num indices								indices
 				+ sizeof(float) * 3 + sizeof(uint) + sizeof(uint) * num_indices;
@@ -501,15 +524,31 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			memcpy(meshIt, vertices, bytes);
 			meshIt += bytes;
 
-			//Normals
-			bytes = sizeof(float) * num_vertices * 3;
-			memcpy(meshIt, normals, bytes);
+			//Num Normals
+			bytes = sizeof(uint);
+			memcpy(meshIt, &numNormals, bytes);
 			meshIt += bytes;
 
-			//texture coords
-			bytes = sizeof(float) * num_vertices * 2;
-			memcpy(meshIt, textureCoords, bytes);
+			if (numNormals > 0)
+			{
+				//Normals
+				bytes = sizeof(float) * numNormals * 3;
+				memcpy(meshIt, normals, bytes);
+				meshIt += bytes;
+			}
+
+			//Num texture coords
+			bytes = sizeof(uint);
+			memcpy(meshIt, &numTextureCoords, bytes);
 			meshIt += bytes;
+
+			if (numTextureCoords > 0)
+			{
+				//texture coords
+				bytes = sizeof(float) * numTextureCoords * 2;
+				memcpy(meshIt, textureCoords, bytes);
+				meshIt += bytes;
+			}
 
 			//Texture name len
 			bytes = sizeof(uint);
@@ -658,23 +697,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	}
 
 	RELEASE_ARRAY(realFile);
-
-	//TMP FOR LOAD AND CHECKING
-	/*char* toLoad = file_0;
-	file_0It = toLoad;
-
-	float _transform[10];
-	bytes = sizeof(float) * 10;
-	memcpy(_transform, toLoad, bytes);
-	file_0It += bytes;
-
-	uint _nMeshes = 0;
-	bytes = sizeof(uint);
-	memcpy(&_nMeshes, file_0It, bytes);
-	file_0It += bytes;*/
-
-	//END FOR TMP LOAD
-
 }
 
 
