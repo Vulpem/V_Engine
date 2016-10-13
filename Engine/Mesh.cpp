@@ -19,10 +19,10 @@ mesh::mesh(GameObject* linkedTo, int id):Component(linkedTo, id)
 
 mesh::~mesh()
 {
-	if (indices) { delete[] indices; }
-	if (vertices) { delete[] vertices; }
-	if (textureCoords) { delete[] textureCoords; }
-	if (normals) { delete[] normals; }
+	RELEASE_ARRAY(indices);
+	RELEASE_ARRAY(vertices);
+	RELEASE_ARRAY(textureCoords);
+	RELEASE_ARRAY(normals);
 
 	if (id_indices != 0)
 	{

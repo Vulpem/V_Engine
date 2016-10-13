@@ -102,8 +102,10 @@ void ModuleImporter::ImportFromFolder(const char * path)
 		std::string toSend(path);
 		toSend += "/";
 		toSend += files[n].data();
-		Import3dScene(toSend.data());
-		ImportImage(toSend.data());
+		if (Import3dScene(toSend.data()) == false)
+		{
+			ImportImage(toSend.data());
+		}
 
 	}
 	files.clear();
@@ -168,7 +170,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 		return false;
 	}
 
-	std::string saveName("Library/Textures/");
+	/*std::string saveName("Library/Textures/");
 	saveName += FileName(filePath);
 	saveName += ".dds";
 
@@ -194,7 +196,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 			RELEASE_ARRAY(data);
 		}
 	}
-	RELEASE_ARRAY (buffer);
+	RELEASE_ARRAY (buffer);*/
 	return true;
 }
 
@@ -271,6 +273,8 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_vertices);
 				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
 				//endof Generating vertices buffer
+				RELEASE_ARRAY(newMesh->vertices);
+
 
 				//Num normals
 				bytes = sizeof(uint);
@@ -290,6 +294,7 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
 					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
 					//endOf Generating normals buffer
+					RELEASE_ARRAY(newMesh->normals);
 				}
 
 				//Num texture coords
@@ -310,6 +315,7 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
 					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, newMesh->textureCoords, GL_STATIC_DRAW);
 					//endOF Generatinv UVs buffer
+					RELEASE_ARRAY(newMesh->textureCoords);
 				}
 
 				//Texture name Len
@@ -355,6 +361,8 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
 				//endOf generating indices buffer
+
+				RELEASE_ARRAY(newMesh->indices);
 			}
 
 			//Num childs
@@ -395,9 +403,6 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				std::vector<std::string>::iterator childNames = childs.begin();
 				while (childNames != childs.end())
 				{
-					//std::string thisChild(meshesFolder);
-					//thisChild += "/";
-					//thisChild += (*childNames);
 					std::string thisChild(*childNames);
 					GameObject* child = LoadVMesh(thisChild.data(), ret, meshesFolder);
 					if (child)
@@ -408,7 +413,7 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				}
 				if (parent == NULL)
 				{
-					RELEASE(meshesFolder);
+					RELEASE_ARRAY(meshesFolder);
 				}
 			}
 

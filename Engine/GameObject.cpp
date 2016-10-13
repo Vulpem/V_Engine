@@ -38,6 +38,14 @@ GameObject::~GameObject()
 			}
 		}
 	}
+
+	std::vector<Component*>::iterator comp = components.begin();
+	while (comp != components.end())
+	{
+		delete *comp;
+		comp++;
+	}
+
 }
 
 void GameObject::Update()
