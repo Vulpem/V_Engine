@@ -310,53 +310,57 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 			memcpy(&nChilds, It, bytes);
 			It += bytes;
 
-			//Length of each child string (in chars)
-			uint* sizeOfChilds = new uint[nChilds];
-			bytes = sizeof(uint) * nChilds;
-			memcpy(sizeOfChilds, It, bytes);
-			It += bytes;
-
-			std::vector<std::string> childs;
-			//Loading each child name into a separate string
-			for (int n = 0; n < nChilds; n++)
+			if (nChilds > 0)
 			{
-				char* name = new char[sizeOfChilds[n]];
-				bytes = sizeof(char) * sizeOfChilds[n];
-				memcpy(name, It, bytes);
+				//Length of each child string (in chars)
+				uint* sizeOfChilds = new uint[nChilds];
+				bytes = sizeof(uint) * nChilds;
+				memcpy(sizeOfChilds, It, bytes);
 				It += bytes;
 
-				childs.push_back(std::string(name));
-				delete[] name;
-			}
-
-			//Releasing the buffer
-			delete[] file;
-			delete[] sizeOfChilds;
-
-			if (parent == NULL)
-			{
-				meshesFolder = new char[fileName.length() + 1];
-				memcpy(meshesFolder, fileName.data(), sizeof(char) * (fileName.length() + 1));
-			}
-
-			std::vector<std::string>::iterator childNames = childs.begin();
-			while (childNames != childs.end())
-			{
-				//std::string thisChild(meshesFolder);
-				//thisChild += "/";
-				//thisChild += (*childNames);
-				std::string thisChild(*childNames);
-				GameObject* child = LoadVMesh(thisChild.data(), ret, meshesFolder);
-				if (child)
+				std::vector<std::string> childs;
+				//Loading each child name into a separate string
+				for (int n = 0; n < nChilds; n++)
 				{
-					ret->childs.push_back(child);
+					char* name = new char[sizeOfChilds[n]];
+					bytes = sizeof(char) * sizeOfChilds[n];
+					memcpy(name, It, bytes);
+					It += bytes;
+
+					childs.push_back(std::string(name));
+					delete[] name;
 				}
-				childNames++;
+				delete[] sizeOfChilds;
+
+
+				if (parent == NULL)
+				{
+					meshesFolder = new char[fileName.length() + 1];
+					memcpy(meshesFolder, fileName.data(), sizeof(char) * (fileName.length() + 1));
+				}
+
+				std::vector<std::string>::iterator childNames = childs.begin();
+				while (childNames != childs.end())
+				{
+					//std::string thisChild(meshesFolder);
+					//thisChild += "/";
+					//thisChild += (*childNames);
+					std::string thisChild(*childNames);
+					GameObject* child = LoadVMesh(thisChild.data(), ret, meshesFolder);
+					if (child)
+					{
+						ret->childs.push_back(child);
+					}
+					childNames++;
+				}
+				if (parent == NULL)
+				{
+					RELEASE(meshesFolder);
+				}
 			}
-			if (parent == NULL)
-			{
-				RELEASE(meshesFolder);
-			}
+
+			delete[] file;
+
 			return ret;
 		}
 	}
@@ -498,13 +502,15 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				sizeof(uint) +
 
 				//num_vertices				   vertices				num_normals   normals
-				sizeof(uint) + sizeof(float) * num_vertices * 3 +  sizeof(uint) + sizeof(float) * num_vertices * 3
+				sizeof(uint) + sizeof(float) * num_vertices * 3 +  sizeof(uint) + sizeof(float) * numNormals * 3
 
-				//num_texture coords  texture Coords						texture name length						tetxture name
-				+ sizeof(uint) + sizeof(float) * num_vertices * 2 + sizeof(uint) + sizeof(char) * textureNameLen
+				//num_texture coords  texture Coords		        texture name length		      tetxture name
+				+ sizeof(uint) + sizeof(float) * numTextureCoords * 2 + sizeof(uint) + sizeof(char) * textureNameLen
 
 				//colors								num indices								indices
 				+ sizeof(float) * 3 + sizeof(uint) + sizeof(uint) * num_indices;
+
+
 
 			meshes[n] = new char[meshSize[n]];
 			char* meshIt = meshes[n];
