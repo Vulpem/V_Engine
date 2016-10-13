@@ -214,6 +214,8 @@ bool ModuleImporter::ImportImage(const char * filePath)
 
 GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
 {
+	std::string fileName = FileName(fileName_NoFileType);
+
 	char* file = NULL;
 	std::string path("Library/Meshes/");
 	if (parent && meshesFolder)
@@ -221,15 +223,14 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 		path += meshesFolder;
 		path += "/";
 	}
-	path += fileName_NoFileType;
+	path += fileName;
 	path += ".vmesh";
 
 	if (App->fs->Exists(path.data()))
 	{
 		int size = App->fs->Load(path.data(), &file);
 		if (file != NULL && size > 0)
-		{
-			std::string fileName = FileName(fileName_NoFileType);
+		{			
 			char* It = file;
 
 			//Creating basic components for a GameObject

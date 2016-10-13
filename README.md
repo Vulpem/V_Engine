@@ -1,8 +1,24 @@
 
 # V_Engine
 
-A simple game engine developed by Vulpem.    
-This has been created for learning purposes, during 2016 at the CITM university.    
+A simple game engine developed by Vulpem.     
+This has been created for learning purposes, during 2016 at the CITM university.   
+
+Source code can be found at:
+https://github.com/Vulpem/V_Engine/
+
+## Usage
+
+The editor will import all the 3d scenes and textures located inside of the "Assets" folder at the beggining of execution.     
+Any changes done to those files during execution or files from outside this folder won't be handled by the engine.         
+
+Drop any 3dFile into the scene to load it.    
+Alternatively, you can use the "Import Geometry" menu. To do so, just input the geometry you want to import.
+
+
+All tmp files are created in "%appdata%/UPC/V_Engine/Library"      
+Note: All files will be converted into a .vmesh file. Avoid having files with the same name, even if they're     
+in different folders or different formats, since it may cause one of the files to overwrite the other's .vmesh.   
 
 
 ## LICENSE
