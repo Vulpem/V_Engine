@@ -90,7 +90,7 @@ bool ModuleRenderer3D::Init()
 		glClearDepth(10.0f);
 
 		//Initialize clear color
-		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClearColor(0.78f, 0.81f, 0.84f, 1.f);
 
 		//Check for error
 		error = glGetError();
@@ -135,7 +135,6 @@ bool ModuleRenderer3D::Init()
 		glEnable(GL_LIGHTING);
 		glEnable(GL_COLOR_MATERIAL);
 		glEnable(GL_TEXTURE_2D);
-
 
 		lights[0].Active(true);
 

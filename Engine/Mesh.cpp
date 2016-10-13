@@ -100,15 +100,22 @@ void mesh::RealRender(bool wired)
 		glDisable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glLineWidth(1.0f);
-		glColor4f(0.7f, 0.7f, 0.7, 1.0f);
+		glColor4f(0.f, 0.f, 0.f, 1.0f);
 		if (wires)
 		{
 			glDisable(GL_CULL_FACE);
 		}
 		if(object->selected)
 		{
-			glLineWidth(0.1f);
-			glColor4f(0, 0.8f, 0.8f, 1);
+			glLineWidth(1.1f);			
+			if (object->parent && object->parent->selected)
+			{
+				glColor4f(0, 0.5f, 0.5f, 1);
+			}
+			else
+			{
+				glColor4f(0, 0.8f, 0.8f, 1);
+			}
 		}
 	}
 	else
