@@ -170,22 +170,29 @@ bool ModuleImporter::ImportImage(const char * filePath)
 	saveName += FileName(filePath);
 	saveName += ".dds";
 
-	ILuint size;
-	ILubyte *data;
+	char* buffer;
+	uint loadSize = App->fs->Load(filePath, &buffer);
 
-	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
-	size = ilSaveL(IL_DDS, NULL, 0); // Get the size of the data buffer
-
-	if (size > 0)
+	if (loadSize > 0)
 	{
-		data = new ILubyte[size]; // allocate data buffer
-		if (ilSaveL(IL_DDS, data, size) > 0)
+		ILuint size;
+		ILubyte *data = (ILubyte*)buffer;
+
+		ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
+		size = ilSaveL(IL_DDS, NULL, 0); // Get the size of the data buffer
+
+		if (size > 0)
 		{
-			// Save to buffer with the ilSaveIL function
-			App->fs->Save(saveName.data(), (const char*)data, size);
+			data = new ILubyte[size]; // allocate data buffer
+			if (ilSaveL(IL_DDS, data, size) > 0)
+			{
+				// Save to buffer with the ilSaveIL function
+				App->fs->Save(saveName.data(), (const char*)data, size);
+			}
+			RELEASE_ARRAY(data);
 		}
-		RELEASE_ARRAY(data);
 	}
+	RELEASE_ARRAY (buffer);
 	return true;
 }
 
