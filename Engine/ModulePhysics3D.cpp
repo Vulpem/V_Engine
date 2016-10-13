@@ -57,7 +57,7 @@ bool ModulePhysics3D::Start()
 	world->setGravity(GRAVITY);
 
 	// Big plane as ground
-	{
+	/*{
 		btCollisionShape* colShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
 
 		btDefaultMotionState* myMotionState = new btDefaultMotionState();
@@ -65,15 +65,15 @@ bool ModulePhysics3D::Start()
 
 		ground = new btRigidBody(rbInfo);
 		world->addRigidBody(ground);
-	}
-
+	}*/
+	
 	return true;
 }
 
 // ---------------------------------------------------------
 update_status ModulePhysics3D::PreUpdate(float dt)
 {
-	world->stepSimulation(dt, 15);
+//	world->stepSimulation(dt, 15);
 
 	int numManifolds = world->getDispatcher()->getNumManifolds();
 	for(int i = 0; i<numManifolds; i++)
@@ -118,7 +118,6 @@ update_status ModulePhysics3D::Update(float dt)
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
 
-	debug = true; 
 	if(debug == true)
 	{
 		world->debugDrawWorld();
@@ -138,8 +137,8 @@ update_status ModulePhysics3D::PostUpdate(float dt)
 bool ModulePhysics3D::CleanUp()
 {
 	LOG("Destroying 3D Physics simulation");
-	world->removeRigidBody(ground);
-	delete ground;
+	//world->removeRigidBody(ground);
+	//delete ground;
 	ground = NULL;
 
 	// Remove from the world all collision bodies
