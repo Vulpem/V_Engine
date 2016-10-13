@@ -67,6 +67,10 @@ update_status ModuleEditor::PreUpdate(float dt)
 	int screenW, screenH;
 	App->window->GetWindowSize(&screenW, &screenH);
 
+	ImGuiStyle style = ImGui::GetStyle();
+	style.Alpha = 0.9f;
+
+
 #pragma region MenuBar
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -131,7 +135,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 530));
 		ImGui::SetNextWindowSize(ImVec2(330, screenH -530));
 
-		ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 1.0f, 0);
+		ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 0.8f);
 
 			if (ImGui::CollapsingHeader("Application"))
 			{
@@ -233,7 +237,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 		ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
 		ImGui::SetNextWindowSize(ImVec2(screenW - 330, 200));
 
-		ImGui::Begin("Console", &tmp, ImVec2(500, 300), 1.0f, 0);
+		ImGui::Begin("Console", &tmp, ImVec2(500, 300), 0.8f);
 
 		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
 		ImGui::PushStyleColor(0, col);
@@ -256,7 +260,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
 		ImGui::SetNextWindowSize(ImVec2(300, screenH - 220));
 
-		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 1.0f, 0);
+		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 0.8f);
 		if (ImGui::CollapsingHeader("Load Geometry"))
 		{
 			ImGui::InputText("Load:", toImport, 256);
@@ -299,7 +303,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 	{
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
 		ImGui::SetNextWindowSize(ImVec2(330, 510));
-		ImGui::Begin("Attribute Editor", &IsOpenAttributes);
+		ImGui::Begin("Attribute Editor", &IsOpenAttributes, 0.8f);
 		if (selectedGameObject)
 		{
 			bool isActive = selectedGameObject->IsActive();
