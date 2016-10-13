@@ -4,7 +4,7 @@
 A simple game engine developed by Vulpem.     
 This has been created for learning purposes, during 2016 at the CITM university.   
 
-Source code can be found at:
+Source code can be found at:        
 https://github.com/Vulpem/V_Engine/
 
 ## Usage
@@ -17,8 +17,8 @@ Alternatively, you can use the "Import Geometry" menu. To do so, just input the 
 
 
 All tmp files are created in "%appdata%/UPC/V_Engine/Library"      
-Note: All files will be converted into a .vmesh file. Avoid having files with the same name, even if they're     
-in different folders or different formats, since it may cause one of the files to overwrite the other's .vmesh.   
+Note: All imported files will be converted into a ".vmesh". Avoid having multiple files with the same name, even if they're     
+in different folders or different formats, since it may cause one of the ".vmesh"es to be overwritten.   
 
 
 ## LICENSE
