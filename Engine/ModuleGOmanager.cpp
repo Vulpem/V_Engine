@@ -95,8 +95,6 @@ bool ModuleGoManager::Start()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERS_WIDTH, CHECKERS_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	App->importer->LoadVMesh("MechaT");
-
 	return true;
 }
 
@@ -112,7 +110,10 @@ update_status ModuleGoManager::Update(float dt)
 {
 	if (App->input->file_was_dropped)
 	{
-			LoadFBX(App->input->dropped_file, false);
+		char droppedFile[1024];
+		strcpy(droppedFile, App->input->dropped_file);
+		std::string onlyName = App->importer->FileName(droppedFile);
+		LoadGO(onlyName.data());
 	}
 
 	std::vector<GameObject*>::iterator it = root->childs.begin();
@@ -144,42 +145,26 @@ bool ModuleGoManager::CleanUp()
 	return true;
 }
 
-GameObject* ModuleGoManager::LoadFBX(char* file, bool defaultLocation)
+std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
-	char* fullPath = new char[526];
-	strcpy(fullPath, "");
-	if (defaultLocation)
+	GameObject* sceneRoot = App->importer->LoadVMesh(fileName);
+	std::vector<GameObject*> ret;
+	if (sceneRoot && sceneRoot->childs.empty() == false)
 	{
-		strcpy(fullPath, "Assets/FBX/");
-	}
-	strcat(fullPath, file);
-
-	LOG("Loading mesh: %s", file);
-	LOG("from %s \n", fullPath);
-
-	const aiScene* scene = aiImportFileEx(fullPath, aiProcessPreset_TargetRealtime_MaxQuality, App->fs->GetAssimpIO());
-
-	GameObject* ret = NULL;
-
-	if (scene != NULL)
-	{
-		if (scene->HasMeshes())
+		for (std::vector<GameObject*>::iterator childs = sceneRoot->childs.begin(); childs != sceneRoot->childs.end(); childs++)
 		{
-			ret = LoadGameObject(file, scene->mRootNode, scene, root);
-			root->childs.push_back(ret);
+			(*childs)->parent = root;
+			root->childs.push_back((*childs));
+			ret.push_back((*childs));
 		}
-		if (scene)
-		{
-			aiReleaseImport(scene);
-			scene = NULL;
-		}
+		sceneRoot->childs.clear();
+		delete sceneRoot;
+		LOG("Loaded %s", fileName);
 	}
 	else
 	{
-		LOG("Error loading scene %s", fullPath);
+		LOG("Failed to load %s", fileName);
 	}
-
-	delete[] fullPath;
 	return ret;
 }
 
@@ -193,52 +178,6 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	return false;
 	
 }
-
-GameObject* ModuleGoManager::LoadGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, GameObject* parent)
-{
-	GameObject* ret = new GameObject();
-
-	//Setting Name
-	char tmpName[MAXLEN];
-	memcpy(tmpName, toLoad->mName.data, toLoad->mName.length + 1);
-
-	CleanName(tmpName);
-
-	strcpy(ret->name, tmpName);
-
-	//Setting parent
-	ret->parent = parent;
-
-	Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
-	//Setting transform
-	aiQuaternion rot;
-	aiVector3D scal;
-	aiVector3D pos;
-
-	toLoad->mTransformation.Decompose(scal, rot, pos);
-
-	trans->SetPos(pos.x, pos.y, pos.z);
-	trans->SetScale(scal.x, scal.y, scal.z);
-	trans->SetRot(rot.x, rot.y, rot.z, rot.w);
-
-	Material* mat = (Material*)ret->AddComponent(Component::Type::C_material);
-
-	//Loading meshes
-	for (int n = 0; n < toLoad->mNumMeshes; n++)
-	{   
-		mesh* addedMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
-		addedMesh->LoadMesh(scene->mMeshes[toLoad->mMeshes[n]], scene, path);
-	}
-
-	//Loading child nodes
-	for (int n = 0; n < toLoad->mNumChildren; n++)
-	{
-		ret->childs.push_back(LoadGameObject(path, toLoad->mChildren[n], scene, ret));
-	}
-
-	return ret;
-}
-
 
 void ModuleGoManager::CleanName(char* toClean)
 {

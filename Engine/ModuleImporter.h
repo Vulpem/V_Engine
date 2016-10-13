@@ -25,11 +25,14 @@ public:
 	update_status Update(float dt);
 	update_status PostUpdate(float dt);
 
+	//Import al 3D Models from a folder and sub-folders
 	void ImportFromFolder(const char* path);
+
+	//Import a specific 3D model
 	void Import3dScene(const char* filePath);
 
-	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL
-	GameObject* LoadVMesh(const char* fileName_NoFileType, GameObject* parent = NULL, char* meshesFolder = NULL);
+	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
+	GameObject* LoadVMesh(const char* fileName, GameObject* parent = NULL, char* meshesFolder = NULL);
 
 private:
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = NULL);

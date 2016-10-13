@@ -32,13 +32,10 @@ public:
 
 	int texMaterialIndex = -1;
 
-	bool init = false;
-
 	bool wires = false;
 
 	void DoUpdate();
 	void EditorContent();
-	bool LoadMesh(const aiMesh* toLoad, const aiScene* scene, const char* path);
 
 	void Draw();
 private:

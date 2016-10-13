@@ -46,7 +46,7 @@ bool ModuleEditor::Start()
 	testConsoleInput = new char[64];
 	strcpy(testConsoleInput, "InputTextHere");
 
-	strcpy(toImport, ".fbx");
+	strcpy(toImport, "");
 
 	selectedGameObject = NULL;
 
@@ -262,10 +262,9 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::InputText("Load:", toImport, 256);
 			if (ImGui::Button("Import"))
 			{
-				GameObject* import = App->GO->LoadFBX(toImport);
-				if (import != NULL)
+				std::vector<GameObject*> import = App->GO->LoadGO(toImport);
+				if (import.empty() == false)
 				{
-					geometries.push_back(App->GO->LoadFBX(toImport));
 					importResult = "Import successful!";
 				}
 				else
@@ -281,12 +280,13 @@ update_status ModuleEditor::PreUpdate(float dt)
 			std::vector<GameObject*>::iterator node = App->GO->root->childs.begin();
 			while (node != App->GO->root->childs.end())
 			{
-					std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
-					while (childNodes != (*node)->childs.end())
-					{
-						SceneTreeGameObject((*childNodes));
-						childNodes++;
-					}
+					//std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
+					//while (childNodes != (*node)->childs.end())
+					//{
+					//	SceneTreeGameObject((*childNodes));
+					//	childNodes++;
+					//}
+				SceneTreeGameObject((*node));
 				node++;
 			}
 

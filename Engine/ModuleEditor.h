@@ -69,7 +69,6 @@ private:
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;
 
-	std::vector<GameObject*> geometries;
 	char toImport[256];
 	C_String importResult;
 	math::float3 changeGeometryPos;

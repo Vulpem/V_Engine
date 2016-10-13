@@ -37,8 +37,8 @@ bool ModuleCamera3D::Start()
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
-	ref = App->GO->LoadFBX("Sphere.fbx");
-	ref->HideFromOutliner();
+	//ref = (*App->GO->LoadGO("Sphere").begin());
+	//ref->HideFromOutliner();
 
 	return ret;
 }
@@ -55,7 +55,7 @@ bool ModuleCamera3D::CleanUp()
 update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
-	if (ref)
+	/*if (ref)
 	{
 		if (renderReference)
 		{
@@ -72,7 +72,7 @@ update_status ModuleCamera3D::Update(float dt)
 		{
 			ref->SetActive(false);
 		}
-	}
+	}*/
 
 	bool updatePos = false;
 	if (App->input->GetMouseButton(4) == KEY_DOWN)

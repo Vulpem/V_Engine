@@ -189,14 +189,17 @@ std::vector<Component*> GameObject::GetComponent(Component::Type type)
 
 bool GameObject::HasComponent(Component::Type type)
 {
-	std::vector<Component*>::iterator it = components.begin();
-	while (it != components.end())
+	if (components.size() > 0)
 	{
-		if ((*it)->GetType() == type)
+		std::vector<Component*>::iterator it = components.begin();
+		while (it != components.end())
 		{
-			return true;
+			if ((*it)->GetType() == type)
+			{
+				return true;
+			}
+			it++;
 		}
-		it++;
 	}
 	return false;
 }

@@ -37,14 +37,12 @@ public:
 
 	bool CleanUp();
 
-	GameObject* LoadFBX(char* file, bool defaultLocation = true);
+	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 
 	uint GetCheckerID() { return id_checkerTexture; }
 
 private:
-	GameObject* LoadGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, GameObject* parent = NULL);
-
 	void CleanName(char* toClean);
 
 	void CreateRootGameObject();
