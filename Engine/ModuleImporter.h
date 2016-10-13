@@ -10,6 +10,7 @@
 class aiScene;
 class aiNode;
 class GameObject;
+class Material;
 
 class ModuleImporter : public Module
 {
@@ -29,10 +30,12 @@ public:
 	void ImportFromFolder(const char* path);
 
 	//Import a specific 3D model
-	void Import3dScene(const char* filePath);
+	bool Import3dScene(const char* filePath);
+	bool ImportImage(const char* filePath);
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVMesh(const char* fileName, GameObject* parent = NULL, char* meshesFolder = NULL);
+	int LoadTexture(char* path, Material* mat);
 
 private:
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = NULL);

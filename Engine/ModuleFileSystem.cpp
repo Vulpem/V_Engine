@@ -120,6 +120,11 @@ bool ModuleFileSystem::IsDirectory(const char* file) const
 	return PHYSFS_isDirectory(file) != 0;
 }
 
+std::string ModuleFileSystem::GetWrittingDirectory()
+{
+	return std::string(PHYSFS_getWriteDir());
+}
+
 void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files)
 {
 	char** f = PHYSFS_enumerateFiles(directory);

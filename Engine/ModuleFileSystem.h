@@ -30,7 +30,7 @@ public:
 	bool Exists(const char* file) const;
 	bool CreateDir(const char* dir);
 	bool IsDirectory(const char* file) const;
-
+	std::string GetWrittingDirectory();
 	void GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files);
 
 	bool EraseFile(const char* file);

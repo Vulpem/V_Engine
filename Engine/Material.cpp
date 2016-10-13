@@ -58,64 +58,6 @@ int Material::GetTexture(uint n)
 	return -1;
 }
 
-int Material::LoadTexture(char* path)
-{
-	if (*path == '\0')
-	{
-		return -1;
-	}
-
-	//Checking if the texture is already loaded
-	std::vector<C_String>::iterator it = texturePaths.begin();
-	int n = 0;
-	while (it != texturePaths.end())
-	{
-		if (path == it->GetString())
-		{
-			return textures.at(n);
-		}
-		it++;
-		n++;
-	}
-
-	LOG("Loading Texture %s", path);
-
-	uint ID = ilutGLLoadImage(path);
-
-
-	if (ID != 0)
-	{
-		int ret = textures.size();
-		textures.push_back(ID);
-		texturePaths.push_back(path);
-		return ret;
-	}
-	else
-	{
-		LOG("Error loading texture %s", path);
-		for (ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
-		{
-			LOG("devIL got error %d", error);
-			//	LOG("%s", iluErrorString(error));
-		}
-		return -1;
-	}
-}
-
-int Material::LoadTexture(char * path, char * file)
-{
-	//Checking we've actually recieved a file
-	if (*file == '\0')
-	{
-		return -1;
-	}
-
-	char tmp[1024];
-	strcpy(tmp, path);
-	strcat(tmp, file);
-	return LoadTexture(tmp);
-}
-
 void Material::SetColor(float r, float g, float b, float a)
 {
 	color[0] = r;

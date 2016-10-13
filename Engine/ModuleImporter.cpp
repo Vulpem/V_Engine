@@ -101,6 +101,8 @@ void ModuleImporter::ImportFromFolder(const char * path)
 		toSend += "/";
 		toSend += files[n].data();
 		Import3dScene(toSend.data());
+		ImportImage(toSend.data());
+
 	}
 	files.clear();
 	for (int n = 0; n < folders.size(); n++)
@@ -113,7 +115,7 @@ void ModuleImporter::ImportFromFolder(const char * path)
 
 }
 
-void ModuleImporter::Import3dScene(const char * filePath)
+bool ModuleImporter::Import3dScene(const char * filePath)
 {
 	//Making sure the file recieved is supported by the assimp library
 	std::string fmt = FileFormat(filePath);
@@ -126,7 +128,7 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	}
 	if (supportedFormats.find(fmt) == std::string::npos)
 	{
-		return;
+		return false;
 	}
 
 	LOG("Importing mesh: %s", filePath);
@@ -150,6 +152,41 @@ void ModuleImporter::Import3dScene(const char * filePath)
 	{
 		LOG("Error loading scene %s", filePath);
 	}
+	return true;
+}
+
+bool ModuleImporter::ImportImage(const char * filePath)
+{
+	// Extracted from
+	//http://openil.sourceforge.net/features.php
+	std::string supportedFormats("bmp dcx dds hdr icns ico cur iff gif jpg jpe jpeg jp2 lbm png raw tif tga");
+
+	if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
+	{
+		return false;
+	}
+
+	std::string saveName("Library/Textures/");
+	saveName += FileName(filePath);
+	saveName += ".dds";
+
+	ILuint size;
+	ILubyte *data;
+
+	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
+	size = ilSaveL(IL_DDS, NULL, 0); // Get the size of the data buffer
+
+	if (size > 0)
+	{
+		data = new ILubyte[size]; // allocate data buffer
+		if (ilSaveL(IL_DDS, data, size) > 0)
+		{
+			// Save to buffer with the ilSaveIL function
+			App->fs->Save(saveName.data(), (const char*)data, size);
+		}
+		RELEASE_ARRAY(data);
+	}
+	return true;
 }
 
 GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
@@ -274,10 +311,17 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 
 				//TODO pendant to load texture from name
 				//Texture name
-				char* textureName = new char[textureNameLen]; //TO DELETE
+				char* textureName = new char[textureNameLen]; 
 				bytes = sizeof(char) * textureNameLen;
 				memcpy(textureName, It, bytes);
 				It += bytes;
+
+				if (textureNameLen > 1)
+				{
+					newMesh->texMaterialIndex =	LoadTexture(textureName, mat);
+				}
+				delete[] textureName;
+
 
 				//Color
 				float color[3];
@@ -366,6 +410,58 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 	}
 
 	return nullptr;
+}
+
+int ModuleImporter::LoadTexture(char* path, Material* mat)
+{
+	if (*path == '\0')
+	{
+		return -1;
+	}
+
+	std::string name = FileName(path);
+
+	std::string fullPath(App->fs->GetWrittingDirectory());
+	fullPath += "Library\\Textures\\";
+	fullPath += name;
+	fullPath += ".dds";
+
+	//Checking if the texture is already loaded
+	std::vector<C_String>::iterator it = mat->texturePaths.begin();
+	int n = 0;
+	while (it != mat->texturePaths.end())
+	{
+		if (name == it->GetString())
+		{
+			return mat->textures.at(n);
+		}
+		it++;
+		n++;
+	}
+
+	LOG("Loading Texture %s", path);
+
+	char tmp[1024];
+	strcpy(tmp, fullPath.data());
+	uint ID = ilutGLLoadImage(tmp);
+
+	if (ID != 0)
+	{
+		int ret = mat->textures.size();
+		mat->textures.push_back(ID);
+		mat->texturePaths.push_back(name.data());
+		return ret;
+	}
+	else
+	{
+		LOG("Error loading texture %s", path);
+		for (ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
+		{
+			LOG("devIL got error %d", error);
+			//LOG("%s", iluErrorString(error));
+		}
+		return -1;
+	}
 }
 
 void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
@@ -463,7 +559,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &texturePath);
 		char textureName[1024];
 		strcpy(textureName, texturePath.data);
-		CleanName(textureName);
 
 		std::string tmp(textureName);
 		uint textureNameLen = tmp.length() + 1;
