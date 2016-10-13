@@ -45,10 +45,6 @@ bool ModuleFileSystem::Init()
 //		AddPath(path.child_value());
 //	}
 
-	CreateDir("Library");
-	CreateDir("Library/Meshes");
-	CreateDir("Library/Textures");
-
 	// Ask SDL for a write dir
 	char* write_path = SDL_GetPrefPath(App->GetOrganization(), App->GetTitle());
 
@@ -64,6 +60,11 @@ bool ModuleFileSystem::Init()
 	}
 
 	SDL_free(write_path);
+
+	CreateDir("Library");
+	CreateDir("Library/Meshes");
+	CreateDir("Library/Textures");
+
 	PHYSFS_addToSearchPath("Library/", 0);
 
 	return ret;

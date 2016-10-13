@@ -170,33 +170,45 @@ bool ModuleImporter::ImportImage(const char * filePath)
 		return false;
 	}
 
-	/*std::string saveName("Library/Textures/");
+	std::string saveName("Library/Textures/");
 	saveName += FileName(filePath);
 	saveName += ".dds";
 
+
 	char* buffer;
-	uint loadSize = App->fs->Load(filePath, &buffer);
+	uint size;
 
-	if (loadSize > 0)
+	size = App->fs->Load(filePath, &buffer);
+	if (size > 0)
 	{
-		ILuint size;
-		ILubyte *data = (ILubyte*)buffer;
+		ILuint image;
+		ILuint newSize;
+		ILubyte *data;
 
-		ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
-		size = ilSaveL(IL_DDS, NULL, 0); // Get the size of the data buffer
+		ilGenImages(1, &image);
+		ilBindImage(image);
 
-		if (size > 0)
+		if (ilLoadL(IL_TYPE_UNKNOWN, (const void*)buffer, size))
 		{
-			data = new ILubyte[size]; // allocate data buffer
-			if (ilSaveL(IL_DDS, data, size) > 0)
+			ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
+			newSize = ilSaveL(IL_DDS, NULL, 0); // Get the size of the data buffer
+
+			if (newSize > 0)
 			{
-				// Save to buffer with the ilSaveIL function
-				App->fs->Save(saveName.data(), (const char*)data, size);
+				data = new ILubyte[size]; // allocate data buffer
+
+				ilEnable(IL_FILE_OVERWRITE);
+				if (ilSaveL(IL_DDS, data, newSize) > 0)
+				{
+					// Save to buffer with the ilSaveIL function
+					App->fs->Save(saveName.data(), (const char*)data, newSize);
+				}
+				RELEASE_ARRAY(data);
 			}
-			RELEASE_ARRAY(data);
 		}
+		ilDeleteImages(1, &image);
 	}
-	RELEASE_ARRAY (buffer);*/
+	RELEASE_ARRAY(buffer);
 	return true;
 }
 
