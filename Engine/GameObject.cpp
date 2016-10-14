@@ -122,6 +122,22 @@ void GameObject::DrawLocator()
 		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.1f, 0.0f, 0.9f);
 		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(-0.1f, 0.0f, 0.9f);
 
+		if (childs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				if ((*it)->HasComponent(Component::Type::C_transform))
+				{
+					glVertex3f(0.0f, 0.0f, 0.0f);
+
+					math::float3 childPos((*(*it)->GetComponent<Transform>().begin())->GetPos());
+					
+
+					glVertex3f(childPos.x, childPos.y, childPos.z);
+				}
+			}
+		}
+
 		glEnd();
 
 		glLineWidth(1.0f);
@@ -132,6 +148,9 @@ void GameObject::Select(bool _renderNormals)
 {
 	selected = true;
 	renderNormals = _renderNormals;
+
+	(*GetComponent<Transform>().begin())->UpdateEditorValues();
+
 	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
 	{

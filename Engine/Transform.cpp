@@ -18,7 +18,6 @@ Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
 	position.Set(0, 0, 0);
 	scale.Set(1, 1, 1);
 	rotation = math::Quat::identity;
-	editorRot = GetRot();
 }
 Transform::~Transform()
 {
@@ -80,6 +79,11 @@ math::float4x4 Transform::GetTransformMatrix()
 	{
 		return math::float4x4::identity;
 	}
+}
+
+void Transform::UpdateEditorValues()
+{
+	editorRot = GetRot();
 }
 
 void Transform::SetPos(float x, float y, float z)

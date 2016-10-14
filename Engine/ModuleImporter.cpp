@@ -254,6 +254,8 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 			trans->SetScale(_transform[4], _transform[5], _transform[6]);
 			trans->SetPos(_transform[7], _transform[8], _transform[9]);
 
+			trans->UpdateEditorValues();
+
 			//Number of meshes
 			uint _nMeshes = 0;
 			bytes = sizeof(uint);

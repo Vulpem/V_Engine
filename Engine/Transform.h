@@ -23,6 +23,8 @@ private:
 public:
 	math::float4x4 GetTransformMatrix();
 
+	void UpdateEditorValues();
+
 	void SetPos(float x, float y, float z);
 	void ResetPos();
 	math::float3 GetPos();
