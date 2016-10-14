@@ -19,6 +19,8 @@ public:
 	void SetColor(float r, float g, float b, float a = 1.0f);
 	math::float4 GetColor();
 
+	static Type GetType() { return Type::C_material; }
+
 	std::vector<uint> textures;
 	std::vector<C_String> texturePaths;
 private:

@@ -36,6 +36,8 @@ public:
 	void ResetScale();
 	math::float3 GetScale();
 
+	static Type GetType() { return Type::C_transform; }
+
 };
 
 #endif

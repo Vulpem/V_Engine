@@ -93,6 +93,9 @@ bool Application::Init()
 	LOG("Application Start --------------");
 	item = list_modules.begin();
 
+	//Variable used to determine if LOG's can be shown on console
+	gameRunning = true;
+
 	while(item != list_modules.end() && ret == true)
 	{
 		if ((*item)->IsEnabled())
@@ -105,8 +108,6 @@ bool Application::Init()
 
 	ms_timer.Start();
 	FPS_Timer.Start();
-
-	gameRunning = true;
 
 	return ret;
 }

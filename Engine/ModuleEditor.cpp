@@ -92,8 +92,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::Checkbox("Editor", &IsOpenEditor);
 			ImGui::Checkbox("Attribute Editor", &IsOpenAttributes);
 			ImGui::Checkbox("Console", &IsOpenConsole);
-			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);		
-			ImGui::Checkbox("CameraReference", &App->camera->renderReference);
+			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);	
 			ImGui::Checkbox("InGame Plane", &showPlane);
 			ImGui::Checkbox("Reference Axis", &showAxis);
 			
@@ -161,12 +160,6 @@ update_status ModuleEditor::PreUpdate(float dt)
 				ImGui::DragFloat("X##cam", &App->camera->Position.x);
 				ImGui::DragFloat("Y##cam", &App->camera->Position.y);
 				ImGui::DragFloat("Z##cam", &App->camera->Position.z);
-				ImGui::NewLine();
-				ImGui::Text("Reference");
-				if (ImGui::DragFloat3("##CamReference", camRef, 1.0f))
-				{
-					App->camera->LookAt(vec3(camRef[0], camRef[1], camRef[2]));
-				}
 				ImGui::NewLine();
 				ImGui::Text("Distance to reference");	
 				if(ImGui::DragFloat("##Distance to reference", &App->camera->distanceToRef, 1.0f, 1.0f))
@@ -320,7 +313,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::Separator();
 			if (ImGui::Button("Look at"))
 			{
-				Transform* trans = (Transform*)*selectedGameObject->GetComponent(Component::C_transform).begin();
+				Transform* trans = *selectedGameObject->GetComponent<Transform>().begin();
 
 				App->camera->LookAt(vec3(trans->GetPos().x, trans->GetPos().y, trans->GetPos().z));
 			}

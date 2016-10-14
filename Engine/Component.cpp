@@ -69,8 +69,3 @@ void Component::DrawOnEditor()
 	}
 }
 
-Component::Type Component::GetType()
-{
-	return type;
-}
-

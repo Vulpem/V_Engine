@@ -37,9 +37,6 @@ bool ModuleCamera3D::Start()
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
-	//ref = (*App->GO->LoadGO("Sphere").begin());
-	//ref->HideFromOutliner();
-
 	return ret;
 }
 
@@ -55,25 +52,6 @@ bool ModuleCamera3D::CleanUp()
 update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
-	/*if (ref)
-	{
-		if (renderReference)
-		{
-			ref->SetActive(true);
-
-			std::vector<Component*> components = ref->GetComponent(Component::Type::C_transform);
-			if (components.empty() == false)
-			{
-				Transform* trans = (Transform*)*(components.begin());
-				trans->SetPos(Reference.x, Reference.y, Reference.z);
-			}
-		}
-		else
-		{
-			ref->SetActive(false);
-		}
-	}*/
-
 	bool updatePos = false;
 	if (App->input->GetMouseButton(4) == KEY_DOWN)
 	{
@@ -154,7 +132,7 @@ update_status ModuleCamera3D::Update(float dt)
 				Y = cross(Z, X);
 			}
 		}
-		Position = Reference + Z * distanceToRef;// length(Position);
+		Position = Reference + Z * distanceToRef;
 	}
 	
 

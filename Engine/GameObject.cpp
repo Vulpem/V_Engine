@@ -56,7 +56,7 @@ void GameObject::Update()
 		{
 			glPushMatrix();
 
-			Transform* transform = (Transform*)(*GetComponent(Component::Type::C_transform).begin());
+			Transform* transform = *GetComponent<Transform>().begin();
 			glMultMatrixf(transform->GetTransformMatrix().ptr());
 		}
 
@@ -71,6 +71,11 @@ void GameObject::Update()
 			(*it)->Update();
 			it++;
 		}
+		if (HasComponent(Component::Type::C_mesh) == false)
+		{
+			DrawLocator();
+		}
+
 		if (HasComponent(Component::Type::C_transform))
 		{
 			glPopMatrix();
@@ -84,6 +89,43 @@ void GameObject::DrawOnEditor()
 	{
 		(*it)->DrawOnEditor();
 	}
+}
+
+void GameObject::DrawLocator()
+{
+		glDisable(GL_LIGHTING);
+		// Draw Axis Grid
+		glLineWidth(2.0f);
+
+		glBegin(GL_LINES);
+
+		if (selected)
+		{
+			if (parent->selected)
+			{
+				glColor4f(0, 0.5f, 0.5f, 1);
+			}
+			else
+			{
+				glColor4f(0, 0.8f, 0.8f, 1);
+			}
+		}
+		else
+		{
+			glColor4f(0.1f, 0.58f, 0.2f, 1.0f);
+		}
+
+		glVertex3f(1.0f, 0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 1.0f, 0.0f); glVertex3f(0.0f, -1.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.0f, 0.0f, -1.0f);
+		//Arrow indicating forward
+		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.1f, 0.0f, 0.9f);
+		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(-0.1f, 0.0f, 0.9f);
+
+		glEnd();
+
+		glLineWidth(1.0f);
+		glEnable(GL_LIGHTING);
 }
 
 void GameObject::Select(bool _renderNormals)
@@ -149,10 +191,6 @@ Component* GameObject::AddComponent(Component::Type type)
 		{
 			toAdd = new Transform(this, components.size()); 
 		}
-		else
-		{
-			return *GetComponent(Component::C_transform).begin();
-		}
 		break;
 	}
 	case Component::Type::C_mesh:
@@ -165,10 +203,6 @@ Component* GameObject::AddComponent(Component::Type type)
 		{
 			toAdd = new Material(this, components.size());
 		}
-		else
-		{
-			return *GetComponent(Component::C_material).begin();
-		}
 		break;
 	}
 	}
@@ -178,21 +212,6 @@ Component* GameObject::AddComponent(Component::Type type)
 		components.push_back(toAdd);
 	}
 	return toAdd;
-}
-
-std::vector<Component*> GameObject::GetComponent(Component::Type type)
-{
-	std::vector<Component*> ret;
-	std::vector<Component*>::iterator it = components.begin();
-	while (it != components.end())
-	{
-		if ((*it)->GetType() == type)
-		{
-			ret.push_back((*it));			
-		}
-		it++;
-	}
-	return ret;
 }
 
 bool GameObject::HasComponent(Component::Type type)

@@ -37,6 +37,8 @@ public:
 	void DoUpdate();
 	void EditorContent();
 
+	static Type GetType() { return Type::C_mesh; }
+
 	void Draw();
 private:
 	void RealRender(bool wired = false);

@@ -63,8 +63,6 @@ public:
 
 	char* testConsoleInput;
 
-	float camRef[3] = { 0,0,0 };
-
 private:
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;

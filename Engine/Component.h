@@ -11,6 +11,7 @@ class Component
 public:
 	enum Type
 	{
+		C_None,
 		C_transform,
 		C_mesh,
 		C_material
@@ -27,7 +28,8 @@ public:
 	void Update();
 	void DrawOnEditor();
 
-	Type GetType();
+	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS
+	Type GetType() { return type; }
 	bool IsEnabled() { return enabled; }
 
 protected:

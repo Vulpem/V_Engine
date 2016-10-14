@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
 			else
 			{
 				state = MAIN_UPDATE;
-				LOG("-------------- Application Update --------------");
+				LOG("\n\n-------------- Application Update --------------\n\n");
 			}
 
 			break;

@@ -174,7 +174,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 	saveName += FileName(filePath);
 	saveName += ".dds";
 
-
+	LOG("Started importing %s", filePath);
 	char* buffer;
 	uint size;
 
@@ -202,6 +202,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 				{
 					// Save to buffer with the ilSaveIL function
 					App->fs->Save(saveName.data(), (const char*)data, newSize);
+					LOG("Succesfully imported %s", filePath);
 				}
 				RELEASE_ARRAY(data);
 			}
