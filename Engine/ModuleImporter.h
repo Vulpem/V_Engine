@@ -34,15 +34,17 @@ public:
 	bool ImportImage(const char* filePath);
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
-	GameObject* LoadVMesh(const char* fileName, GameObject* parent = NULL, char* meshesFolder = NULL);
+	GameObject* LoadVgo(const char* fileName, GameObject* parent = NULL, char* meshesFolder = NULL);
 	int LoadTexture(char* path, Material* mat);
 
 private:
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = NULL);
 
 public:
-	void CleanName(char* toClean);
+	//This function will return only the file format, without the dot.
 	std::string FileFormat(const char* file);
+
+	//This function will remove everything from the path except the file's actual name. No format, no path
 	std::string FileName(const char* file);
 
 	bool CleanUp();

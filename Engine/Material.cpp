@@ -13,6 +13,7 @@ Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id)
 	name = tmp;
 	type = C_material;
 }
+
 Material::~Material()
 {
 
@@ -33,10 +34,10 @@ void Material::EditorContent()
 			ImTextureID image = (void*)textures.at(n);
 
 			ImGui::Image(image, ImVec2(270,270));
+			glBindTexture(GL_TEXTURE_2D, 0);
 			ImGui::TreePop();
 		}		
 	}
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 uint Material::NofTextures()

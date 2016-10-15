@@ -86,7 +86,7 @@ bool ModuleGoManager::CleanUp()
 
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
-	GameObject* sceneRoot = App->importer->LoadVMesh(fileName);
+	GameObject* sceneRoot = App->importer->LoadVgo(fileName);
 	std::vector<GameObject*> ret;
 	if (sceneRoot && sceneRoot->childs.empty() == false)
 	{
@@ -111,6 +111,7 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 {
 	if (toErase)
 	{
+		LOG("Erasing GO %s", toErase->name);
 		delete toErase;
 		return true;
 	}
@@ -118,38 +119,26 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	
 }
 
-void ModuleGoManager::CleanName(char* toClean)
-{
-	char* searcher = toClean;
-	int n = 0;
-	while (*searcher != '\0')
-	{
-		if (*searcher == '_')
-		{
-			*searcher = ' ';
-		}
-		if (*searcher == '$' || n == NAME_MAX_LEN)
-		{
-			*searcher = '\0';
-			break;
-		}
-		n++;
-		searcher++;
-	}
-}
-
 void ModuleGoManager::CreateRootGameObject()
 {
-	GameObject* ret = new GameObject();
+	if (root == NULL)
+	{
+		GameObject* ret = new GameObject();
 
-	//Setting Name
-	strcpy(ret->name, "Root");
+		LOG("Creating root node for scene");
+		//Setting Name
+		strcpy(ret->name, "Root");
 
-	//Setting parent
-	ret->parent = nullptr;
+		//Setting parent
+		ret->parent = nullptr;
 
-	//Setting transform
-	math::Quat rot = math::Quat::identity;
+		//Setting transform
+		math::Quat rot = math::Quat::identity;
 
-	root = ret;
+		root = ret;
+	}
+	else
+	{
+		LOG("Be careful! You almost created a second root node!");
+	}
 }

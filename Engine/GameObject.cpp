@@ -128,11 +128,9 @@ void GameObject::DrawLocator()
 			{
 				if ((*it)->HasComponent(Component::Type::C_transform))
 				{
-					glVertex3f(0.0f, 0.0f, 0.0f);
-
+					glLineWidth(0.8f);
 					math::float3 childPos((*(*it)->GetComponent<Transform>().begin())->GetPos());
-					
-
+					glVertex3f(0.0f, 0.0f, 0.0f);
 					glVertex3f(childPos.x, childPos.y, childPos.z);
 				}
 			}

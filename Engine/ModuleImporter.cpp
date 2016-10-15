@@ -66,6 +66,7 @@ bool ModuleImporter::Start()
 {
 	ilutRenderer(ILUT_OPENGL);
 
+	LOG("Importing assets");
 	ImportFromFolder("Assets");
 
 	return true;
@@ -93,6 +94,7 @@ update_status ModuleImporter::PostUpdate(float dt)
 
 void ModuleImporter::ImportFromFolder(const char * path)
 {
+	LOG("Importing all assets in folder: %s", path);
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
 	App->fs->GetFilesIn(path, &folders, &files);
@@ -135,7 +137,8 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 		return false;
 	}
 
-	LOG("Importing mesh: %s", filePath);
+	LOG("\n ------ [Started importing 3D Scene] ------ ");
+	LOG("Importing 3D scene: %s", filePath);
 
 	//Loading the aiScene from Assimp
 	const aiScene* scene = aiImportFileEx(filePath, aiProcessPreset_TargetRealtime_MaxQuality, App->fs->GetAssimpIO());
@@ -151,6 +154,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 			aiReleaseImport(scene);
 			scene = NULL;
 		}
+		LOG(" ------ [End of importing 3D Scene] ------\n");
 	}
 	else
 	{
@@ -174,7 +178,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 	saveName += FileName(filePath);
 	saveName += ".dds";
 
-	LOG("Started importing %s", filePath);
+	LOG("\nStarted importing texture %s", filePath);
 	char* buffer;
 	uint size;
 
@@ -202,18 +206,30 @@ bool ModuleImporter::ImportImage(const char * filePath)
 				{
 					// Save to buffer with the ilSaveIL function
 					App->fs->Save(saveName.data(), (const char*)data, newSize);
-					LOG("Succesfully imported %s", filePath);
+					LOG("Succesfully imported!");
+				}
+				else
+				{
+					LOG("devIl couldn't create de .dds!");
 				}
 				RELEASE_ARRAY(data);
 			}
 		}
+		else
+		{
+			LOG("devIl couldn't load the image");
+		}
 		ilDeleteImages(1, &image);
+	}
+	else
+	{
+		LOG("Couldn't open the file!");
 	}
 	RELEASE_ARRAY(buffer);
 	return true;
 }
 
-GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
+GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
 {
 	std::string fileName = FileName(fileName_NoFileType);
 
@@ -224,8 +240,15 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 		path += meshesFolder;
 		path += "/";
 	}
+	else
+	{
+		LOG("\n ------- [Began loading Vgo %s] ---------", fileName.data());
+	}
+
 	path += fileName;
-	path += ".vmesh";
+	path += ".vgo";
+
+	LOG("Loading vgo %s", path.data());
 
 	if (App->fs->Exists(path.data()))
 	{
@@ -340,7 +363,6 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				memcpy(&textureNameLen, It, bytes);
 				It += bytes;
 
-				//TODO pendant to load texture from name
 				//Texture name
 				char* textureName = new char[textureNameLen]; 
 				bytes = sizeof(char) * textureNameLen;
@@ -420,7 +442,7 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 				while (childNames != childs.end())
 				{
 					std::string thisChild(*childNames);
-					GameObject* child = LoadVMesh(thisChild.data(), ret, meshesFolder);
+					GameObject* child = LoadVgo(thisChild.data(), ret, meshesFolder);
 					if (child)
 					{
 						ret->childs.push_back(child);
@@ -437,6 +459,14 @@ GameObject * ModuleImporter::LoadVMesh(const char * fileName_NoFileType, GameObj
 
 			return ret;
 		}
+		else
+		{
+			LOG("Something went wrong while loading %s", fileName.data());
+		}
+	}
+	else
+	{
+		LOG("Woops! This .vgo doesn't really exist.")
 	}
 
 	return nullptr;
@@ -456,6 +486,8 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	fullPath += name;
 	fullPath += ".dds";
 
+	LOG("Loading Texture %s", path);
+
 	//Checking if the texture is already loaded
 	std::vector<C_String>::iterator it = mat->texturePaths.begin();
 	int n = 0;
@@ -463,17 +495,20 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	{
 		if (name == it->GetString())
 		{
+			LOG("It already exists! Passing id %i", mat->textures.at(n));
 			return mat->textures.at(n);
 		}
 		it++;
 		n++;
 	}
 
-	LOG("Loading Texture %s", path);
+	
 
 	char tmp[1024];
 	strcpy(tmp, fullPath.data());
 	uint ID = ilutGLLoadImage(tmp);
+
+
 
 	if (ID != 0)
 	{
@@ -488,6 +523,7 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 		for (ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
 		{
 			LOG("devIL got error %d", error);
+			//For some reason, this will break and cause a crash
 			//LOG("%s", iluErrorString(error));
 		}
 		return -1;
@@ -510,14 +546,8 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		strcpy(name, FileName(path).data());
 	}
 
-	//TODO
-	std::string tmpName(name);
-	if (tmpName.find("$Assimp") != std::string::npos)
-	{
-		bool doStuff = true;
-	}
-	else
-	{
+	LOG("Importing GameObject %s", name);
+
 		uint bytes = 0;
 
 		//					rot + scal + pos				nMeshes
@@ -819,11 +849,10 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		}
 
 		toCreate += name;
-		toCreate += ".vmesh";
+		toCreate += ".vgo";
 		App->fs->Save(toCreate.data(), realFile, realFileSize);
 
 		RELEASE_ARRAY(realFile);
-	}
 	//Importing also all the childs
 	for (int n = 0; n < NodetoLoad->mNumChildren; n++)
 	{
@@ -838,26 +867,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	}
 }
 
-
-void ModuleImporter::CleanName(char* toClean)
-{
-	char* searcher = toClean;
-	int n = 0;
-	while (*searcher != '\0')
-	{
-		if (*searcher == '_')
-		{
-			*searcher = ' ';
-		}
-		if (*searcher == '$' || n == MAXLEN)
-		{
-			*searcher = '\0';
-			break;
-		}
-		n++;
-		searcher++;
-	}
-}
 
 std::string ModuleImporter::FileFormat(const char * file)
 {

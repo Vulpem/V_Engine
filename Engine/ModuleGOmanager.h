@@ -40,14 +40,9 @@ public:
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 
-	uint GetCheckerID() { return id_checkerTexture; }
-
 private:
-	void CleanName(char* toClean);
-
 	void CreateRootGameObject();
 public:
-	uint id_checkerTexture;
 	std::vector<uint> id_textures;
 
 	GameObject* root = NULL;
