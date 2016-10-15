@@ -52,7 +52,9 @@ void mesh::DoUpdate()
 
 void mesh::EditorContent()
 {
-	ImGui::Checkbox("Wireframe", &wires);
+	char tmp[48];
+	sprintf(tmp, "Wireframe##%i", id);
+	ImGui::Checkbox(tmp, &wires);
 
 	ImGui::Text("Vertices in memory: %i", num_vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
