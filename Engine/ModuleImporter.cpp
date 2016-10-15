@@ -496,7 +496,8 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 		if (name == it->GetString())
 		{
 			LOG("It already exists! Passing id %i", mat->textures.at(n));
-			return mat->textures.at(n);
+			return n;
+			//return mat->textures.at(n);
 		}
 		it++;
 		n++;
