@@ -179,24 +179,42 @@ void mesh::RealRender(bool wired)
 
 void mesh::RenderNormals()
 {
-	glDisable(GL_LIGHTING);
-	// Draw Axis Grid
-	glLineWidth(0.7f);
-
-	glBegin(GL_LINES);
-
-	glColor4f(0.54f, 0.0f, 0.54f, 1.0f);
-
-	for (int n = 0; n < num_vertices; n++)
+	if (num_normals > 0)
 	{
-		glVertex3f(vertices[n * 3], vertices[n * 3 + 1], vertices[n * 3 + 2]);
-		
-		glVertex3f(vertices[n * 3] + normals[n * 3], vertices[n * 3 + 1] + normals[n * 3 + 1], vertices[n * 3 + 2] + normals[n * 3 + 2]);
+		//Retrieving the normals & vertices from the buffer
+		//NOTE
+		//This is pretty slow, and shouldn't be used outside of debug or editor mode
+		normals = new float[num_normals * 3];
+		glBindBuffer(GL_ARRAY_BUFFER, id_normals);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * num_normals * 3, normals);
+
+		vertices = new float[num_vertices * 3];
+		glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * num_vertices * 3, vertices);
+
+		glDisable(GL_LIGHTING);
+		// Draw Axis Grid
+		glLineWidth(0.8f);
+
+		glBegin(GL_LINES);
+
+		glColor4f(0.54f, 0.0f, 0.54f, 1.0f);
+
+		for (int n = 0; n < num_normals; n++)
+		{
+			glVertex3f(vertices[n * 3], vertices[n * 3 + 1], vertices[n * 3 + 2]);
+
+			glVertex3f(vertices[n * 3] + normals[n * 3], vertices[n * 3 + 1] + normals[n * 3 + 1], vertices[n * 3 + 2] + normals[n * 3 + 2]);
+		}
+
+		glEnd();
+
+		glLineWidth(1.0f);
+		glEnable(GL_LIGHTING);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		RELEASE_ARRAY(normals);
+		RELEASE_ARRAY(vertices);
 	}
-
-	glEnd();
-
-	glLineWidth(1.0f);
-	glEnable(GL_LIGHTING);
-
 }
