@@ -27,7 +27,7 @@ void Material::EditorContent()
 	{
 		ImGui::Separator();
 		char tmp[524];
-		sprintf(tmp, "Id: %i    %s",n , texturePaths.at(n).GetString());
+		sprintf(tmp, "Id: %i    %s",n , texturePaths.at(n).data());
 		if (ImGui::TreeNode(tmp))
 		{
 			glBindTexture(GL_TEXTURE_2D ,textures.at(n));

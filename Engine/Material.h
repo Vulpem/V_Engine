@@ -22,7 +22,7 @@ public:
 	static Type GetType() { return Type::C_material; }
 
 	std::vector<uint> textures;
-	std::vector<C_String> texturePaths;
+	std::vector<std::string> texturePaths;
 private:
 	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
 

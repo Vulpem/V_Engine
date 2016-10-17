@@ -489,11 +489,11 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	LOG("Loading Texture %s", path);
 
 	//Checking if the texture is already loaded
-	std::vector<C_String>::iterator it = mat->texturePaths.begin();
+	std::vector<std::string>::iterator it = mat->texturePaths.begin();
 	int n = 0;
 	while (it != mat->texturePaths.end())
 	{
-		if (name == it->GetString())
+		if (name == it->data())
 		{
 			LOG("It already exists! Passing id %i", mat->textures.at(n));
 			return n;
