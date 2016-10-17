@@ -509,8 +509,6 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	strcpy(tmp, fullPath.data());
 	uint ID = ilutGLLoadImage(tmp);
 
-
-
 	if (ID != 0)
 	{
 		int ret = mat->textures.size();

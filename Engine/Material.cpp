@@ -4,8 +4,6 @@
 
 #include "imGUI\imgui.h"
 
-#include "OpenGL.h"
-
 Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id)
 {
 	char tmp[NAME_MAX_LEN];
@@ -16,7 +14,7 @@ Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id)
 
 Material::~Material()
 {
-
+	
 }
 
 void Material::EditorContent()
@@ -30,11 +28,9 @@ void Material::EditorContent()
 		sprintf(tmp, "Id: %i    %s",n , texturePaths.at(n).data());
 		if (ImGui::TreeNode(tmp))
 		{
-			glBindTexture(GL_TEXTURE_2D ,textures.at(n));
 			ImTextureID image = (void*)textures.at(n);
-
 			ImGui::Image(image, ImVec2(270,270));
-			glBindTexture(GL_TEXTURE_2D, 0);
+
 			ImGui::TreePop();
 		}		
 	}

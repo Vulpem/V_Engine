@@ -41,7 +41,7 @@ protected:
 
 	Type type;
 public:
-	C_String name;
+	std::string name;
 
 	GameObject* object;
 protected:
