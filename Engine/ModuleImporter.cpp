@@ -582,6 +582,9 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		memcpy(file_0It, &nMeshes, bytes);
 		file_0It += bytes;
 
+		//Storing all vertex in a vector to later on create the AABB box
+		std::vector<float3> vertex;
+
 		char** meshes = new char*[nMeshes];
 		uint* meshSize = new uint[nMeshes];
 
@@ -593,6 +596,13 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			uint num_vertices = toLoad->mNumVertices;
 			float* vertices = new float[num_vertices * 3];
 			memcpy_s(vertices, sizeof(float) * num_vertices * 3, toLoad->mVertices, sizeof(float) * num_vertices * 3);
+
+			float* it = vertices;
+			for (int n = 0; n < num_vertices * 3; n += 3)
+			{
+				vertex.push_back(float3(*it, *(it + 1), *(it + 2)));
+				it += 3;
+			}
 
 			//Importing normals
 			float* normals = NULL;
@@ -657,7 +667,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				}
 				currentFace++;
 			}
-
 
 			meshSize[n] =
 				//Mesh size
@@ -750,6 +759,31 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 		}
 
+		uint AABBFileSize = sizeof(float) * 6;
+		AABB aabb;
+		aabb.Enclose(vertex.data(), vertex.size());
+
+		float* aabbFile = new float[6];
+		float* aabbFile_it = aabbFile;
+		if (vertex.empty() == false)
+		{
+			//minPoint
+			bytes = sizeof(float) * 3;
+			memcpy(aabbFile_it, aabb.minPoint.ptr(), bytes);
+			aabbFile_it += bytes;
+
+			//maxPoint
+			memcpy(aabbFile_it, aabb.maxPoint.ptr(), bytes);
+			aabbFile_it += bytes;
+		}
+		else
+		{
+			float zeros[] = { 0,0,0,0,0,0 };
+			bytes = sizeof(float) * 6;
+			memcpy(aabbFile_it, zeros, bytes);
+		}
+
+
 		uint nChilds = NodetoLoad->mNumChildren;
 		uint* childsSize = new uint[nChilds];
 		std::vector<std::string> childs;
@@ -797,6 +831,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		{
 			realFileSize += meshSize[n];
 		}
+		realFileSize += AABBFileSize;
 		realFileSize += childFileSize;
 
 		//Copying all the buffers we created into a single bigger buffer
@@ -816,6 +851,11 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			realIt += bytes;
 		}
 
+		//AABB
+		bytes = AABBFileSize;
+		memcpy(realIt, aabbFile, bytes);
+		realIt += bytes;
+
 		//file_0
 		bytes = childFileSize;
 		memcpy(realIt, file_childs, bytes);
@@ -829,6 +869,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		}
 		RELEASE_ARRAY(meshes);
 		RELEASE_ARRAY(meshSize);
+		RELEASE_ARRAY(aabbFile);
 		RELEASE_ARRAY(childsSize);
 		RELEASE_ARRAY(file_childs);
 
