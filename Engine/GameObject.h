@@ -17,10 +17,14 @@ class GameObject
 {
 public:
 	char name[NAME_MAX_LEN];
+	AABB aabb;
+
 private:
 	bool active = true;
 	bool publicActive = true;
 	bool hiddenOnOutliner = false;
+
+	AABB originalAABB;
 public:
 
 	GameObject();
@@ -44,6 +48,9 @@ public:
 
 	void Select(bool renderNormals = false);
 	void Unselect();
+
+	void SetOriginalAABB(float3 minPoint, float3 maxPoint);
+	void UpdateAABB();
 
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive() { return publicActive; }

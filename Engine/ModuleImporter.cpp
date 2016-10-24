@@ -403,6 +403,18 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				RELEASE_ARRAY(newMesh->indices);
 			}
 
+			//AABB box
+			bytes = sizeof(float) * 3;
+			float3 minPoint;
+			memcpy(minPoint.ptr(), It, bytes);
+			It += bytes;
+
+			float3 maxPoint;
+			memcpy(maxPoint.ptr(), It, bytes);
+			It += bytes;
+
+			ret->SetOriginalAABB(minPoint, maxPoint);
+			
 			//Num childs
 			uint nChilds = 0;
 			bytes = sizeof(uint);

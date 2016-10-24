@@ -55,9 +55,16 @@ void GameObject::Update()
 		if (HasComponent(Component::Type::C_transform))
 		{
 			glPushMatrix();
-
-			Transform* transform = *GetComponent<Transform>().begin();
-			glMultMatrixf(transform->GetTransformMatrix().ptr());
+			if (selected)
+			{				
+				float4x4 id = float4x4::identity;
+				glLoadMatrixf(id.ptr());
+			}
+			else
+			{
+				Transform* transform = *GetComponent<Transform>().begin();
+				glMultMatrixf(transform->GetTransformMatrix().ptr());
+			}
 		}
 
 		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
@@ -167,6 +174,19 @@ void GameObject::Unselect()
 		(*childIt)->Unselect();
 		childIt++;
 	}
+}
+
+void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
+{
+	originalAABB.minPoint = minPoint;
+	originalAABB.maxPoint = maxPoint;
+}
+
+void GameObject::UpdateAABB()
+{
+	Transform* trans = *(GetComponent<Transform>().begin());
+	OBB obb = originalAABB.Transform(trans->GetTransformMatrix().Float3x3Part());
+	aabb.Enclose(obb);
 }
 
 void GameObject::SetActive(bool state, bool justPublic)
