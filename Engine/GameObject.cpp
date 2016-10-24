@@ -128,7 +128,7 @@ void GameObject::DrawLocator()
 		{
 			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
 			{
-				if ((*it)->HasComponent(Component::Type::C_transform))
+				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
 				{
 					glLineWidth(0.8f);
 					math::float3 childPos((*(*it)->GetComponent<Transform>().begin())->GetLocalPos());
@@ -146,6 +146,41 @@ void GameObject::DrawLocator()
 
 void GameObject::DrawAABB()
 {
+	glPushMatrix();
+	Transform* trans = *GetComponent<Transform>().begin();
+	float4x4 pos = float4x4::identity;
+	pos.SetTranslatePart(trans->GetGlobalPos());
+	pos.Transpose();
+
+	glMultMatrixf(pos.ptr());
+
+	math::float3 corners[8];
+	aabb.GetCornerPoints(corners);
+	
+	glDisable(GL_LIGHTING);
+	glLineWidth(2.0f);
+
+	glBegin(GL_LINES);
+
+	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[1].ptr());
+	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[2].ptr());
+	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[4].ptr());
+	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[1].ptr());
+	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[2].ptr());
+	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[7].ptr());
+	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[1].ptr());
+	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[4].ptr());
+	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[7].ptr());
+	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[2].ptr());
+	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[4].ptr());
+	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[7].ptr());
+
+	glEnd();
+
+	glLineWidth(1.0f);
+	glEnable(GL_LIGHTING);
+
+	glPopMatrix();
 }
 
 void GameObject::Select(bool _renderNormals)
