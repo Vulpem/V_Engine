@@ -582,8 +582,8 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		memcpy(file_0It, &nMeshes, bytes);
 		file_0It += bytes;
 
-		//Storing all vertex in a vector to later on create the AABB box
-		std::vector<float3> vertex;
+		//The AABB box that will englobe all the vertices of the meshes
+		AABB aabb(float3(0, 0, 0), float3(0, 0, 0));
 
 		char** meshes = new char*[nMeshes];
 		uint* meshSize = new uint[nMeshes];
@@ -600,7 +600,12 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			float* it = vertices;
 			for (int n = 0; n < num_vertices * 3; n += 3)
 			{
-				vertex.push_back(float3(*it, *(it + 1), *(it + 2)));
+				float* x = it;
+				float* y = x;
+				y++;
+				float* z = y;
+				z++;
+				aabb.Enclose(float3(*x,*y,*z));
 				it += 3;
 			}
 
@@ -760,13 +765,9 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		}
 
 		uint AABBFileSize = sizeof(float) * 6;
-		AABB aabb;
-		aabb.Enclose(vertex.data(), vertex.size());
 
-		float* aabbFile = new float[6];
-		float* aabbFile_it = aabbFile;
-		if (vertex.empty() == false)
-		{
+		char* aabbFile = new char[AABBFileSize];
+		char* aabbFile_it = aabbFile;
 			//minPoint
 			bytes = sizeof(float) * 3;
 			memcpy(aabbFile_it, aabb.minPoint.ptr(), bytes);
@@ -774,15 +775,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 			//maxPoint
 			memcpy(aabbFile_it, aabb.maxPoint.ptr(), bytes);
-			aabbFile_it += bytes;
-		}
-		else
-		{
-			float zeros[] = { 0,0,0,0,0,0 };
-			bytes = sizeof(float) * 6;
-			memcpy(aabbFile_it, zeros, bytes);
-		}
-
+			
 
 		uint nChilds = NodetoLoad->mNumChildren;
 		uint* childsSize = new uint[nChilds];
