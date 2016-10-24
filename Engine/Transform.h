@@ -34,17 +34,21 @@ public:
 	void SetLocalPos(float x, float y, float z);
 	math::float3 GetLocalPos();
 
+	void SetGlobalPos(float x, float y, float z);
 	math::float3 GetGlobalPos();
 
 	void SetLocalRot(float x, float y, float z);
 	void SetLocalRot(float x, float y, float z, float w);
 	math::float3 GetLocalRot();
 
+	//void SetGlobalRot(float x, float y, float z);
+	math::Quat GetGlobalRotQuat();
 	math::float3 GetGlobalRot();
 
 	void SetLocalScale(float x, float y, float z);
 	math::float3 GetLocalScale();
 
+	//void SetGlobalScale(float x, float y, float z);
 	math::float3 GetGlobalScale();
 
 	static Type GetType() { return Type::C_transform; }

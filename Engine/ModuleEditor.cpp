@@ -314,8 +314,8 @@ update_status ModuleEditor::PreUpdate(float dt)
 			if (ImGui::Button("Look at"))
 			{
 				Transform* trans = *selectedGameObject->GetComponent<Transform>().begin();
-
-				App->camera->LookAt(vec3(trans->GetLocalPos().x, trans->GetLocalPos().y, trans->GetLocalPos().z));
+				float3 toLook = trans->GetGlobalPos();
+				App->camera->LookAt(vec3(toLook.x, toLook.y, toLook.z));
 			}
 			ImGui::NewLine();
 			ImGui::Text("Danger Zone:");

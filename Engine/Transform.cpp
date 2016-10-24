@@ -70,33 +70,32 @@ void Transform::EditorContent()
 	ImGui::Text("Global transformations");
 
 	float3 pos = GetGlobalPos();
-	ImGui::Text("%.4f, %.4f, %.4f", pos.x, pos.y, pos.z);
+	tmp[0] = pos.x;
+	tmp[1] = pos.y;
+	tmp[2] = pos.z;
+	if (ImGui::DragFloat3("Global Pos", tmp, 1.0f))
+	{
+		SetGlobalPos(tmp[0], tmp[1], tmp[2]);
+	}
 
 	float3 rot = GetGlobalRot();
-	ImGui::Text("%f.2, %.4f, %.4f", rot.x, rot.y, rot.z);
+	ImGui::Text("%.2f, %.2f, %.2f", rot.x, rot.y, rot.z);
 
 	float3 scal = GetGlobalScale();
-	ImGui::Text("%f.2, %.4f, %.4f", scal.x, scal.y, scal.z);
+	ImGui::Text("%.2f, %.2f, %.2f", scal.x, scal.y, scal.z);
 
 }
 
 math::float4x4 Transform::GetLocalTransformMatrix()
 {
-	if (IsEnabled())
-	{
 		math::float4x4 transform = math::float4x4::FromTRS(localPosition, localRotation.ToFloat3x3(), localScale);
 		transform.Transpose();
 		return transform;
-	}
-	else
-	{
-		return math::float4x4::identity;
-	}
 }
 
 void Transform::UpdateGlobalTransform()
 {
-	if (object->parent && object->parent->HasComponent(Component::Type::C_transform))
+	if (object->parent != NULL && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
 		Transform* parent = *object->parent->GetComponent<Transform>().begin();
 		
@@ -132,9 +131,28 @@ math::float3 Transform::GetLocalPos()
 	return localPosition;
 }
 
+void Transform::SetGlobalPos(float x, float y, float z)
+{
+	globalTransform = float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale());
+	globalTransform.Transpose();
+	if (object->parent != NULL && object->parent->HasComponent(Component::Type::C_transform) == true)
+	{
+		Transform* parentTrans = *(object->parent->GetComponent<Transform>().begin());
+
+		float4x4 localMat = globalTransform.Transposed() * parentTrans->GetGlobalTransform().InverseTransposed();
+
+		localPosition = localMat.TranslatePart();
+	}
+	else
+	{
+		localPosition.Set(x, y, z);
+	}
+}
+
 math::float3 Transform::GetGlobalPos()
 {
-	return globalTransform.Transposed().TranslatePart();
+	math::float4x4 p = globalTransform.Transposed();
+	return p.TranslatePart();
 }
 
 void Transform::SetLocalRot(float x, float y, float z)
@@ -173,9 +191,18 @@ math::float3 Transform::GetLocalRot()
 	return ret;
 }
 
+math::Quat Transform::GetGlobalRotQuat()
+{
+	float3 pos;
+	float3 scal;
+	Quat ret;
+	globalTransform.Transposed().Decompose(pos, ret, scal);
+	return ret;
+}
+
 math::float3 Transform::GetGlobalRot()
 {
-	math::float3 ret = globalTransform.ToEulerXYZ();
+	math::float3 ret = globalTransform.Transposed().ToEulerXYZ();
 	ret.x *= RADTODEG;
 	ret.y *= RADTODEG;
 	ret.z *= RADTODEG;
