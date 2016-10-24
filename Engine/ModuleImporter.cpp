@@ -273,9 +273,9 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 			memcpy(_transform, file, bytes);
 			It += bytes;
 
-			trans->SetRot(_transform[0], _transform[1], _transform[2], _transform[3]);
-			trans->SetScale(_transform[4], _transform[5], _transform[6]);
-			trans->SetPos(_transform[7], _transform[8], _transform[9]);
+			trans->SetLocalRot(_transform[0], _transform[1], _transform[2], _transform[3]);
+			trans->SetLocalScale(_transform[4], _transform[5], _transform[6]);
+			trans->SetLocalPos(_transform[7], _transform[8], _transform[9]);
 
 			trans->UpdateEditorValues();
 

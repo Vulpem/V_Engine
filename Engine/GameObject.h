@@ -24,6 +24,7 @@ private:
 	bool publicActive = true;
 	bool hiddenOnOutliner = false;
 
+	bool drawAABB = true;
 	AABB originalAABB;
 public:
 
@@ -41,6 +42,7 @@ public:
 	void DrawOnEditor();
 
 	void DrawLocator();
+	void DrawAABB();
 
 	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
 	void HideFromOutliner() { hiddenOnOutliner = true; }
@@ -51,6 +53,8 @@ public:
 
 	void SetOriginalAABB(float3 minPoint, float3 maxPoint);
 	void UpdateAABB();
+
+	void UpdateTransformMatrix();
 
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive() { return publicActive; }

@@ -52,19 +52,12 @@ void GameObject::Update()
 {
 	if (active)
 	{
+		glPushMatrix();
+
 		if (HasComponent(Component::Type::C_transform))
-		{
-			glPushMatrix();
-			if (selected)
-			{				
-				float4x4 id = float4x4::identity;
-				glLoadMatrixf(id.ptr());
-			}
-			else
-			{
-				Transform* transform = *GetComponent<Transform>().begin();
-				glMultMatrixf(transform->GetTransformMatrix().ptr());
-			}
+		{			
+			Transform* transform = *GetComponent<Transform>().begin();
+			glMultMatrixf(transform->GetGlobalTransform().ptr());
 		}
 
 		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
@@ -72,20 +65,22 @@ void GameObject::Update()
 			(*it)->Update();
 		}
 
+		if (HasComponent(Component::Type::C_mesh) == false)
+		{
+			DrawLocator();
+		}
+		glPopMatrix();
+
+		if (drawAABB)
+		{
+			DrawAABB();
+		}
+
 		std::vector<GameObject*>::iterator it = childs.begin();
 		while (it != childs.end())
 		{
 			(*it)->Update();
 			it++;
-		}
-		if (HasComponent(Component::Type::C_mesh) == false)
-		{
-			DrawLocator();
-		}
-
-		if (HasComponent(Component::Type::C_transform))
-		{
-			glPopMatrix();
 		}
 	}
 }
@@ -136,7 +131,7 @@ void GameObject::DrawLocator()
 				if ((*it)->HasComponent(Component::Type::C_transform))
 				{
 					glLineWidth(0.8f);
-					math::float3 childPos((*(*it)->GetComponent<Transform>().begin())->GetPos());
+					math::float3 childPos((*(*it)->GetComponent<Transform>().begin())->GetLocalPos());
 					glVertex3f(0.0f, 0.0f, 0.0f);
 					glVertex3f(childPos.x, childPos.y, childPos.z);
 				}
@@ -147,6 +142,10 @@ void GameObject::DrawLocator()
 
 		glLineWidth(1.0f);
 		glEnable(GL_LIGHTING);
+}
+
+void GameObject::DrawAABB()
+{
 }
 
 void GameObject::Select(bool _renderNormals)
@@ -185,8 +184,30 @@ void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
 void GameObject::UpdateAABB()
 {
 	Transform* trans = *(GetComponent<Transform>().begin());
-	OBB obb = originalAABB.Transform(trans->GetTransformMatrix().Float3x3Part());
+	OBB obb = originalAABB.Transform(trans->GetLocalTransformMatrix().Float3x3Part());
 	aabb.Enclose(obb);
+}
+
+void GameObject::UpdateTransformMatrix()
+{
+	if (HasComponent(Component::Type::C_transform))
+	{
+		Transform* trans = *GetComponent<Transform>().begin();		
+		trans->UpdateGlobalTransform();
+	}
+
+	UpdateAABB();
+
+	if (childs.empty() == false)
+	{
+		std::vector<GameObject*>::iterator child = childs.begin();
+		while (child != childs.end())
+		{
+			(*child)->UpdateTransformMatrix();
+			child++;
+		}
+	}
+
 }
 
 void GameObject::SetActive(bool state, bool justPublic)

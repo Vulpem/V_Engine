@@ -13,30 +13,39 @@ public:
 	Transform(GameObject* linkedTo, int id);
 	~Transform();
 private:
-	math::Quat rotation = math::Quat::identity;
-	math::float3 position = math::float3::zero;
-	math::float3 scale = math::float3::zero;
+	math::Quat localRotation = math::Quat::identity;
+	math::float3 localPosition = math::float3::zero;
+	math::float3 localScale = math::float3::zero;
 	//TMP - Needed to fix the attribute editor display
 	math::float3 editorRot = math::float3::zero;
 
+	math::float4x4 globalTransform = math::float4x4::identity;
+
 	void EditorContent();
 public:
-	math::float4x4 GetTransformMatrix();
+	math::float4x4 GetLocalTransformMatrix();
+
+	void UpdateGlobalTransform();
+	math::float4x4 GetGlobalTransform();
+
 
 	void UpdateEditorValues();
 
-	void SetPos(float x, float y, float z);
-	void ResetPos();
-	math::float3 GetPos();
+	void SetLocalPos(float x, float y, float z);
+	math::float3 GetLocalPos();
 
-	void SetRot(float x, float y, float z);
-	void SetRot(float x, float y, float z, float w);
-	void ResetRot();
-	math::float3 GetRot();
+	math::float3 GetGlobalPos();
 
-	void SetScale(float x, float y, float z);
-	void ResetScale();
-	math::float3 GetScale();
+	void SetLocalRot(float x, float y, float z);
+	void SetLocalRot(float x, float y, float z, float w);
+	math::float3 GetLocalRot();
+
+	math::float3 GetGlobalRot();
+
+	void SetLocalScale(float x, float y, float z);
+	math::float3 GetLocalScale();
+
+	math::float3 GetGlobalScale();
 
 	static Type GetType() { return Type::C_transform; }
 

@@ -15,9 +15,9 @@ Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
 	name = tmp;
 	type = C_transform;
 
-	position.Set(0, 0, 0);
-	scale.Set(1, 1, 1);
-	rotation = math::Quat::identity;
+	localPosition.Set(0, 0, 0);
+	localScale.Set(1, 1, 1);
+	localRotation = math::Quat::identity;
 }
 Transform::~Transform()
 {
@@ -27,15 +27,15 @@ Transform::~Transform()
 void Transform::EditorContent()
 {
 	float tmp[3];
-	tmp[0] = position.x;
-	tmp[1] = position.y;
-	tmp[2] = position.z;
+	tmp[0] = localPosition.x;
+	tmp[1] = localPosition.y;
+	tmp[2] = localPosition.z;
 	if (ImGui::DragFloat3("Position", tmp, 1.0f))
 	{
-		SetPos(tmp[0], tmp[1], tmp[2]);
+		SetLocalPos(tmp[0], tmp[1], tmp[2]);
 	}
 
-	//math::float3 rot = GetRot();
+	//math::float3 rot = GetLocalRot();
 	tmp[0] = editorRot.x;
 	tmp[1] = editorRot.y;
 	tmp[2] = editorRot.z;
@@ -52,26 +52,39 @@ void Transform::EditorContent()
 	}
 	if (ImGui::DragFloat3("Rotation", tmp, 1.0f))
 	{
-		SetRot(tmp[0], tmp[1], tmp[2]);
+		SetLocalRot(tmp[0], tmp[1], tmp[2]);
 		editorRot.x = tmp[0];
 		editorRot.y = tmp[1];
 		editorRot.z = tmp[2];
 	}
 
-	tmp[0] = scale.x;
-	tmp[1] = scale.y;
-	tmp[2] = scale.z;
+	tmp[0] = localScale.x;
+	tmp[1] = localScale.y;
+	tmp[2] = localScale.z;
 	if (ImGui::DragFloat3("Scale", tmp, 0.01f, 0.1f))
 	{
-		SetScale(tmp[0], tmp[1], tmp[2]);
+		SetLocalScale(tmp[0], tmp[1], tmp[2]);
 	}
+	ImGui::NewLine();
+	ImGui::Separator();
+	ImGui::Text("Global transformations");
+
+	float3 pos = GetGlobalPos();
+	ImGui::Text("%.4f, %.4f, %.4f", pos.x, pos.y, pos.z);
+
+	float3 rot = GetGlobalRot();
+	ImGui::Text("%f.2, %.4f, %.4f", rot.x, rot.y, rot.z);
+
+	float3 scal = GetGlobalScale();
+	ImGui::Text("%f.2, %.4f, %.4f", scal.x, scal.y, scal.z);
+
 }
 
-math::float4x4 Transform::GetTransformMatrix()
+math::float4x4 Transform::GetLocalTransformMatrix()
 {
 	if (IsEnabled())
 	{
-		math::float4x4 transform = math::float4x4::FromTRS(position, rotation.ToFloat3x3(), scale);
+		math::float4x4 transform = math::float4x4::FromTRS(localPosition, localRotation.ToFloat3x3(), localScale);
 		transform.Transpose();
 		return transform;
 	}
@@ -81,31 +94,50 @@ math::float4x4 Transform::GetTransformMatrix()
 	}
 }
 
+void Transform::UpdateGlobalTransform()
+{
+	if (object->parent && object->parent->HasComponent(Component::Type::C_transform))
+	{
+		Transform* parent = *object->parent->GetComponent<Transform>().begin();
+		
+		globalTransform = GetLocalTransformMatrix() * parent->GetGlobalTransform();
+	}
+	else
+	{
+		globalTransform = GetLocalTransformMatrix();
+	}
+}
+
+math::float4x4 Transform::GetGlobalTransform()
+{
+	return globalTransform;
+}
+
 void Transform::UpdateEditorValues()
 {
-	editorRot = GetRot();
+	editorRot = GetLocalRot();
 }
 
-void Transform::SetPos(float x, float y, float z)
+void Transform::SetLocalPos(float x, float y, float z)
 {
-	position.x = x;
-	position.y = y;
-	position.z = z;
+	localPosition.x = x;
+	localPosition.y = y;
+	localPosition.z = z;
 
-	object->UpdateAABB();
+	object->UpdateTransformMatrix();
 }
 
-void Transform::ResetPos()
+math::float3 Transform::GetLocalPos()
 {
-	SetPos(0, 0, 0);
+	return localPosition;
 }
 
-math::float3 Transform::GetPos()
+math::float3 Transform::GetGlobalPos()
 {
-	return position;
+	return globalTransform.Transposed().TranslatePart();
 }
 
-void Transform::SetRot(float x, float y, float z)
+void Transform::SetLocalRot(float x, float y, float z)
 {
 	while (x < 0) { x += 360; }
 	while (y < 0) { y += 360; }
@@ -115,26 +147,21 @@ void Transform::SetRot(float x, float y, float z)
 	y *= DEGTORAD;
 	z *= DEGTORAD;
 
-	rotation = math::Quat::FromEulerXYZ(x, y, z);
+	localRotation = math::Quat::FromEulerXYZ(x, y, z);
 
-	object->UpdateAABB();
+	object->UpdateTransformMatrix();
 }
 
-void Transform::SetRot(float x, float y, float z, float w)
+void Transform::SetLocalRot(float x, float y, float z, float w)
 {
-	rotation.Set(x, y, z, w);
+	localRotation.Set(x, y, z, w);
 
-	object->UpdateAABB();
+	object->UpdateTransformMatrix();
 }
 
-void Transform::ResetRot()
+math::float3 Transform::GetLocalRot()
 {
-	SetRot(0, 0, 0);
-}
-
-math::float3 Transform::GetRot()
-{
-	math::float3 ret = rotation.ToEulerXYZ();
+	math::float3 ret = localRotation.ToEulerXYZ();
 	ret.x *= RADTODEG;
 	ret.y *= RADTODEG;
 	ret.z *= RADTODEG;
@@ -146,22 +173,31 @@ math::float3 Transform::GetRot()
 	return ret;
 }
 
-void Transform::SetScale(float x, float y, float z)
+math::float3 Transform::GetGlobalRot()
+{
+	math::float3 ret = globalTransform.ToEulerXYZ();
+	ret.x *= RADTODEG;
+	ret.y *= RADTODEG;
+	ret.z *= RADTODEG;
+	return ret;
+}
+
+void Transform::SetLocalScale(float x, float y, float z)
 {
 	if (x != 0 && y != 0 && z != 0)
 	{
-		scale.Set(x, y, z);
+		localScale.Set(x, y, z);
 
-		object->UpdateAABB();
+		object->UpdateTransformMatrix();
 	}
 }
 
-void Transform::ResetScale()
+math::float3 Transform::GetLocalScale()
 {
-	SetScale(1, 1, 1);
+	return localScale;
 }
 
-math::float3 Transform::GetScale()
+math::float3 Transform::GetGlobalScale()
 {
-	return scale;
+	return globalTransform.ExtractScale();
 }
