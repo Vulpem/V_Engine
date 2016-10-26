@@ -71,7 +71,7 @@ void GameObject::Update()
 		}
 		glPopMatrix();
 
-		if (drawAABB)
+		if (drawAABB && selected)
 		{
 			DrawAABB();
 		}
@@ -159,6 +159,7 @@ void GameObject::DrawAABB()
 	
 	glDisable(GL_LIGHTING);
 	glLineWidth(2.0f);
+	glColor4f(1.0f, 1.0f, 0.6f, 1.0f);
 
 	glBegin(GL_LINES);
 
@@ -214,12 +215,14 @@ void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
 {
 	originalAABB.minPoint = minPoint;
 	originalAABB.maxPoint = maxPoint;
+	UpdateAABB();
 }
 
 void GameObject::UpdateAABB()
 {
 	Transform* trans = *(GetComponent<Transform>().begin());
-	OBB obb = originalAABB.Transform(trans->GetLocalTransformMatrix().Float3x3Part());
+	aabb.SetNegativeInfinity();
+	OBB obb = originalAABB.Transform(trans->GetGlobalTransform().Transposed().Float3x3Part());
 	aabb.Enclose(obb);
 }
 

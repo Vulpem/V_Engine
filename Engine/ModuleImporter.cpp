@@ -595,7 +595,8 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		file_0It += bytes;
 
 		//The AABB box that will englobe all the vertices of the meshes
-		AABB aabb(float3(0, 0, 0), float3(0, 0, 0));
+		AABB aabb;
+		aabb.SetNegativeInfinity();
 
 		char** meshes = new char*[nMeshes];
 		uint* meshSize = new uint[nMeshes];
