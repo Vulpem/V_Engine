@@ -9,17 +9,8 @@
 
 #include "GameObject.h"
 
-#define CHECKERS_HEIGHT 128
-#define CHECKERS_WIDTH 128
-
-struct aiMesh;
-struct aiNode;
-struct aiScene;
 
 class GameObject;
-
-//TO_REMOVE
-class mesh;
 
 class ModuleGoManager : public Module
 {

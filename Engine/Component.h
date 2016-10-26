@@ -14,7 +14,8 @@ public:
 		C_None,
 		C_transform,
 		C_mesh,
-		C_material
+		C_material,
+		C_camera
 	};
 
 

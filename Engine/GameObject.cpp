@@ -2,7 +2,8 @@
 
 #include "AllComponents.h"
 
-//WILL BE REMOVED WHEN WE CREATE TRANSFORM COMPONENT
+#include "imGUI\imgui.h"
+
 #include "OpenGL.h"
 
 //------------------------- NODE --------------------------------------------------------------------------------
@@ -87,6 +88,20 @@ void GameObject::Update()
 
 void GameObject::DrawOnEditor()
 {
+	if(ImGui::BeginPopup("Add Component"))
+	{
+		if (ImGui::Button("Camera##add"))
+		{
+			AddComponent(Component::Type::C_camera);
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::Button("Add:"))
+	{
+		ImGui::OpenPopup("Add Component");
+	}
+
 	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
 	{
 		(*it)->DrawOnEditor();
@@ -282,6 +297,7 @@ Component* GameObject::AddComponent(Component::Type type)
 		if (HasComponent(Component::C_transform) == false)
 		{
 			toAdd = new Transform(this, components.size()); 
+			transform = (Transform*)toAdd;
 		}
 		break;
 	}
@@ -296,6 +312,10 @@ Component* GameObject::AddComponent(Component::Type type)
 			toAdd = new Material(this, components.size());
 		}
 		break;
+	}
+	case Component::Type::C_camera:
+	{
+		toAdd = new Camera(this, components.size()); break;
 	}
 	}
 
@@ -321,4 +341,9 @@ bool GameObject::HasComponent(Component::Type type)
 		}
 	}
 	return false;
+}
+
+Transform * GameObject::GetTransform()
+{
+	return transform;
 }

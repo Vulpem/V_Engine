@@ -11,7 +11,7 @@
 #include "Component.h"
 #include "Mesh.h"
 
-
+class Transform;
 
 class GameObject
 {
@@ -26,6 +26,8 @@ private:
 
 	bool drawAABB = true;
 	AABB originalAABB;
+
+	Transform* transform = NULL;
 public:
 
 	GameObject();
@@ -64,6 +66,7 @@ public:
 
 	Component* AddComponent(Component::Type type);
 	bool HasComponent(Component::Type type);
+	Transform* GetTransform();
 
 #pragma region GetComponents
 	//GetComponent function
