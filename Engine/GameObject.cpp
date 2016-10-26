@@ -144,19 +144,8 @@ void GameObject::DrawLocator()
 		glEnable(GL_LIGHTING);
 }
 
-void GameObject::DrawAABB()
+void GameObject::DrawBox(float3* corners)
 {
-	glPushMatrix();
-	Transform* trans = *GetComponent<Transform>().begin();
-	float4x4 pos = float4x4::identity;
-	pos.SetTranslatePart(trans->GetGlobalPos());
-	pos.Transpose();
-
-	glMultMatrixf(pos.ptr());
-
-	math::float3 corners[8];
-	aabb.GetCornerPoints(corners);
-	
 	glDisable(GL_LIGHTING);
 	glLineWidth(2.0f);
 	glColor4f(1.0f, 1.0f, 0.6f, 1.0f);
@@ -180,8 +169,14 @@ void GameObject::DrawAABB()
 
 	glLineWidth(1.0f);
 	glEnable(GL_LIGHTING);
+}
 
-	glPopMatrix();
+void GameObject::DrawAABB()
+{
+	math::float3 corners[8];
+	aabb.GetCornerPoints(corners);
+	DrawBox(corners);
+	
 }
 
 void GameObject::Select(bool _renderNormals)
@@ -222,7 +217,8 @@ void GameObject::UpdateAABB()
 {
 	Transform* trans = *(GetComponent<Transform>().begin());
 	aabb.SetNegativeInfinity();
-	OBB obb = originalAABB.Transform(trans->GetGlobalTransform().Transposed().Float3x3Part());
+	OBB obb = originalAABB;// .Transform(trans->GetGlobalTransform().Transposed().Float3x3Part());
+	obb.Transform(trans->GetGlobalTransform().Transposed());
 	aabb.Enclose(obb);
 }
 

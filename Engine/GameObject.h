@@ -42,6 +42,9 @@ public:
 	void DrawOnEditor();
 
 	void DrawLocator();
+private:
+	void DrawBox(float3* corners);
+public:
 	void DrawAABB();
 
 	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
