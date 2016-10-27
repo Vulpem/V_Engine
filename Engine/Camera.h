@@ -13,12 +13,23 @@ public:
 	void DoUpdate();
 	void EditorContent();
 
+	void UpdateCamMatrix();
+	void UpdatePos();
+	void UpdateOrientation();
+
 	static Type GetType() { return Type::C_camera; }
 
 	void Draw();
 
+	void SetHorizontalFOV(float horizontalFOV);
+
 	bool active = true;
+private:
 	math::Frustum frustum;
+public:
+	math::FrustumType viewType = math::FrustumType::PerspectiveFrustum;
+	float aspectRatio = 1.77777777f;
+	math::float3 positionOffset = float3::zero;
 };
 
 #endif

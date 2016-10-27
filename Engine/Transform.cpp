@@ -3,6 +3,8 @@
 
 #include "GameObject.h"
 
+#include "Camera.h"
+
 #include "Math.h"
 
 #include "imGUI\imgui.h"
@@ -19,6 +21,7 @@ Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
 	localScale.Set(1, 1, 1);
 	localRotation = math::Quat::identity;
 }
+
 Transform::~Transform()
 {
 
@@ -124,6 +127,18 @@ void Transform::SetLocalPos(float x, float y, float z)
 	localPosition.z = z;
 
 	object->UpdateTransformMatrix();
+
+	std::vector<Camera*> cams = object->GetComponent<Camera>();
+	if (cams.empty() == false)
+	{
+		std::vector<Camera*>::iterator it = cams.begin();
+		while (it != cams.end())
+		{
+			(*it)->UpdatePos();
+			it++;
+		}
+	}
+
 }
 
 math::float3 Transform::GetLocalPos()
@@ -141,11 +156,11 @@ void Transform::SetGlobalPos(float x, float y, float z)
 
 		float4x4 localMat = globalTransform.Transposed() * parentTrans->GetGlobalTransform().InverseTransposed();
 
-		localPosition = localMat.TranslatePart();
+		SetLocalPos(localMat.TranslatePart().x, localMat.TranslatePart().y, localMat.TranslatePart().z);
 	}
 	else
 	{
-		localPosition.Set(x, y, z);
+		SetLocalPos(x, y, z);
 	}
 }
 

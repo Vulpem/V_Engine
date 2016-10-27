@@ -72,9 +72,22 @@ void GameObject::Update()
 		}
 		glPopMatrix();
 
+		//Drawing AABB independantly of object transform
 		if (drawAABB && selected)
 		{
 			DrawAABB();
+		}
+
+		//Drawing Camera independantly of object transform
+		std::vector<Camera*> cams = GetComponent<Camera>();
+		if (cams.empty() == false)
+		{
+			std::vector<Camera*>::iterator it = cams.begin();
+			while (it != cams.end())
+			{
+				(*it)->Draw();
+				it++;
+			}
 		}
 
 		std::vector<GameObject*>::iterator it = childs.begin();
@@ -247,6 +260,18 @@ void GameObject::UpdateTransformMatrix()
 
 	UpdateAABB();
 
+	//Updating cameras position
+	std::vector<Camera*> cams = GetComponent<Camera>();
+	if (cams.empty() == false)
+	{
+		std::vector<Camera*>::iterator it = cams.begin();
+		while (it != cams.end())
+		{
+			(*it)->UpdateCamMatrix();
+			it++;
+		}
+	}
+
 	if (childs.empty() == false)
 	{
 		std::vector<GameObject*>::iterator child = childs.begin();
@@ -315,7 +340,11 @@ Component* GameObject::AddComponent(Component::Type type)
 	}
 	case Component::Type::C_camera:
 	{
-		toAdd = new Camera(this, components.size()); break;
+		if (HasComponent(Component::Type::C_transform))
+		{
+			toAdd = new Camera(this, components.size());
+		}
+		break;
 	}
 	}
 
@@ -330,15 +359,23 @@ bool GameObject::HasComponent(Component::Type type)
 {
 	if (components.size() > 0)
 	{
-		std::vector<Component*>::iterator it = components.begin();
-		while (it != components.end())
+		if (type == Component::Type::C_transform)
 		{
-			if ((*it)->GetType() == type)
+			if (transform == nullptr)
 			{
-				return true;
+				return false;
 			}
-			it++;
+			return true;
 		}
+			std::vector<Component*>::iterator it = components.begin();
+			while (it != components.end())
+			{
+				if ((*it)->GetType() == type)
+				{
+					return true;
+				}
+				it++;
+			}
 	}
 	return false;
 }
