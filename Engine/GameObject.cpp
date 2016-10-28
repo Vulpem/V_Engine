@@ -9,7 +9,8 @@
 //------------------------- NODE --------------------------------------------------------------------------------
 GameObject::GameObject()
 {
-
+	aabb.SetNegativeInfinity();
+	strcpy(name, "Unnamed");
 }
 
 
@@ -57,8 +58,7 @@ void GameObject::Update()
 
 		if (HasComponent(Component::Type::C_transform))
 		{			
-			Transform* transform = *GetComponent<Transform>().begin();
-			glMultMatrixf(transform->GetGlobalTransform().ptr());
+			glMultMatrixf(GetTransform()->GetGlobalTransform().ptr());
 		}
 
 		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
@@ -159,7 +159,7 @@ void GameObject::DrawLocator()
 				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
 				{
 					glLineWidth(0.8f);
-					math::float3 childPos((*(*it)->GetComponent<Transform>().begin())->GetLocalPos());
+					math::float3 childPos(GetTransform()->GetLocalPos());
 					glVertex3f(0.0f, 0.0f, 0.0f);
 					glVertex3f(childPos.x, childPos.y, childPos.z);
 				}
@@ -201,10 +201,12 @@ void GameObject::DrawBox(float3* corners)
 
 void GameObject::DrawAABB()
 {
-	math::float3 corners[8];
-	aabb.GetCornerPoints(corners);
-	DrawBox(corners);
-	
+	if (aabb.IsFinite())
+	{
+		math::float3 corners[8];
+		aabb.GetCornerPoints(corners);
+		DrawBox(corners);
+	}
 }
 
 void GameObject::Select(bool _renderNormals)
@@ -212,7 +214,7 @@ void GameObject::Select(bool _renderNormals)
 	selected = true;
 	renderNormals = _renderNormals;
 
-	(*GetComponent<Transform>().begin())->UpdateEditorValues();
+	GetTransform()->UpdateEditorValues();
 
 	std::vector<GameObject*>::iterator childIt = childs.begin();
 	while (childIt != childs.end())
@@ -243,19 +245,20 @@ void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
 
 void GameObject::UpdateAABB()
 {
-	Transform* trans = *(GetComponent<Transform>().begin());
 	aabb.SetNegativeInfinity();
-	OBB obb = originalAABB;// .Transform(trans->GetGlobalTransform().Transposed().Float3x3Part());
-	obb.Transform(trans->GetGlobalTransform().Transposed());
-	aabb.Enclose(obb);
+	if (originalAABB.IsFinite())
+	{
+		OBB obb = originalAABB;
+		obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
+		aabb.Enclose(obb);
+	}
 }
 
 void GameObject::UpdateTransformMatrix()
 {
 	if (HasComponent(Component::Type::C_transform))
-	{
-		Transform* trans = *GetComponent<Transform>().begin();		
-		trans->UpdateGlobalTransform();
+	{	
+		GetTransform()->UpdateGlobalTransform();
 	}
 
 	UpdateAABB();

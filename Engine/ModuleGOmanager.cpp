@@ -84,6 +84,25 @@ bool ModuleGoManager::CleanUp()
 	return true;
 }
 
+GameObject * ModuleGoManager::CreateEmpty()
+{
+	GameObject* empty = new GameObject();
+
+	empty->AddComponent(Component::Type::C_transform);
+
+	empty->parent = root;
+	root->childs.push_back(empty);
+
+	return empty;
+}
+
+GameObject* ModuleGoManager::CreateCamera()
+{
+	GameObject* camera = CreateEmpty();
+	camera->AddComponent(Component::Type::C_camera);
+	return camera;
+}
+
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
 	GameObject* sceneRoot = App->importer->LoadVgo(fileName);
@@ -96,6 +115,7 @@ std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 			root->childs.push_back((*childs));
 			ret.push_back((*childs));
 		}
+		//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
 		sceneRoot->childs.clear();
 		delete sceneRoot;
 		LOG("Loaded %s", fileName);

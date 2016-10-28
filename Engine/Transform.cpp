@@ -100,7 +100,7 @@ void Transform::UpdateGlobalTransform()
 {
 	if (object->parent != NULL && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
-		Transform* parent = *object->parent->GetComponent<Transform>().begin();
+		Transform* parent = object->parent->GetTransform();
 		
 		globalTransform = GetLocalTransformMatrix() * parent->GetGlobalTransform();
 	}
@@ -148,13 +148,11 @@ math::float3 Transform::GetLocalPos()
 
 void Transform::SetGlobalPos(float x, float y, float z)
 {
-	globalTransform = float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale());
-	globalTransform.Transpose();
 	if (object->parent != NULL && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
-		Transform* parentTrans = *(object->parent->GetComponent<Transform>().begin());
+		Transform* parentTrans = object->parent->GetTransform();
 
-		float4x4 localMat = globalTransform.Transposed() * parentTrans->GetGlobalTransform().InverseTransposed();
+		float4x4 localMat = parentTrans->GetGlobalTransform() * (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
 
 		SetLocalPos(localMat.TranslatePart().x, localMat.TranslatePart().y, localMat.TranslatePart().z);
 	}

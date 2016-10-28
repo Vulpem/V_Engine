@@ -20,15 +20,18 @@ Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id)
 	name = tmp;
 	type = C_camera;
 
-	positionOffset = object->aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+	positionOffset = float3::zero;
+	if (object->aabb.IsFinite())
+	{
+		positionOffset = object->aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+	}
 
 	frustum.nearPlaneDistance = 4;
 	frustum.farPlaneDistance = 500;
 	frustum.type = FrustumType::PerspectiveFrustum;
 
-	UpdatePos();
-	UpdateOrientation();
 	SetHorizontalFOV(65*DEGTORAD);
+	UpdateCamMatrix();
 }
 
 Camera::~Camera()
@@ -44,7 +47,10 @@ void Camera::DoUpdate()
 
 void Camera::UpdateCamMatrix()
 {
-	positionOffset = object->aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+	if (object->aabb.IsFinite())
+	{
+		positionOffset = object->aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+	}
 	UpdateOrientation();
 	UpdatePos();
 }
@@ -87,7 +93,7 @@ void Camera::EditorContent()
 	tmp = frustum.verticalFov * RADTODEG;
 	if (ImGui::DragFloat("Vertical FOV", &tmp, 1.0f, 1.0f, 180.0f))
 	{
-		SetHorizontalFOV(tmp * aspectRatio);
+		SetHorizontalFOV(tmp * aspectRatio * DEGTORAD);
 	}
 	ImGui::DragFloat("NearPlane", &frustum.nearPlaneDistance, 0.1f, 0.1f, frustum.farPlaneDistance - 1.0f);
 	ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 4000.0f);

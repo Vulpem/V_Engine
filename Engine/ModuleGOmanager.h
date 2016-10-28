@@ -28,6 +28,8 @@ public:
 
 	bool CleanUp();
 
+	GameObject* CreateEmpty();
+	GameObject* CreateCamera();
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 

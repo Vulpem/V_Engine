@@ -103,6 +103,18 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::EndMenu();
 		}
 
+		if (ImGui::BeginMenu("Create"))
+		{
+			if (ImGui::Button("Empty"))
+			{
+				App->GO->CreateEmpty();
+			}
+			if (ImGui::Button("Camera"))
+			{
+				App->GO->CreateCamera();
+			}
+			ImGui::EndMenu();
+		}
 		if (ImGui::BeginMenu("Documentation"))
 		{
 			if (ImGui::MenuItem("MathGeoLib"))
@@ -311,20 +323,21 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::InputText("##Name", selectedGameObject->name, NAME_MAX_LEN);
 			selectedGameObject->DrawOnEditor();
 			ImGui::Separator();
-			if (ImGui::Button("Look at"))
+			if (selectedGameObject->HasComponent(Component::Type::C_transform))
 			{
-				Transform* trans = *selectedGameObject->GetComponent<Transform>().begin();
-				float3 toLook = trans->GetGlobalPos();
-				App->camera->LookAt(vec3(toLook.x, toLook.y, toLook.z));
+				if (ImGui::Button("Look at"))
+				{
+					float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
+					App->camera->LookAt(vec3(toLook.x, toLook.y, toLook.z));
+				}
+				ImGui::NewLine();
+				ImGui::Text("Danger Zone:");
+				if (ImGui::Button("Delete"))
+				{
+					App->GO->DeleteGameObject(selectedGameObject);
+					selectedGameObject = NULL;
+				}
 			}
-			ImGui::NewLine();
-			ImGui::Text("Danger Zone:");
-			if (ImGui::Button("Delete"))
-			{
-				App->GO->DeleteGameObject(selectedGameObject);
-				selectedGameObject = NULL;
-			}
-
 		}
 		ImGui::End();
 	}
