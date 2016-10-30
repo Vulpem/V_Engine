@@ -38,7 +38,7 @@ private:
 public:
 	std::vector<uint> id_textures;
 
-	GameObject* root = NULL;
+	GameObject* root = nullptr;
 };
 
 #endif

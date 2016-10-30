@@ -98,7 +98,7 @@ math::float4x4 Transform::GetLocalTransformMatrix()
 
 void Transform::UpdateGlobalTransform()
 {
-	if (object->parent != NULL && object->parent->HasComponent(Component::Type::C_transform) == true)
+	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
 		Transform* parent = object->parent->GetTransform();
 		
@@ -148,7 +148,7 @@ math::float3 Transform::GetLocalPos()
 
 void Transform::SetGlobalPos(float x, float y, float z)
 {
-	if (object->parent != NULL && object->parent->HasComponent(Component::Type::C_transform) == true)
+	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
 		Transform* parentTrans = object->parent->GetTransform();
 

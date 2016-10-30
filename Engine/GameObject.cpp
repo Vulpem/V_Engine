@@ -318,7 +318,7 @@ void GameObject::SetActive(bool state, bool justPublic)
 
 Component* GameObject::AddComponent(Component::Type type)
 {
-	Component* toAdd = NULL;
+	Component* toAdd = nullptr;
 	switch (type)
 	{
 	case Component::Type::C_transform:
@@ -352,7 +352,7 @@ Component* GameObject::AddComponent(Component::Type type)
 	}
 	}
 
-	if (toAdd != NULL)
+	if (toAdd != nullptr)
 	{
 		components.push_back(toAdd);
 	}

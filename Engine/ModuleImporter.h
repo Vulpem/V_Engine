@@ -34,11 +34,11 @@ public:
 	bool ImportImage(const char* filePath);
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
-	GameObject* LoadVgo(const char* fileName, GameObject* parent = NULL, char* meshesFolder = NULL);
+	GameObject* LoadVgo(const char* fileName, GameObject* parent = nullptr, char* meshesFolder = nullptr);
 	int LoadTexture(char* path, Material* mat);
 
 private:
-	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = NULL);
+	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = nullptr);
 
 public:
 	//This function will return only the file format, without the dot.

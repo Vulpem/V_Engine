@@ -143,7 +143,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 	//Loading the aiScene from Assimp
 	const aiScene* scene = aiImportFileEx(filePath, aiProcessPreset_TargetRealtime_MaxQuality, App->fs->GetAssimpIO());
 
-	if (scene != NULL)
+	if (scene != nullptr)
 	{
 		if (scene->HasMeshes())
 		{
@@ -152,7 +152,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 		if (scene)
 		{
 			aiReleaseImport(scene);
-			scene = NULL;
+			scene = nullptr;
 		}
 		LOG(" ------ [End of importing 3D Scene] ------\n");
 	}
@@ -233,7 +233,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 {
 	std::string fileName = FileName(fileName_NoFileType);
 
-	char* file = NULL;
+	char* file = nullptr;
 	std::string path("Library/Meshes/");
 	if (parent && meshesFolder)
 	{
@@ -253,7 +253,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 	if (App->fs->Exists(path.data()))
 	{
 		int size = App->fs->Load(path.data(), &file);
-		if (file != NULL && size > 0)
+		if (file != nullptr && size > 0)
 		{			
 			char* It = file;
 
@@ -444,7 +444,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				delete[] sizeOfChilds;
 
 
-				if (parent == NULL)
+				if (parent == nullptr)
 				{
 					meshesFolder = new char[fileName.length() + 1];
 					memcpy(meshesFolder, fileName.data(), sizeof(char) * (fileName.length() + 1));
@@ -461,7 +461,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 					}
 					childNames++;
 				}
-				if (parent == NULL)
+				if (parent == nullptr)
 				{
 					RELEASE_ARRAY(meshesFolder);
 				}
@@ -623,7 +623,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			}
 
 			//Importing normals
-			float* normals = NULL;
+			float* normals = nullptr;
 			uint numNormals = 0;
 			if (toLoad->HasNormals())
 			{
@@ -633,7 +633,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			}
 
 			//Importing texture coords
-			float* textureCoords = NULL;
+			float* textureCoords = nullptr;
 			uint numTextureCoords = 0;
 			if (toLoad->HasTextureCoords(0))
 			{
@@ -665,7 +665,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 			//Importing index (3 per face)
 			uint num_indices = 0;
-			uint* indices = NULL;
+			uint* indices = nullptr;
 
 			aiFace* currentFace = toLoad->mFaces;
 

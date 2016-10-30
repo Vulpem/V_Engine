@@ -131,7 +131,7 @@ void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::strin
 	char** f = PHYSFS_enumerateFiles(directory);
 	char** it;
 
-	for (it = f; *it != NULL; it++)
+	for (it = f; *it != nullptr; it++)
 	{
 		std::string toPush(*it);
 		if (GetFileFormat(*it).Length() > 0)
@@ -179,7 +179,7 @@ unsigned int ModuleFileSystem::Load(const char* file, char** buffer) const
 
 	PHYSFS_file* fs_file = PHYSFS_openRead(file);
 
-	if(fs_file != NULL)
+	if(fs_file != nullptr)
 	{
 		PHYSFS_sint64 size = PHYSFS_fileLength(fs_file);
 
@@ -217,13 +217,13 @@ SDL_RWops* ModuleFileSystem::Load(const char* file) const
 	if(size > 0)
 	{
 		SDL_RWops* r = SDL_RWFromConstMem(buffer, size);
-		if(r != NULL)
+		if(r != nullptr)
 			r->close = close_sdl_rwops;
 
 		return r;
 	}
 	else
-		return NULL;
+		return nullptr;
 }
 
 
@@ -244,7 +244,7 @@ unsigned int ModuleFileSystem::Save(const char* file, const char* buffer, unsign
 
 	PHYSFS_file* fs_file = PHYSFS_openWrite(file);
 
-	if(fs_file != NULL)
+	if(fs_file != nullptr)
 	{
 		PHYSFS_sint64 written = PHYSFS_write(fs_file, (const void*)buffer, 1, size);
 		if (written != size)

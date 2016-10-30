@@ -53,7 +53,7 @@ private:
 	std::list<btDefaultMotionState*> motions;
 	std::list<btTypedConstraint*> constraints;
 
-	btRigidBody* ground = NULL;
+	btRigidBody* ground = nullptr;
 };
 
 class DebugDrawer : public btIDebugDraw

@@ -235,7 +235,7 @@ void Application::Log(char* str)
 {
 	if (gameRunning == true)
 	{
-		if (Editor != NULL && Editor->IsEnabled())
+		if (Editor != nullptr && Editor->IsEnabled())
 		{
 			Editor->Log(str);
 		}

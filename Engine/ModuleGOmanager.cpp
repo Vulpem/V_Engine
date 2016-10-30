@@ -141,7 +141,7 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 
 void ModuleGoManager::CreateRootGameObject()
 {
-	if (root == NULL)
+	if (root == nullptr)
 	{
 		GameObject* ret = new GameObject();
 

@@ -48,7 +48,7 @@ bool ModuleEditor::Start()
 
 	strcpy(toImport, "");
 
-	selectedGameObject = NULL;
+	selectedGameObject = nullptr;
 
 	return true;
 }
@@ -335,7 +335,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 				if (ImGui::Button("Delete"))
 				{
 					App->GO->DeleteGameObject(selectedGameObject);
-					selectedGameObject = NULL;
+					selectedGameObject = nullptr;
 				}
 			}
 		}

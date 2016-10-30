@@ -15,7 +15,7 @@ enum main_states
 	MAIN_EXIT
 };
 
-Application* App = NULL;
+Application* App = nullptr;
 
 int main(int argc, char ** argv)
 {
@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
 	}
 
 	delete App;
-	App = NULL;
+	App = nullptr;
 	LOG("Exiting game '%s'...\n", TITLE);
 	return main_return;
 }

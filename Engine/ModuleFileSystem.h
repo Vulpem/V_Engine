@@ -26,7 +26,7 @@ public:
 	bool CleanUp();
 
 	// Utility functions
-	bool AddPath(const char* path_or_zip, const char* mount_point = NULL);
+	bool AddPath(const char* path_or_zip, const char* mount_point = nullptr);
 	bool Exists(const char* file) const;
 	bool CreateDir(const char* dir);
 	bool IsDirectory(const char* file) const;
