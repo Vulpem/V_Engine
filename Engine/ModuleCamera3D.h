@@ -4,8 +4,8 @@
 #include "Module.h"
 #include "Globals.h"
 #include "glmath.h"
+#include "Camera.h"
 
-class GameObject;
 
 class ModuleCamera3D : public Module
 {
@@ -37,6 +37,8 @@ public:
 	float camSprintMultiplier = 2.0f;
 
 private:
+	Camera* defaultCamera = nullptr;
+	Camera* activeCamera = nullptr;
 
 	mat4x4 ViewMatrix, ViewMatrixInverse;
 };

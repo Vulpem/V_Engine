@@ -10,6 +10,7 @@
 GameObject::GameObject()
 {
 	aabb.SetNegativeInfinity();
+	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
 }
 
