@@ -37,6 +37,10 @@ bool ModuleCamera3D::Start()
 	Position = vec3(0.0f, 20.0f, -10.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 
+	defaultCameraGO = App->GO->CreateCamera();
+	defaultCamera = *defaultCameraGO->GetComponent<Camera>().begin();
+	defaultCameraGO->SetName("Default editor camera");
+
 	return ret;
 }
 
@@ -66,39 +70,39 @@ update_status ModuleCamera3D::Update(float dt)
 
 #pragma region cameraMovementKeys
 	float speed = camSpeed;
+	float3 lastCamPos = defaultCameraGO->GetTransform()->GetGlobalPos();
+	float3 camPos = lastCamPos;
 	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 	{
 		speed *= camSprintMultiplier;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 	{
-		Position -= Z * speed;
-		Reference -= Z * speed;
+		lastCamPos -= defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 	{
-		Position += Z * speed;
-		Reference += Z * speed;
+		lastCamPos += defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		Position -= X * speed;
-		Reference -= X * speed;
+		lastCamPos -= defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		Position += X * speed;
-		Reference += X * speed;
+		lastCamPos += defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
-		Position -= Y * speed;
-		Reference -= Y * speed;
+		lastCamPos -= defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 	{
-		Position += Y * speed;
-		Reference += Y * speed;
+		lastCamPos += defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
+	}
+	if (lastCamPos.x != camPos.x || lastCamPos.y != camPos.y || lastCamPos.z != camPos.z)
+	{
+		defaultCameraGO->GetTransform()->SetGlobalPos(lastCamPos);
 	}
 #pragma endregion
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT || updatePos)
@@ -106,33 +110,7 @@ update_status ModuleCamera3D::Update(float dt)
 		int dx = -App->input->GetMouseXMotion();
 		int dy = -App->input->GetMouseYMotion();
 
-		float Sensitivity = 0.15f;
-
-		Position -= Reference;
-
-		if (dx != 0)
-		{
-			float DeltaX = (float)dx * Sensitivity;
-
-			X = rotate(X, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Y = rotate(Y, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-			Z = rotate(Z, DeltaX, vec3(0.0f, 1.0f, 0.0f));
-		}
-
-		if (dy != 0)
-		{
-			float DeltaY = (float)dy * Sensitivity;
-
-			Y = rotate(Y, DeltaY, X);
-			Z = rotate(Z, DeltaY, X);
-
-			if (Y.y < 0.0f)
-			{
-				Z = vec3(0.0f, Z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
-				Y = cross(Z, X);
-			}
-		}
-		Position = Reference + Z * distanceToRef;
+		float Sensitivity = 0.15f;		
 	}
 	
 
@@ -194,7 +172,36 @@ void ModuleCamera3D::SetPos(const vec3 &Pos)
 // -----------------------------------------------------------------
 float* ModuleCamera3D::GetViewMatrix()
 {
-	return &ViewMatrix;
+	float4x4 ret(GetActiveCamera()->GetFrustum()->ViewMatrix());
+	return ret.Transposed().ptr();
+}
+
+void ModuleCamera3D::SetActiveCamera(Camera * activeCamera)
+{
+	this->activeCamera = activeCamera;
+}
+
+void ModuleCamera3D::SetActiveCamera(GameObject * activeCamera)
+{
+	std::vector<Camera*> cam = activeCamera->GetComponent<Camera>();
+	if (cam.empty() == false)
+	{
+		SetActiveCamera(*cam.begin());
+	}
+}
+
+void ModuleCamera3D::SetCameraToDefault()
+{
+	SetActiveCamera((Camera*)nullptr);
+}
+
+Camera * ModuleCamera3D::GetActiveCamera()
+{
+	if (activeCamera != nullptr)
+	{
+		return activeCamera;
+	}
+	return defaultCamera;
 }
 
 // -----------------------------------------------------------------

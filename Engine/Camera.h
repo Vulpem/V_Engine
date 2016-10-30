@@ -17,6 +17,8 @@ public:
 	void UpdatePos();
 	void UpdateOrientation();
 
+	const math::Frustum* GetFrustum() const { return &frustum; }
+
 	static Type GetType() { return Type::C_camera; }
 
 	void Draw();
@@ -27,6 +29,7 @@ public:
 private:
 	math::Frustum frustum;
 public:
+	bool frustumChanged = true;
 	math::FrustumType viewType = math::FrustumType::PerspectiveFrustum;
 	float aspectRatio = 1.77777777f;
 	math::float3 positionOffset = float3::zero;

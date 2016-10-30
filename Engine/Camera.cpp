@@ -10,6 +10,9 @@
 
 #include "OpenGL.h"
 
+#include "Application.h"
+#include "ModuleCamera3D.h"
+
 
 //------------------------- Camera --------------------------------------------------------------------------------
 
@@ -21,16 +24,18 @@ Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id)
 	type = C_camera;
 
 	positionOffset = float3::zero;
-	if (object->aabb.IsFinite())
+	if (object)
 	{
-		positionOffset = object->aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+		if (object->aabb.IsFinite())
+		{
+			positionOffset = object->aabb.CenterPoint() - object->GetTransform()->GetGlobalPos();
+		}
 	}
-
 	frustum.nearPlaneDistance = 4;
 	frustum.farPlaneDistance = 500;
 	frustum.type = FrustumType::PerspectiveFrustum;
 
-	SetHorizontalFOV(65*DEGTORAD);
+	SetHorizontalFOV(20*DEGTORAD);
 	UpdateCamMatrix();
 }
 
@@ -70,6 +75,10 @@ void Camera::UpdateOrientation()
 
 void Camera::EditorContent()
 {
+	if(ImGui::Button("Set As Active Camera"))
+	{
+		App->camera->SetActiveCamera(this);
+	}
 	ImGui::Text("Position:");
 	ImGui::Text("X: %.2f, Y: %.2f, Z: %.2f", frustum.pos.x, frustum.pos.y, frustum.pos.z);
 	ImGui::Text("Position Offset");
@@ -77,8 +86,6 @@ void Camera::EditorContent()
 	{
 		UpdatePos();
 	}
-
-
 
 	ImGui::Text("AspectRatio");
 	if (ImGui::DragFloat("##Aspect_ratio", &aspectRatio, 0.1f, 0.1f, 5.0f))
@@ -110,4 +117,5 @@ void Camera::SetHorizontalFOV(float horizontalFOV)
 {
 	frustum.horizontalFov = horizontalFOV;
 	frustum.verticalFov = horizontalFOV / aspectRatio;
+	frustumChanged = true;
 }

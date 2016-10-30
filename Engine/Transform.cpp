@@ -141,6 +141,11 @@ void Transform::SetLocalPos(float x, float y, float z)
 
 }
 
+void Transform::SetLocalPos(float3 pos)
+{
+	SetLocalPos(pos.x, pos.y, pos.z);
+}
+
 math::float3 Transform::GetLocalPos()
 {
 	return localPosition;
@@ -160,6 +165,11 @@ void Transform::SetGlobalPos(float x, float y, float z)
 	{
 		SetLocalPos(x, y, z);
 	}
+}
+
+void Transform::SetGlobalPos(float3 pos)
+{
+	SetGlobalPos(pos.x, pos.y, pos.z);
 }
 
 math::float3 Transform::GetGlobalPos()

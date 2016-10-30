@@ -316,6 +316,16 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 }
 
+void GameObject::SetName(const char * newName)
+{
+	strcpy(name, newName);
+}
+
+const char * GameObject::GetName()
+{
+	return name;
+}
+
 Component* GameObject::AddComponent(Component::Type type)
 {
 	Component* toAdd = nullptr;

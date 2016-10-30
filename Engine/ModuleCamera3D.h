@@ -23,6 +23,11 @@ public:
 	void SetPos(const vec3 &Pos);
 	float* GetViewMatrix();
 
+	void SetActiveCamera(Camera* activeCamera);
+	void SetActiveCamera(GameObject* activeCamera);
+	void SetCameraToDefault();
+	Camera* GetActiveCamera();
+
 	void UpdateView();
 
 private:
@@ -37,6 +42,7 @@ public:
 	float camSprintMultiplier = 2.0f;
 
 private:
+	GameObject* defaultCameraGO = nullptr;
 	Camera* defaultCamera = nullptr;
 	Camera* activeCamera = nullptr;
 

@@ -131,7 +131,7 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 {
 	if (toErase)
 	{
-		LOG("Erasing GO %s", toErase->name);
+		LOG("Erasing GO %s", toErase->GetName());
 		delete toErase;
 		return true;
 	}
@@ -147,7 +147,7 @@ void ModuleGoManager::CreateRootGameObject()
 
 		LOG("Creating root node for scene");
 		//Setting Name
-		strcpy(ret->name, "Root");
+		ret->SetName("Root");
 
 		//Setting parent
 		ret->parent = nullptr;

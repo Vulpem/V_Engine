@@ -32,9 +32,11 @@ public:
 	void UpdateEditorValues();
 
 	void SetLocalPos(float x, float y, float z);
+	void SetLocalPos(float3 pos);
 	math::float3 GetLocalPos();
 
 	void SetGlobalPos(float x, float y, float z);
+	void SetGlobalPos(float3 pos);
 	math::float3 GetGlobalPos();
 
 	void SetLocalRot(float x, float y, float z);

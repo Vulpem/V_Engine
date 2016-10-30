@@ -263,7 +263,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 			Material* mat = (Material*)ret->AddComponent(Component::Type::C_material);
 
 			//Setting name
-			strcpy(ret->name, fileName.data());
+			ret->SetName(fileName.data());
 			//Setting parent
 			ret->parent = parent;
 

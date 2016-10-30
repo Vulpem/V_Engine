@@ -62,6 +62,9 @@ public:
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive() { return publicActive; }
 
+	void SetName(const char* newName);
+	const char* GetName();
+
 	Component* AddComponent(Component::Type type);
 	bool HasComponent(Component::Type type);
 	Transform* GetTransform();
