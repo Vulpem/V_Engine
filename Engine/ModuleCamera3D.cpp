@@ -11,15 +11,6 @@
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	name.create("ModuleCamera3D");
-
-	CalculateViewMatrix();
-
-	X = vec3(1.0f, 0.0f, 0.0f);
-	Y = vec3(0.0f, 1.0f, 0.0f);
-	Z = vec3(0.0f, 0.0f, 1.0f);
-
-	Position = vec3(0.0f, 20.0f, -10.0f);
-	Reference = vec3(0.0f, 0.0f, 0.0f);
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -30,12 +21,6 @@ bool ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
 	bool ret = true;
-	X = vec3(1.0f, 0.0f, 0.0f);
-	Y = vec3(0.0f, 1.0f, 0.0f);
-	Z = vec3(0.0f, 0.0f, 1.0f);
-
-	Position = vec3(0.0f, 20.0f, -10.0f);
-	Reference = vec3(0.0f, 0.0f, 0.0f);
 
 	defaultCameraGO = App->GO->CreateCamera();
 	defaultCamera = *defaultCameraGO->GetComponent<Camera>().begin();
@@ -57,20 +42,10 @@ update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
 	bool updatePos = false;
-	if (App->input->GetMouseButton(4) == KEY_DOWN)
-	{
-		distanceToRef++;
-		updatePos = true;
-	}
-	else if(App->input->GetMouseButton(5) == KEY_DOWN)
-	{
-		distanceToRef++;
-		updatePos = true;
-	}
 
 #pragma region cameraMovementKeys
 	float speed = camSpeed;
-	float3 lastCamPos = defaultCameraGO->GetTransform()->GetGlobalPos();
+	float3 lastCamPos = GetActiveCamera()->object->GetTransform()->GetGlobalPos();
 	float3 camPos = lastCamPos;
 	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 	{
@@ -78,31 +53,31 @@ update_status ModuleCamera3D::Update(float dt)
 	}
 	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 	{
-		lastCamPos -= defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
+		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 	{
-		lastCamPos += defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
+		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		lastCamPos -= defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
+		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		lastCamPos += defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
+		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
-		lastCamPos -= defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
+		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 	{
-		lastCamPos += defaultCameraGO->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
+		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
 	}
 	if (lastCamPos.x != camPos.x || lastCamPos.y != camPos.y || lastCamPos.z != camPos.z)
 	{
-		defaultCameraGO->GetTransform()->SetGlobalPos(lastCamPos);
+		GetActiveCamera()->object->GetTransform()->SetGlobalPos(lastCamPos);
 	}
 #pragma endregion
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT || updatePos)
@@ -112,61 +87,37 @@ update_status ModuleCamera3D::Update(float dt)
 
 		float Sensitivity = 0.15f;		
 	}
-	
-
-	// Recalculate matrix -------------
-	CalculateViewMatrix();
 
 	return UPDATE_CONTINUE;
 }
 
+
 // -----------------------------------------------------------------
-void ModuleCamera3D::Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference)
+void ModuleCamera3D::LookAt( const float3 &Spot)
 {
-	this->Position = Position;
-	this->Reference = Reference;
-
-	Z = normalize(Position - Reference);
-	X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), Z));
-	Y = cross(Z, X);
-
-	if (!RotateAroundReference)
+	float4x4 tmp;
+	if (GetActiveCamera()->object->parent && GetActiveCamera()->object->parent->HasComponent(Component::Type::C_transform))
 	{
-		this->Reference = this->Position;
-		this->Position += Z * 0.05f;
+		 tmp = float4x4::LookAt(GetActiveCamera()->object->GetTransform()->GetGlobalPos(), Spot, GetActiveCamera()->object->GetTransform()->GetGlobalTransform().WorldZ(), GetActiveCamera()->object->GetTransform()->GetGlobalTransform().WorldY(), GetActiveCamera()->object->parent->GetTransform()->GetGlobalTransform().WorldY());
 	}
-
-	CalculateViewMatrix();
-}
-
-// -----------------------------------------------------------------
-void ModuleCamera3D::LookAt( const vec3 &Spot)
-{
-	Reference = Spot;
-
-	Z = normalize(Position - Reference);
-	X = normalize(cross(vec3(0.0f, 1.0f, 0.0f), Z));
-	Y = cross(Z, X);
-
-	Position = Reference + Z * distanceToRef;
-
-	CalculateViewMatrix();
+	else
+	{
+		tmp = float4x4::LookAt(GetActiveCamera()->object->GetTransform()->GetGlobalPos(), Spot, GetActiveCamera()->object->GetTransform()->GetGlobalTransform().WorldY(), float3(0,1,0));
+	}	
+	Quat quat(tmp);
+	GetActiveCamera()->object->GetTransform()->SetLocalRot(quat.x, quat.y, quat.z, quat.z);
 }
 
 
 // -----------------------------------------------------------------
-void ModuleCamera3D::Move(const vec3 &Movement)
+void ModuleCamera3D::Move(const float3 &Movement)
 {
-	Position += Movement;
-	Reference += Movement;
-
-	CalculateViewMatrix();
+	GetActiveCamera()->object->GetTransform()->SetGlobalPos(GetActiveCamera()->object->GetTransform()->GetGlobalPos() + Movement);
 }
 
-void ModuleCamera3D::SetPos(const vec3 &Pos)
+void ModuleCamera3D::SetPos(const float3 &Pos)
 {
-	Position = Pos;
-	LookAt(Reference);
+	GetActiveCamera()->object->GetTransform()->SetGlobalPos(Pos);
 }
 
 // -----------------------------------------------------------------
@@ -195,6 +146,33 @@ void ModuleCamera3D::SetCameraToDefault()
 	SetActiveCamera((Camera*)nullptr);
 }
 
+void ModuleCamera3D::AddCamCulling(Camera * toAdd)
+{
+	cullingCameras.push_back(toAdd);
+}
+
+void ModuleCamera3D::RemoveCamCulling(Camera * toRemove)
+{
+	if (cullingCameras.empty() == false)
+	{
+		std::vector<Camera*>::iterator it = cullingCameras.begin();
+		while (it != cullingCameras.end())
+		{
+			if ((*it) == toRemove)
+			{
+				cullingCameras.erase(it);
+				return;
+			}
+			it++;
+		}
+	}
+}
+
+void ModuleCamera3D::ClearCamCulling()
+{
+	cullingCameras.clear();
+}
+
 Camera * ModuleCamera3D::GetActiveCamera()
 {
 	if (activeCamera != nullptr)
@@ -204,16 +182,7 @@ Camera * ModuleCamera3D::GetActiveCamera()
 	return defaultCamera;
 }
 
-// -----------------------------------------------------------------
-void ModuleCamera3D::CalculateViewMatrix()
+float3 ModuleCamera3D::GetCamPos()
 {
-	ViewMatrix = mat4x4(X.x, Y.x, Z.x, 0.0f, X.y, Y.y, Z.y, 0.0f, X.z, Y.z, Z.z, 0.0f, -dot(X, Position), -dot(Y, Position), -dot(Z, Position), 1.0f);
-	ViewMatrixInverse = inverse(ViewMatrix);
-}
-
-void ModuleCamera3D::UpdateView()
-{
-	Position = Reference + Z * distanceToRef;
-
-	CalculateViewMatrix();
+	return GetActiveCamera()->object->GetTransform()->GetGlobalPos();
 }

@@ -44,7 +44,7 @@ mesh::~mesh()
 
 void mesh::DoUpdate()
 {
-	if (IsEnabled())
+	if (IsEnabled() && object->disabledByCulling == false)
 	{
 		Draw();
 	}

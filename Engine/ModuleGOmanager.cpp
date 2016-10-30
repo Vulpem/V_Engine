@@ -44,6 +44,13 @@ update_status ModuleGoManager::PreUpdate(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
+	std::vector<GameObject*>::iterator it = root->childs.begin();
+	while (it != root->childs.end())
+	{
+		(*it)->PreUpdate();
+		it++;
+	}
+
 	return ret;
 }
 
@@ -69,7 +76,13 @@ update_status ModuleGoManager::Update(float dt)
 
 update_status ModuleGoManager::PostUpdate(float dt)
 {
-	
+	std::vector<GameObject*>::iterator it = root->childs.begin();
+	while (it != root->childs.end())
+	{
+		(*it)->PostUpdate();
+		it++;
+	}
+
 	return UPDATE_CONTINUE;
 }
 

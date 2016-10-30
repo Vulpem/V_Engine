@@ -169,14 +169,9 @@ update_status ModuleEditor::PreUpdate(float dt)
 			if (ImGui::CollapsingHeader("Camera"))
 			{
 				ImGui::Text("Position");
-				ImGui::DragFloat("X##cam", &App->camera->Position.x);
-				ImGui::DragFloat("Y##cam", &App->camera->Position.y);
-				ImGui::DragFloat("Z##cam", &App->camera->Position.z);
-				ImGui::NewLine();
-				ImGui::Text("Distance to reference");	
-				if(ImGui::DragFloat("##Distance to reference", &App->camera->distanceToRef, 1.0f, 1.0f))
+				if (ImGui::Button("Select active camera"))
 				{
-					App->camera->UpdateView();
+					SelectGameObject(App->camera->GetActiveCamera()->object);
 				}
 				ImGui::Text("Camera speed");
 				ImGui::DragFloat("##camSpeed", &App->camera->camSpeed, 0.1f);
@@ -328,7 +323,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 				if (ImGui::Button("Look at"))
 				{
 					float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
-					App->camera->LookAt(vec3(toLook.x, toLook.y, toLook.z));
+					App->camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
 				}
 				ImGui::NewLine();
 				ImGui::Text("Danger Zone:");
@@ -369,7 +364,7 @@ update_status ModuleEditor::Update(float dt)
 
 	if (showAxis == true)
 	{
-		math::float3 axisPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
+	/*	math::float3 axisPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
 		math::float3 front(App->camera->Z.x, App->camera->Z.y, App->camera->Z.z);
 		math::float3 right(App->camera->X.x, App->camera->X.y, App->camera->X.z);
 		math::float3 up(App->camera->Y.x, App->camera->Y.y, App->camera->Y.z);
@@ -405,7 +400,7 @@ update_status ModuleEditor::Update(float dt)
 		glEnd();
 
 		glLineWidth(1.0f);
-		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHTING);*/
 	}
 
 #pragma endregion

@@ -19,6 +19,7 @@ public:
 	char name[NAME_MAX_LEN];
 	AABB aabb;
 
+	bool disabledByCulling = false;
 private:
 	bool active = true;
 	bool publicActive = true;
@@ -40,7 +41,10 @@ public:
 	bool selected = false;
 	bool renderNormals = false;
 
+	void PreUpdate();
 	void Update();
+	void PostUpdate();
+
 	void DrawOnEditor();
 
 	void DrawLocator();

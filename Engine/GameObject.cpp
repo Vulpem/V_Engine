@@ -6,6 +6,9 @@
 
 #include "OpenGL.h"
 
+#include "Application.h"
+#include "ModuleCamera3D.h"
+
 //------------------------- NODE --------------------------------------------------------------------------------
 GameObject::GameObject()
 {
@@ -49,6 +52,49 @@ GameObject::~GameObject()
 		comp++;
 	}
 
+}
+
+void GameObject::PreUpdate()
+{
+	if (active)
+	{
+		if (App->camera->cullingCameras.empty() == true)
+		{
+			disabledByCulling = false;
+		}
+		else
+		{
+			if (aabb.IsFinite())
+			{
+				for (std::vector<Camera*>::iterator it = App->camera->cullingCameras.begin(); it != App->camera->cullingCameras.end(); it++)
+				{
+					if ((*it)->Collides(aabb) == FrustumCollision::outside)
+					{
+						disabledByCulling = true;
+					}
+					else
+					{
+						disabledByCulling = false;
+					}
+				}
+			}
+			else
+			{
+				disabledByCulling = true;
+			}
+		}
+
+		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
+		{
+			(*it)->PreUpdate();
+		}
+		std::vector<GameObject*>::iterator it = childs.begin();
+		while (it != childs.end())
+		{
+			(*it)->PreUpdate();
+			it++;
+		}
+	}
 }
 
 void GameObject::Update()
@@ -95,6 +141,24 @@ void GameObject::Update()
 		while (it != childs.end())
 		{
 			(*it)->Update();
+			it++;
+		}
+	}
+}
+
+void GameObject::PostUpdate()
+{
+	if (active)
+	{
+
+		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
+		{
+			(*it)->PostUpdate();
+		}
+		std::vector<GameObject*>::iterator it = childs.begin();
+		while (it != childs.end())
+		{
+			(*it)->PostUpdate();
 			it++;
 		}
 	}

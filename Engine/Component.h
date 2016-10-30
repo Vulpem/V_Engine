@@ -26,7 +26,9 @@ public:
 	virtual void Enable();
 	virtual void Disable();
 
+	void PreUpdate();
 	void Update();
+	void PostUpdate();
 	void DrawOnEditor();
 
 	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS
@@ -34,7 +36,9 @@ public:
 	bool IsEnabled() { return enabled; }
 
 protected:
+	virtual void DoPreUpdate() {}
 	virtual void DoUpdate() {}
+	virtual void DoPostUpdate() {}
 	virtual void DoEnable() {}
 	virtual void DoDisable() {}
 

@@ -31,6 +31,15 @@ void Component::Disable()
 	}
 }
 
+void Component::PreUpdate()
+{
+	if (enabled)
+	{
+		DoPreUpdate();
+	}
+}
+
+
 void Component::Update()
 {
 	if (enabled)
@@ -38,6 +47,15 @@ void Component::Update()
 		DoUpdate();
 	}
 }
+
+void Component::PostUpdate()
+{
+	if (enabled)
+	{
+		DoPostUpdate();
+	}
+}
+
 
 void Component::DrawOnEditor()
 {
