@@ -80,6 +80,7 @@ void Camera::UpdateOrientation()
 	rotation *= DEGTORAD;
 	float4x4 toSend = float4x4::FromEulerXYZ(rotation.x, rotation.y, rotation.z);
 	frustum.SetWorldMatrix(toSend.Float3x4Part());
+	frustum.front = object->GetTransform()->GetGlobalTransform().Transposed().WorldZ().Normalized();
 }
 
 FrustumCollision Camera::Collides(AABB boundingBox)

@@ -21,7 +21,8 @@ bool ModuleScene::Start()
 	LOG("Loading Intro assets");
 	bool ret = true;
 
-	App->camera->LookAt(float3(0, 7, 0));
+	App->camera->SetPos(float3(0, 40, -40));
+	App->camera->LookAt(float3(0, 0, 0));
 
 	reset = false;
 	return ret;

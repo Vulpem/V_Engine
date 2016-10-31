@@ -53,19 +53,19 @@ update_status ModuleCamera3D::Update(float dt)
 	}
 	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 	{
-		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
+		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 	{
-		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
+		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
+		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
+		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
