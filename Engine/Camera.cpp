@@ -12,6 +12,7 @@
 
 #include "Application.h"
 #include "ModuleCamera3D.h"
+#include "ModuleWindow.h"
 
 
 //------------------------- Camera --------------------------------------------------------------------------------
@@ -34,6 +35,10 @@ Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id)
 	frustum.nearPlaneDistance = 4;
 	frustum.farPlaneDistance = 500;
 	frustum.type = FrustumType::PerspectiveFrustum;
+
+	int width, heigth;
+	App->window->GetWindowSize(&width, &heigth);
+	aspectRatio = ((float)width / (float)heigth);
 
 	SetHorizontalFOV(20*DEGTORAD);
 	UpdateCamMatrix();
@@ -159,9 +164,11 @@ math::FrustumType Camera::SwitchViewType()
 	if (frustum.type == FrustumType::PerspectiveFrustum)
 	{
 		frustum.type = FrustumType::OrthographicFrustum;
+		SetHorizontalFOV(frustum.horizontalFov * 100.0f);
 		return FrustumType::OrthographicFrustum;
 	}
 	frustum.type = FrustumType::PerspectiveFrustum;
+	SetHorizontalFOV(frustum.horizontalFov / 100.0f);
 	return FrustumType::PerspectiveFrustum;
 }
 
@@ -212,15 +219,21 @@ void Camera::EditorContent()
 		SetHorizontalFOV(frustum.horizontalFov);
 	}
 	float tmp = frustum.horizontalFov * RADTODEG;
-	if (ImGui::DragFloat("Horizontal FOV", &tmp, 1.0f, 1.0f, 180.0f))
+	float maxFOV = 180;
+	if (frustum.type == FrustumType::OrthographicFrustum)
 	{
-		SetHorizontalFOV(tmp * DEGTORAD);
+		maxFOV = floatMax;
 	}
-	tmp = frustum.verticalFov * RADTODEG;
-	if (ImGui::DragFloat("Vertical FOV", &tmp, 1.0f, 1.0f, 180.0f))
-	{
-		SetHorizontalFOV(tmp * aspectRatio * DEGTORAD);
-	}
+		if (ImGui::DragFloat("Horizontal FOV", &tmp, 1.0f, 1.0f, maxFOV))
+		{
+			SetHorizontalFOV(tmp * DEGTORAD);
+		}
+		tmp = frustum.verticalFov * RADTODEG;
+		if (ImGui::DragFloat("Vertical FOV", &tmp, 1.0f, 1.0f, maxFOV))
+		{
+			SetHorizontalFOV(tmp * aspectRatio * DEGTORAD);
+		}
+
 	ImGui::DragFloat("NearPlane", &frustum.nearPlaneDistance, 0.1f, 0.1f, frustum.farPlaneDistance - 1.0f);
 	ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 4000.0f);
 }

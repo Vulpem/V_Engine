@@ -41,8 +41,6 @@ bool ModuleCamera3D::CleanUp()
 update_status ModuleCamera3D::Update(float dt)
 {
 	// Mouse motion ----------------
-	bool updatePos = false;
-
 #pragma region cameraMovementKeys
 	float speed = camSpeed;
 	float3 lastCamPos = GetActiveCamera()->object->GetTransform()->GetGlobalPos();
@@ -80,12 +78,24 @@ update_status ModuleCamera3D::Update(float dt)
 		GetActiveCamera()->object->GetTransform()->SetGlobalPos(lastCamPos);
 	}
 #pragma endregion
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT || updatePos)
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
 		int dx = -App->input->GetMouseXMotion();
 		int dy = -App->input->GetMouseYMotion();
+		if (dx != 0 || dy != 0)
+		{
+			float Sensitivity = 0.15f;
 
-		float Sensitivity = 0.15f;		
+			Transform* activeCam = GetActiveCamera()->object->GetTransform();
+
+			/*
+			float3 toLook = activeCam->GetGlobalPos();
+			toLook += activeCam->GetGlobalTransform().WorldZ() * 10;
+
+			toLook.y += dy * Sensitivity;
+
+			LookAt(toLook);*/
+		}
 	}
 
 	return UPDATE_CONTINUE;
