@@ -59,6 +59,7 @@ void Transform::EditorContent()
 		editorRot.x = tmp[0];
 		editorRot.y = tmp[1];
 		editorRot.z = tmp[2];
+		editorGlobalRot = GetGlobalRot();
 	}
 
 	tmp[0] = localScale.x;
@@ -87,6 +88,7 @@ void Transform::EditorContent()
 		editorGlobalRot.x = tmp[0];
 		editorGlobalRot.y = tmp[1];
 		editorGlobalRot.z = tmp[2];
+		editorRot = GetLocalRot();
 	}
 
 	float3 scal = GetGlobalScale();
@@ -230,11 +232,19 @@ void Transform::SetGlobalRot(float x, float y, float z)
 {
 	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
+		//TODO
+		//Needs cleaning
+		x *= DEGTORAD;
+		y *= DEGTORAD;
+		z *= DEGTORAD;
+
 		Transform* parentTrans = object->parent->GetTransform();
 
-		float4x4 localMat = parentTrans->GetGlobalTransform() * (float4x4::FromTRS(GetGlobalPos(), float4x4::FromEulerXYZ(x,y,z), GetGlobalScale()));
+		float4x4 localMat = (float4x4::FromTRS(GetGlobalPos(), float3x3::FromEulerXYZ(x, y, z), GetGlobalScale())).Transposed() * parentTrans->GetGlobalTransform().Inverted();
+		localMat.Transposed();
 
 		float3 localEuler = localMat.ToEulerXYZ();
+		localEuler *= RADTODEG;
 
 		SetLocalRot(localEuler.x, localEuler.y, localEuler.z);
 	}
