@@ -95,9 +95,7 @@ update_status ModuleCamera3D::Update(float dt)
 // -----------------------------------------------------------------
 void ModuleCamera3D::LookAt( const float3 &Spot)
 {
-	Transform* activeTrans = GetActiveCamera()->object->GetTransform();
-	float4x4 tmp = float4x4::LookAt(activeTrans->GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
-	activeTrans->SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);	
+	GetActiveCamera()->object->GetTransform()->LookAt(Spot);
 }
 
 

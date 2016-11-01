@@ -55,6 +55,8 @@ public:
 	//void SetGlobalScale(float x, float y, float z);
 	math::float3 GetGlobalScale();
 
+	void LookAt(const float3 &Spot);
+
 	static Type GetType() { return Type::C_transform; }
 
 };
