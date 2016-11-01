@@ -18,6 +18,7 @@ private:
 	math::float3 localScale = math::float3::zero;
 	//TMP - Needed to fix the attribute editor display
 	math::float3 editorRot = math::float3::zero;
+	math::float3 editorGlobalRot = math::float3::zero;
 
 	math::float4x4 globalTransform = math::float4x4::identity;
 
@@ -43,7 +44,7 @@ public:
 	void SetLocalRot(float x, float y, float z, float w);
 	math::float3 GetLocalRot();
 
-	//void SetGlobalRot(float x, float y, float z);
+	void SetGlobalRot(float x, float y, float z);
 	math::Quat GetGlobalRotQuat();
 	math::float3 GetGlobalRot();
 

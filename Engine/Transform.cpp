@@ -73,16 +73,21 @@ void Transform::EditorContent()
 	ImGui::Text("Global transformations");
 
 	float3 pos = GetGlobalPos();
-	tmp[0] = pos.x;
-	tmp[1] = pos.y;
-	tmp[2] = pos.z;
-	if (ImGui::DragFloat3("Global Pos", tmp, 1.0f))
+	if (ImGui::DragFloat3("Global Pos##G_Pos", pos.ptr(), 1.0f))
 	{
-		SetGlobalPos(tmp[0], tmp[1], tmp[2]);
+		SetGlobalPos(pos.x, pos.y, pos.z);
 	}
 
-	float3 rot = GetGlobalRot();
-	ImGui::Text("%.2f, %.2f, %.2f", rot.x, rot.y, rot.z);
+	tmp[0] = editorGlobalRot.x;
+	tmp[1] = editorGlobalRot.y;
+	tmp[2] = editorGlobalRot.z;
+	if (ImGui::DragFloat3("Global Rot##G_Rot", tmp, 1.0f))
+	{
+		SetGlobalRot(tmp[0], tmp[1], tmp[2]);
+		editorGlobalRot.x = tmp[0];
+		editorGlobalRot.y = tmp[1];
+		editorGlobalRot.z = tmp[2];
+	}
 
 	float3 scal = GetGlobalScale();
 	ImGui::Text("%.2f, %.2f, %.2f", scal.x, scal.y, scal.z);
@@ -118,6 +123,7 @@ math::float4x4 Transform::GetGlobalTransform()
 void Transform::UpdateEditorValues()
 {
 	editorRot = GetLocalRot();
+	editorGlobalRot = GetGlobalRot();
 }
 
 void Transform::SetLocalPos(float x, float y, float z)
@@ -155,9 +161,15 @@ void Transform::SetGlobalPos(float x, float y, float z)
 {
 	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 	{
+		//TODO
+		//Needs cleaning
 		Transform* parentTrans = object->parent->GetTransform();
 
-		float4x4 localMat = parentTrans->GetGlobalTransform() * (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
+		float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
+		float4x4 parentGlobal = parentTrans->GetGlobalTransform();
+
+		float4x4 localMat = myGlobal.Transposed() * parentGlobal.Inverted();
+		localMat.Transpose();
 
 		SetLocalPos(localMat.TranslatePart().x, localMat.TranslatePart().y, localMat.TranslatePart().z);
 	}
@@ -212,6 +224,24 @@ math::float3 Transform::GetLocalRot()
 	while (ret.z < 0) { ret.z += 360; }
 
 	return ret;
+}
+
+void Transform::SetGlobalRot(float x, float y, float z)
+{
+	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+	{
+		Transform* parentTrans = object->parent->GetTransform();
+
+		float4x4 localMat = parentTrans->GetGlobalTransform() * (float4x4::FromTRS(GetGlobalPos(), float4x4::FromEulerXYZ(x,y,z), GetGlobalScale()));
+
+		float3 localEuler = localMat.ToEulerXYZ();
+
+		SetLocalRot(localEuler.x, localEuler.y, localEuler.z);
+	}
+	else
+	{
+		SetLocalRot(x, y, z);
+	}
 }
 
 math::Quat Transform::GetGlobalRotQuat()

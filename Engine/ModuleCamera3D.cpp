@@ -96,16 +96,17 @@ update_status ModuleCamera3D::Update(float dt)
 void ModuleCamera3D::LookAt( const float3 &Spot)
 {
 	float4x4 tmp;
+	Transform* activeTrans = GetActiveCamera()->object->GetTransform();
 	if (GetActiveCamera()->object->parent && GetActiveCamera()->object->parent->HasComponent(Component::Type::C_transform))
 	{
-		 tmp = float4x4::LookAt(GetActiveCamera()->object->GetTransform()->GetGlobalPos(), Spot, GetActiveCamera()->object->GetTransform()->GetGlobalTransform().WorldZ(), GetActiveCamera()->object->GetTransform()->GetGlobalTransform().WorldY(), GetActiveCamera()->object->parent->GetTransform()->GetGlobalTransform().WorldY());
+		 tmp = float4x4::LookAt(activeTrans->GetGlobalPos(), Spot, activeTrans->GetGlobalTransform().WorldZ(), activeTrans->GetGlobalTransform().WorldY(), float3(0,1,0));
 	}
 	else
 	{
-		tmp = float4x4::LookAt(GetActiveCamera()->object->GetTransform()->GetGlobalPos(), Spot, GetActiveCamera()->object->GetTransform()->GetGlobalTransform().WorldY(), float3(0,1,0));
+		tmp = float4x4::LookAt(activeTrans->GetGlobalPos(), Spot, activeTrans->GetGlobalTransform().WorldY(), float3(0,1,0));
 	}	
 	Quat quat(tmp);
-	GetActiveCamera()->object->GetTransform()->SetLocalRot(quat.x, quat.y, quat.z, quat.z);
+	activeTrans->SetLocalRot(quat.x, quat.y, quat.z, quat.z);
 }
 
 
