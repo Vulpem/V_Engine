@@ -45,6 +45,7 @@ public:
 	math::float3 GetLocalRot();
 
 	void SetGlobalRot(float x, float y, float z);
+	void SetGlobalRot(float3 rotation);
 	math::Quat GetGlobalRotQuat();
 	math::float3 GetGlobalRot();
 

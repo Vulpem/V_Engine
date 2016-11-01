@@ -254,6 +254,11 @@ void Transform::SetGlobalRot(float x, float y, float z)
 	}
 }
 
+void Transform::SetGlobalRot(float3 rotation)
+{
+	SetGlobalRot(rotation.x, rotation.y, rotation.z);
+}
+
 math::Quat Transform::GetGlobalRotQuat()
 {
 	float3 pos;

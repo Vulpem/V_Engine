@@ -95,18 +95,9 @@ update_status ModuleCamera3D::Update(float dt)
 // -----------------------------------------------------------------
 void ModuleCamera3D::LookAt( const float3 &Spot)
 {
-	float4x4 tmp;
 	Transform* activeTrans = GetActiveCamera()->object->GetTransform();
-	if (GetActiveCamera()->object->parent && GetActiveCamera()->object->parent->HasComponent(Component::Type::C_transform))
-	{
-		 tmp = float4x4::LookAt(activeTrans->GetGlobalPos(), Spot, activeTrans->GetGlobalTransform().WorldZ(), activeTrans->GetGlobalTransform().WorldY(), float3(0,1,0));
-	}
-	else
-	{
-		tmp = float4x4::LookAt(activeTrans->GetGlobalPos(), Spot, activeTrans->GetGlobalTransform().WorldY(), float3(0,1,0));
-	}	
-	Quat quat(tmp);
-	activeTrans->SetLocalRot(quat.x, quat.y, quat.z, quat.z);
+	float4x4 tmp = float4x4::LookAt(activeTrans->GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
+	activeTrans->SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);	
 }
 
 
