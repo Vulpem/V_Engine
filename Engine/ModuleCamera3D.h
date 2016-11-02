@@ -21,6 +21,7 @@ public:
 	void Move(const float3 &Movement);
 	void SetPos(const float3 &Pos);
 	float* GetViewMatrix();
+	float* GetProjectionMatrix();
 
 	void SetActiveCamera(Camera* activeCamera);
 	void SetActiveCamera(GameObject* activeCamera);

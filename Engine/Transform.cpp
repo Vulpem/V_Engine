@@ -24,7 +24,6 @@ Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
 
 Transform::~Transform()
 {
-
 }
 
 void Transform::EditorContent()

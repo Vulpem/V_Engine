@@ -50,6 +50,10 @@ Camera::~Camera()
 	{
 		App->camera->SetCameraToDefault();
 	}
+	if (hasCulling)
+	{
+		App->camera->RemoveCamCulling(this);
+	}
 }
 
 void Camera::DoPreUpdate()
@@ -90,38 +94,24 @@ void Camera::UpdateOrientation()
 
 FrustumCollision Camera::Collides(AABB boundingBox)
 {
-	bool inside = false;
-	bool outside = false;
+	float3 points[8];
+	boundingBox.GetCornerPoints(points);
 
-	/*for (int n = 0; n < 6; n++)
+	for (int p = 0; p < 6; p++)
 	{
-		if(frustum.GetPlane(n).Intersects(boundingBox))
+		for (int n = 0; n < 8; n++)
 		{
-			return FrustumCollision::intersects;
-		}
-	}*/
-
-	for (int n = 0; n < 11; n++)
-	{
-		if (Collides(boundingBox.Edge(n)) == FrustumCollision::outside)
-		{
-			outside = true;
-		}
-		else
-		{
-			inside = true;
+			if (frustum.GetPlane(p).IsOnPositiveSide(points[n]) == false)
+			{
+				break;
+			}
+			if (n == 7)
+			{
+				return FrustumCollision::outside;
+			}
 		}
 	}
-
-	if (inside == true && outside == false)
-	{
-		return FrustumCollision::contains;
-	}
-	else if (outside == true && inside == true)
-	{
-		return FrustumCollision::intersects;
-	}
-	return FrustumCollision::outside;
+	return FrustumCollision::contains;
 }
 
 FrustumCollision Camera::Collides(float3 point)
@@ -134,25 +124,6 @@ FrustumCollision Camera::Collides(float3 point)
 		if (planes[n].IsOnPositiveSide(point) == true)
 		{
 			return FrustumCollision::outside;
-		}
-	}
-	return FrustumCollision::contains;
-}
-
-FrustumCollision Camera::Collides(math::LineSegment line)
-{
-	Plane planes[6];
-	frustum.GetPlanes(planes);
-
-	for (int n = 0; n < 6; n++)
-	{
-		if (planes[n].IsOnPositiveSide(line.a) == true)
-		{
-			if (planes[n].IsOnPositiveSide(line.b) == true)
-			{
-				return FrustumCollision::outside;
-			}
-			return FrustumCollision::intersects;
 		}
 	}
 	return FrustumCollision::contains;
@@ -174,7 +145,7 @@ math::FrustumType Camera::SwitchViewType()
 
 void Camera::EditorContent()
 {
-	if(ImGui::Button("Set As Active Camera"))
+	if (ImGui::Button("Set As Active Camera"))
 	{
 		App->camera->SetActiveCamera(this);
 	}
@@ -224,18 +195,24 @@ void Camera::EditorContent()
 	{
 		maxFOV = floatMax;
 	}
-		if (ImGui::DragFloat("Horizontal FOV", &tmp, 1.0f, 1.0f, maxFOV))
-		{
-			SetHorizontalFOV(tmp * DEGTORAD);
-		}
-		tmp = frustum.verticalFov * RADTODEG;
-		if (ImGui::DragFloat("Vertical FOV", &tmp, 1.0f, 1.0f, maxFOV))
-		{
-			SetHorizontalFOV(tmp * aspectRatio * DEGTORAD);
-		}
+	if (ImGui::DragFloat("Horizontal FOV", &tmp, 1.0f, 1.0f, maxFOV))
+	{
+		SetHorizontalFOV(tmp * DEGTORAD);
+	}
+	tmp = frustum.verticalFov * RADTODEG;
+	if (ImGui::DragFloat("Vertical FOV", &tmp, 1.0f, 1.0f, maxFOV))
+	{
+		SetHorizontalFOV(tmp * aspectRatio * DEGTORAD);
+	}
 
-	ImGui::DragFloat("NearPlane", &frustum.nearPlaneDistance, 0.1f, 0.1f, frustum.farPlaneDistance - 1.0f);
-	ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 4000.0f);
+	if (ImGui::DragFloat("NearPlane", &frustum.nearPlaneDistance, 0.1f, 0.1f, frustum.farPlaneDistance - 1.0f))
+	{
+		SetHorizontalFOV(frustum.horizontalFov);
+	}
+	if (ImGui::DragFloat("FarPlane", &frustum.farPlaneDistance, 1.0f, frustum.nearPlaneDistance + 1.0f, 4000.0f))
+	{
+		SetHorizontalFOV(frustum.horizontalFov);
+	}
 }
 
 void Camera::Draw()
@@ -253,4 +230,14 @@ void Camera::SetHorizontalFOV(float horizontalFOV)
 	frustum.horizontalFov = horizontalFOV;
 	frustum.verticalFov = horizontalFOV / aspectRatio;
 	frustumChanged = true;
+}
+
+float4x4 Camera::GetViewMatrix()
+{
+	return frustum.ViewMatrix();
+}
+
+float4x4 Camera::GetProjectionMatrix()
+{
+	return frustum.ProjectionMatrix();
 }

@@ -123,8 +123,12 @@ void ModuleCamera3D::SetPos(const float3 &Pos)
 // -----------------------------------------------------------------
 float* ModuleCamera3D::GetViewMatrix()
 {
-	float4x4 ret(GetActiveCamera()->GetFrustum()->ViewMatrix());
-	return ret.Transposed().ptr();
+	return GetActiveCamera()->GetViewMatrix().Transposed().ptr();
+}
+
+float* ModuleCamera3D::GetProjectionMatrix()
+{
+	return GetActiveCamera()->GetProjectionMatrix().ptr();
 }
 
 void ModuleCamera3D::SetActiveCamera(Camera * activeCamera)

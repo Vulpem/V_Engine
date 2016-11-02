@@ -27,7 +27,6 @@ public:
 
 	FrustumCollision Collides(AABB boundingBox);
 	FrustumCollision Collides(float3 point);
-	FrustumCollision Collides(math::LineSegment line);
 
 	math::FrustumType SwitchViewType();
 
@@ -38,6 +37,9 @@ public:
 	void Draw();
 
 	void SetHorizontalFOV(float horizontalFOV);
+
+	float4x4 GetViewMatrix();
+	float4x4 GetProjectionMatrix();
 
 	bool active = true;
 private:
