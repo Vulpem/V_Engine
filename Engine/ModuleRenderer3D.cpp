@@ -133,7 +133,6 @@ bool ModuleRenderer3D::Start()
 	//Initialize Projection Matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
 	glLoadMatrixf(App->camera->GetProjectionMatrix());
 
 	//Initialize Modelview Matrix
@@ -158,8 +157,7 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 
 	if (App->camera->GetActiveCamera()->frustumChanged == true)
 	{
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixf(App->camera->GetActiveCamera()->GetFrustum()->ProjectionMatrix().ptr());
+		UpdateProjectionMatrix();
 		App->camera->GetActiveCamera()->frustumChanged = false;
 	}
 
@@ -205,4 +203,12 @@ void ModuleRenderer3D::OnResize(int width, int height)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+}
+
+void ModuleRenderer3D::UpdateProjectionMatrix()
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glLoadMatrixf(App->camera->GetProjectionMatrix());
+	glMatrixMode(GL_MODELVIEW);
 }

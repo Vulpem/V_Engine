@@ -21,6 +21,7 @@ public:
 	bool CleanUp();
 
 	void OnResize(int width, int height);
+	void UpdateProjectionMatrix();
 
 	uint vertexArrayBuffer = -1;
 	float vertexs[108];

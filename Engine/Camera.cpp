@@ -40,7 +40,7 @@ Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id)
 	App->window->GetWindowSize(&width, &heigth);
 	aspectRatio = ((float)width / (float)heigth);
 
-	SetHorizontalFOV(20*DEGTORAD);
+	SetHorizontalFOV(60*DEGTORAD);
 	UpdateCamMatrix();
 }
 
@@ -239,5 +239,5 @@ float4x4 Camera::GetViewMatrix()
 
 float4x4 Camera::GetProjectionMatrix()
 {
-	return frustum.ProjectionMatrix();
+	return frustum.ProjectionMatrix().Transposed();
 }
