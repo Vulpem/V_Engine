@@ -584,15 +584,11 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		transform[8] = pos.y;
 		transform[9] = pos.z;
 
-		bytes = sizeof(float) * 10;
-		memcpy(file_0It, transform, bytes);
-		file_0It += bytes;
+		file_0It = CopyMem<float>(file_0It, transform, 10);
 
 		const uint nMeshes = NodetoLoad->mNumMeshes;
 
-		bytes = sizeof(uint);
-		memcpy(file_0It, &nMeshes, bytes);
-		file_0It += bytes;
+		file_0It = CopyMem<uint>(file_0It, &nMeshes);
 
 		//The AABB box that will englobe all the vertices of the meshes
 		AABB aabb;
@@ -705,76 +701,51 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			char* meshIt = meshes[n];
 
 			//Mesh size
-			bytes = sizeof(uint);
-			memcpy(meshIt, &meshSize, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, meshSize);
 
 			//Num vertices
-			bytes = sizeof(uint);
-			memcpy(meshIt, &num_vertices, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, &num_vertices);
 
 			//Vertices
-			bytes = sizeof(float) * num_vertices * 3;
-			memcpy(meshIt, vertices, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<float>(meshIt, vertices, num_vertices * 3);
 
 			//Num Normals
-			bytes = sizeof(uint);
-			memcpy(meshIt, &numNormals, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, &numNormals);
 
 			if (numNormals > 0)
 			{
 				//Normals
-				bytes = sizeof(float) * numNormals * 3;
-				memcpy(meshIt, normals, bytes);
-				meshIt += bytes;
+				meshIt = CopyMem<float>(meshIt, normals, numNormals * 3);
 			}
 
 			//Num texture coords
-			bytes = sizeof(uint);
-			memcpy(meshIt, &numTextureCoords, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, &numTextureCoords);
 
 			if (numTextureCoords > 0)
 			{
 				//texture coords
-				bytes = sizeof(float) * numTextureCoords * 2;
-				memcpy(meshIt, textureCoords, bytes);
-				meshIt += bytes;
+				meshIt = CopyMem<float>(meshIt, textureCoords, numTextureCoords * 2);
 			}
 
 			//Texture name len
-			bytes = sizeof(uint);
-			memcpy(meshIt, &textureNameLen, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, &textureNameLen);
 
 			//Texture name
-			bytes = sizeof(char) * textureNameLen;
-			memcpy(meshIt, textureName, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<char>(meshIt, textureName, textureNameLen);
 
 			//Color
-			bytes = sizeof(float) * 3;
-			memcpy(meshIt, color, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<float>(meshIt, color, 3);
 
 			//num_indices
-			bytes = sizeof(uint);
-			memcpy(meshIt, &num_indices, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, &num_indices);
 
 			//indices
-			bytes = sizeof(uint) * num_indices;
-			memcpy(meshIt, indices, bytes);
-			meshIt += bytes;
+			meshIt = CopyMem<uint>(meshIt, indices, num_indices);
 
 			RELEASE_ARRAY(vertices);
 			RELEASE_ARRAY(normals);
 			RELEASE_ARRAY(textureCoords);
 			RELEASE_ARRAY(indices);
-
 		}
 
 		uint AABBFileSize = sizeof(float) * 6;
@@ -782,13 +753,10 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		char* aabbFile = new char[AABBFileSize];
 		char* aabbFile_it = aabbFile;
 			//minPoint
-			bytes = sizeof(float) * 3;
-			memcpy(aabbFile_it, aabb.minPoint.ptr(), bytes);
-			aabbFile_it += bytes;
+		aabbFile_it = CopyMem<float>(aabbFile_it, aabb.minPoint.ptr(), 3);
 
 			//maxPoint
-			memcpy(aabbFile_it, aabb.maxPoint.ptr(), bytes);
-			
+		aabbFile_it = CopyMem<float>(aabbFile_it, aabb.maxPoint.ptr(), 3);			
 
 		uint nChilds = NodetoLoad->mNumChildren;
 		uint* childsSize = new uint[nChilds];
@@ -813,21 +781,15 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		char* childsIt = file_childs;
 
 		//nCHilds
-		bytes = sizeof(uint);
-		memcpy(childsIt, &nChilds, bytes);
-		childsIt += bytes;
+		childsIt = CopyMem<uint>(childsIt, &nChilds);
 
 		//size of each child
-		bytes = sizeof(uint) * nChilds;
-		memcpy(childsIt, childsSize, bytes);
-		childsIt += bytes;
+		childsIt = CopyMem<uint>(childsIt, childsSize, nChilds);
 
 		for (int n = 0; n < nChilds; n++)
 		{
 			//a child
-			bytes = sizeof(char) * childsSize[n];
-			memcpy(childsIt, childs[n].data(), bytes);
-			childsIt += bytes;
+			childsIt = CopyMem<char>(childsIt, (childs[n].data()), childsSize[n]);
 		}
 
 		//Getting the total size of the real file
@@ -845,28 +807,19 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		char* realIt = realFile;
 
 		//file_0
-		bytes = file_0Size;
-		memcpy(realIt, file_0, bytes);
-		realIt += bytes;
+		realIt = CopyMem<char>(realIt, file_0, file_0Size);
 
 		for (int n = 0; n < nMeshes; n++)
 		{
 			//each mesh
-			bytes = meshSize[n];
-			memcpy(realIt, meshes[n], bytes);
-			realIt += bytes;
+			realIt = CopyMem<char>(realIt, meshes[n], meshSize[n]);
 		}
 
 		//AABB
-		bytes = AABBFileSize;
-		memcpy(realIt, aabbFile, bytes);
-		realIt += bytes;
+		realIt = CopyMem<char>(realIt, aabbFile, AABBFileSize);
 
-		//file_0
-		bytes = childFileSize;
-		memcpy(realIt, file_childs, bytes);
-		realIt += bytes;
-
+		//childs
+		realIt = CopyMem<char>(realIt, file_childs, childFileSize);
 
 		RELEASE_ARRAY(file_0);
 		for (int n = nMeshes - 1; n >= 0; n--)

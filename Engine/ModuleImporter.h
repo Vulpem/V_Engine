@@ -40,6 +40,13 @@ public:
 private:
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = nullptr);
 
+	template <typename type>
+	char* CopyMem(char* copyTo, const type* copyFrom, int amount = 1)
+	{
+		uint bytes = sizeof(type) * amount;
+		memcpy(copyTo, copyFrom, bytes);
+		return copyTo + bytes;
+	}
 public:
 	//This function will return only the file format, without the dot.
 	std::string FileFormat(const char* file);
