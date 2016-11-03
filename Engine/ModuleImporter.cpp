@@ -559,8 +559,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 	LOG("Importing GameObject %s", name);
 
-		uint bytes = 0;
-
 		//					rot + scal + pos				nMeshes
 		uint file_0Size = sizeof(float) * (4 + 3 + 3) + sizeof(uint) * 1;
 		char* file_0 = new char[file_0Size];
