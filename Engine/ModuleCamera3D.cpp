@@ -49,15 +49,17 @@ update_status ModuleCamera3D::Update(float dt)
 		int dy = -App->input->GetMouseYMotion();
 		if (dx != 0 || dy != 0)
 		{
-			float Sensitivity = 0.15f;
+			float Sensitivity = 0.05f;
 
 			Transform* activeCam = GetActiveCamera()->object->GetTransform();
 
 			
 			float3 toLook = activeCam->GetGlobalPos();
-			toLook += activeCam->GetGlobalTransform().WorldZ() * 10;
+			toLook += activeCam->Forward() * 10;
 
-			toLook.y += dy * Sensitivity;
+			toLook += dy * Sensitivity * activeCam->Up();
+
+			toLook += dx * Sensitivity * activeCam->Left();
 
 			LookAt(toLook);
 		}
