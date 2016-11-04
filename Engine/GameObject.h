@@ -20,10 +20,12 @@ public:
 	AABB aabb;
 
 	bool disabledByCulling = false;
+
 private:
 	bool active = true;
 	bool publicActive = true;
 	bool hiddenOnOutliner = false;
+	bool Static = false;
 
 	bool drawAABB = true;
 	AABB originalAABB;
@@ -65,6 +67,9 @@ public:
 
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive() { return publicActive; }
+
+	void SetStatic(bool Static);
+	bool IsStatic() { return Static; }
 
 	void SetName(const char* newName);
 	const char* GetName();

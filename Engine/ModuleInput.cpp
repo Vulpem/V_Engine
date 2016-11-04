@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleRenderer3D.h"
+#include "ModuleWindow.h"
 
 
 #include "imGUI/imgui.h"
@@ -101,45 +102,69 @@ update_status ModuleInput::PreUpdate(float dt)
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
 	{
-		ImGui_ImplSdlGL3_ProcessEvent(&e);
 		switch(e.type)
 		{
 			case SDL_MOUSEWHEEL:
-			mouse_z = e.wheel.y;
-			break;
-
+			{
+				mouse_z = e.wheel.y;
+				break;
+			}
 			case SDL_MOUSEMOTION:
-			mouse_x = e.motion.x;
-			mouse_y = e.motion.y;
+			{
+				if (captureMouse)
+				{
+					if (CaptureMouse(e))
+					{
+						ImGui::GetIO().MousePos = ImVec2(-1, -1);
+						ImGui::GetIO().MousePosPrev = ImVec2(-1, -1);
+					}
+				}
+				mouse_x = e.motion.x;
+				mouse_y = e.motion.y;
 
-			mouse_x_motion = e.motion.xrel;
-			mouse_y_motion = e.motion.yrel;
-			break;
+				mouse_x_motion = e.motion.xrel;
+				mouse_y_motion = e.motion.yrel;
+				break;
+			}
 
 			case SDL_DROPFILE:
+			{
 				strcpy_s(dropped_file, e.drop.file);
 				SDL_free(e.drop.file);
 				file_was_dropped = true;
 				LOG("Dropped %s", dropped_file);
 				LOG("File was detected as a %s", DroppedFileFormat().GetString());
 				break;
-
+			}
 			case SDL_QUIT:
-			quit = true;
-			break;
-
+			{
+				quit = true;
+				break;
+			}
 			case SDL_WINDOWEVENT:
 			{
-				if(e.window.event == SDL_WINDOWEVENT_RESIZED)
+				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
 					App->renderer3D->OnResize(e.window.data1, e.window.data2);
+					App->window->UpdateWindowSize();
+				}
 			}
 		}
-	}
 
-	SDL_PollEvent(&e);
+		ImGui_ImplSdlGL3_ProcessEvent(&e);
+	}
 
 	if(quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
 		return UPDATE_STOP;
+
+	if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	{
+		captureMouse = true;
+	}
+	else if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
+	{
+		captureMouse = false;
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -170,4 +195,37 @@ C_String ModuleInput::DroppedFileFormat()
 
 	}
 	return C_String("Error_Reading_format");
+}
+
+bool ModuleInput::CaptureMouse(SDL_Event& e)
+{
+	bool ret = false;
+	float2 windowSize = App->window->GetWindowSize();
+	if (mouse_x + e.motion.xrel >= windowSize.x)
+	{
+		SDL_WarpMouseInWindow(App->window->GetWindow(), 1, e.motion.y);
+		e.motion.xrel = 0;
+		ret = true;
+	}
+	else if (mouse_x + e.motion.xrel <= 0)
+	{
+		SDL_WarpMouseInWindow(App->window->GetWindow(), windowSize.x - 1, e.motion.y);
+		e.motion.xrel = 0;
+		ret = true;
+	}
+
+	if (mouse_y + e.motion.yrel >= windowSize.y)
+	{
+		SDL_WarpMouseInWindow(App->window->GetWindow(), e.motion.x, 1);
+		e.motion.yrel = 0;
+		ret = true;
+	}
+	else if (mouse_y + e.motion.yrel <= 0)
+	{
+		SDL_WarpMouseInWindow(App->window->GetWindow(), e.motion.x, windowSize.y - 1);
+		e.motion.yrel = 0;
+		ret = true;
+	}
+
+	return ret;
 }

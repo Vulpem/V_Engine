@@ -21,14 +21,18 @@ public:
 	void SetTitle(const char* title);
 
 	SDL_Window* GetWindow() { return window; }
-	void GetWindowSize(int* width, int* height);
+	void UpdateWindowSize();
+	float2 GetWindowSize();
 
-public:
+private:
 	//The window we'll be rendering to
 	SDL_Window* window;
 
 	//The surface contained by the window
 	SDL_Surface* screen_surface;
+
+	int windowWidth = 100;
+	int windowHeigth = 100;
 };
 
 #endif // __ModuleWindow_H__

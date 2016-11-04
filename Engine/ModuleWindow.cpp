@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleWindow.h"
+#include "Math.h"
 
 ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -67,6 +68,7 @@ bool ModuleWindow::Init()
 		{
 			//Get window surface
 			screen_surface = SDL_GetWindowSurface(window);
+			UpdateWindowSize();
 		}
 	}
 
@@ -94,7 +96,12 @@ void ModuleWindow::SetTitle(const char* title)
 	SDL_SetWindowTitle(window, title);
 }
 
-void ModuleWindow::GetWindowSize(int* width, int* height)
+void ModuleWindow::UpdateWindowSize()
 {
-	SDL_GetWindowSize(window, width, height);
+	SDL_GetWindowSize(window, &windowWidth, &windowHeigth);
+}
+
+float2 ModuleWindow::GetWindowSize()
+{
+	return float2(windowWidth, windowHeigth);
 }

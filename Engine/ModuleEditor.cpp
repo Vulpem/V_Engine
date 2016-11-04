@@ -64,8 +64,8 @@ update_status ModuleEditor::PreUpdate(float dt)
 
 	bool tmp = true;
 
-	int screenW, screenH;
-	App->window->GetWindowSize(&screenW, &screenH);
+	int screenW = App->window->GetWindowSize().x;
+	int screenH = App->window->GetWindowSize().y;
 
 	ImGuiStyle style = ImGui::GetStyle();
 	style.Alpha = 0.9f;
@@ -306,16 +306,6 @@ update_status ModuleEditor::PreUpdate(float dt)
 		ImGui::Begin("Attribute Editor", &IsOpenAttributes, 0.8f);
 		if (selectedGameObject)
 		{
-			bool isActive = selectedGameObject->IsActive();
-			ImGui::Checkbox("", &isActive);
-			if (isActive != selectedGameObject->IsActive())
-			{
-				selectedGameObject->SetActive(isActive);
-			}
-			ImGui::SameLine();
-			ImGui::Text("Name:");
-			ImGui::SameLine();
-			ImGui::InputText("##Name", selectedGameObject->name, NAME_MAX_LEN);
 			selectedGameObject->DrawOnEditor();
 			ImGui::Separator();
 			if (selectedGameObject->HasComponent(Component::Type::C_transform))

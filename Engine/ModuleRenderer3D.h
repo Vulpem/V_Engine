@@ -23,17 +23,8 @@ public:
 	void OnResize(int width, int height);
 	void UpdateProjectionMatrix();
 
-	uint vertexArrayBuffer = -1;
-	float vertexs[108];
-
-	uint indexArrayBuffer = -1;
-	uint indexVertexArrayBuffer = -1;
-	float indexVertex[24];
-	uint indexArray[36];
-
-public:
-
 	Light lights[MAX_LIGHTS];
+private:
 	SDL_GLContext context;
 	mat3x3 NormalMatrix;
 	mat4x4 ModelMatrix, ViewMatrix, ProjectionMatrix;

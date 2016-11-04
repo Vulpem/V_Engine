@@ -36,9 +36,8 @@ Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id)
 	frustum.farPlaneDistance = 500;
 	frustum.type = FrustumType::PerspectiveFrustum;
 
-	int width, heigth;
-	App->window->GetWindowSize(&width, &heigth);
-	aspectRatio = ((float)width / (float)heigth);
+	float2 screenSize = App->window->GetWindowSize();
+	aspectRatio = (screenSize.x / screenSize.y);
 
 	SetHorizontalFOV(60*DEGTORAD);
 	UpdateCamMatrix();

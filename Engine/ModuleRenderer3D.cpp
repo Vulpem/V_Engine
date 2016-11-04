@@ -168,8 +168,10 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 	float3 camPos = App->camera->GetCamPos();
 	lights[0].SetPos(camPos.x, camPos.y, camPos.z);
 
-	for(uint i = 0; i < MAX_LIGHTS; ++i)
+	for (uint i = 0; i < MAX_LIGHTS; ++i)
+	{
 		lights[i].Render();
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -177,7 +179,7 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 // PostUpdate present buffer to screen
 update_status ModuleRenderer3D::PostUpdate(float dt)
 {
-	SDL_GL_SwapWindow(App->window->window);
+	SDL_GL_SwapWindow(App->window->GetWindow());
 	return UPDATE_CONTINUE;
 }
 

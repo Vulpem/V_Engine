@@ -63,6 +63,8 @@ public:
 	}
 
 private:
+	bool CaptureMouse(SDL_Event& e);
+
 	KEY_STATE* keyboard;
 	KEY_STATE mouse_buttons[MAX_MOUSE_BUTTONS];
 	int mouse_x;
@@ -70,8 +72,8 @@ private:
 	int mouse_z;
 	int mouse_x_motion;
 	int mouse_y_motion;
-	//int mouse_z_motion;
 public:
+	bool captureMouse = false;
 	char dropped_file[1024];
 	mutable bool file_was_dropped;
 };

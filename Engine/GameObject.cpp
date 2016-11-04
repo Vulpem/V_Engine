@@ -58,11 +58,8 @@ void GameObject::PreUpdate()
 {
 	if (active)
 	{
-		if (App->camera->cullingCameras.empty() == true)
-		{
-			disabledByCulling = false;
-		}
-		else
+		disabledByCulling = false;
+		if (App->camera->cullingCameras.empty() == false)
 		{
 			if (aabb.IsFinite())
 			{
@@ -71,10 +68,6 @@ void GameObject::PreUpdate()
 					if ((*it)->Collides(aabb) == FrustumCollision::outside)
 					{
 						disabledByCulling = true;
-					}
-					else
-					{
-						disabledByCulling = false;
 					}
 				}
 			}
@@ -166,7 +159,7 @@ void GameObject::PostUpdate()
 
 void GameObject::DrawOnEditor()
 {
-	if(ImGui::BeginPopup("Add Component"))
+	if (ImGui::BeginPopup("Add Component"))
 	{
 		if (ImGui::Button("Camera##add"))
 		{
@@ -175,9 +168,30 @@ void GameObject::DrawOnEditor()
 		ImGui::EndPopup();
 	}
 
+
+	bool isActive = IsActive();
+	ImGui::Checkbox("", &isActive);
+	if (isActive != IsActive())
+	{
+		SetActive(isActive);
+	}
+	ImGui::SameLine();
+	ImGui::Text("Name:");
+	ImGui::SameLine();
+	ImGui::InputText("##Name", name, NAME_MAX_LEN);
+
 	if (ImGui::Button("Add:"))
 	{
 		ImGui::OpenPopup("Add Component");
+	}
+	ImGui::SameLine();
+	ImGui::Text("Static: ");
+	ImGui::SameLine();
+	bool isStatic = IsStatic();
+	ImGui::Checkbox("##isObjectStatic", &isStatic);
+	if (isStatic != IsStatic())
+	{
+		SetStatic(isStatic);
 	}
 
 	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
@@ -377,6 +391,14 @@ void GameObject::SetActive(bool state, bool justPublic)
 	if(state == true && parent)
 	{
 		parent->SetActive(true);
+	}
+}
+
+void GameObject::SetStatic(bool Static)
+{
+	if (Static != this->Static)
+	{
+		this->Static = Static;
 	}
 }
 

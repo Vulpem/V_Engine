@@ -177,6 +177,19 @@ void ModuleCamera3D::MoveWithKeys()
 	}
 	Camera* cam = GetActiveCamera();
 
+	int mouseWheel = App->input->GetMouseZ();
+	if (mouseWheel != 0)
+	{
+		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+		{
+			lastCamPos += cam->object->GetTransform()->Forward() * speed * mouseWheel;
+		}
+		else
+		{
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * mouseWheel);
+		}
+	}
+
 	//Forward Backward
 	//In Ortographic mode, moving the camera forward or backward is meaningless. Instead we'll change the FOV to change the zoom lvl
 	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
