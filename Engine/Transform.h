@@ -57,6 +57,20 @@ public:
 
 	void LookAt(const float3 &Spot);
 
+	float3 Up();
+	float3 Down();
+	float3 Left();
+	float3 Right();
+	float3 Forward();
+	float3 Backward();
+
+	static float3 WorldUp();
+	static float3 WorldDown();
+	static float3 WorldLeft();
+	static float3 WorldRight();
+	static float3 WorldForward();
+	static float3 WorldBackward();
+
 	static Type GetType() { return Type::C_transform; }
 
 };

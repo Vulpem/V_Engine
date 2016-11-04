@@ -134,12 +134,15 @@ math::FrustumType Camera::SwitchViewType()
 	frustumChanged = true;
 	if (frustum.type == FrustumType::PerspectiveFrustum)
 	{
+		otherFOV.x = frustum.horizontalFov;
+		otherFOV.y = frustum.verticalFov;
 		frustum.type = FrustumType::OrthographicFrustum;
 		SetHorizontalFOV(frustum.horizontalFov * 100.0f);
 		return FrustumType::OrthographicFrustum;
 	}
 	frustum.type = FrustumType::PerspectiveFrustum;
-	SetHorizontalFOV(frustum.horizontalFov / 100.0f);
+	aspectRatio = otherFOV.x / otherFOV.y;
+	SetHorizontalFOV(otherFOV.x);
 	return FrustumType::PerspectiveFrustum;
 }
 

@@ -40,44 +40,9 @@ bool ModuleCamera3D::CleanUp()
 // -----------------------------------------------------------------
 update_status ModuleCamera3D::Update(float dt)
 {
+
+	MoveWithKeys();
 	// Mouse motion ----------------
-#pragma region cameraMovementKeys
-	float speed = camSpeed;
-	float3 lastCamPos = GetActiveCamera()->object->GetTransform()->GetGlobalPos();
-	float3 camPos = lastCamPos;
-	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
-	{
-		speed *= camSprintMultiplier;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
-	{
-		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
-	{
-		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldZ() * speed;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
-	{
-		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
-	{
-		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldX() * speed;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
-	{
-		lastCamPos -= GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
-	{
-		lastCamPos += GetActiveCamera()->object->GetTransform()->GetGlobalTransform().Transposed().WorldY() * speed;
-	}
-	if (lastCamPos.x != camPos.x || lastCamPos.y != camPos.y || lastCamPos.z != camPos.z)
-	{
-		GetActiveCamera()->object->GetTransform()->SetGlobalPos(lastCamPos);
-	}
-#pragma endregion
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
 		int dx = -App->input->GetMouseXMotion();
@@ -88,13 +53,13 @@ update_status ModuleCamera3D::Update(float dt)
 
 			Transform* activeCam = GetActiveCamera()->object->GetTransform();
 
-			/*
+			
 			float3 toLook = activeCam->GetGlobalPos();
 			toLook += activeCam->GetGlobalTransform().WorldZ() * 10;
 
 			toLook.y += dy * Sensitivity;
 
-			LookAt(toLook);*/
+			LookAt(toLook);
 		}
 	}
 
@@ -134,6 +99,14 @@ float* ModuleCamera3D::GetProjectionMatrix()
 void ModuleCamera3D::SetActiveCamera(Camera * activeCamera)
 {
 	this->activeCamera = activeCamera;
+	if (this->activeCamera)
+	{
+		this->activeCamera->frustumChanged = true;
+	}
+	else
+	{
+		defaultCamera->frustumChanged = true;
+	}
 }
 
 void ModuleCamera3D::SetActiveCamera(GameObject * activeCamera)
@@ -189,4 +162,66 @@ Camera * ModuleCamera3D::GetActiveCamera()
 float3 ModuleCamera3D::GetCamPos()
 {
 	return GetActiveCamera()->object->GetTransform()->GetGlobalPos();
+}
+
+void ModuleCamera3D::MoveWithKeys()
+{
+	float speed = camSpeed;
+	float3 lastCamPos = GetActiveCamera()->object->GetTransform()->GetGlobalPos();
+	float3 camPos = lastCamPos;
+	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+	{
+		speed *= camSprintMultiplier;
+	}
+	Camera* cam = GetActiveCamera();
+
+	//Forward Backward
+	//In Ortographic mode, moving the camera forward or backward is meaningless. Instead we'll change the FOV to change the zoom lvl
+	if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+	{
+		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+		{
+			lastCamPos += cam->object->GetTransform()->Forward() * speed;
+		}
+		else
+		{
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed);
+		}
+	}
+	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+	{
+		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+		{
+			lastCamPos += cam->object->GetTransform()->Backward() * speed;
+		}
+		else
+		{
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed);
+		}
+	}
+
+	//Right Left
+	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+	{
+		lastCamPos += cam->object->GetTransform()->Left() * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+	{
+		lastCamPos += cam->object->GetTransform()->Right() * speed;
+	}
+
+	//Up Down
+	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+	{
+		lastCamPos += cam->object->GetTransform()->Down() * speed;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
+	{
+		lastCamPos += cam->object->GetTransform()->Up() * speed;
+	}
+
+	if (lastCamPos.x != camPos.x || lastCamPos.y != camPos.y || lastCamPos.z != camPos.z)
+	{
+		cam->object->GetTransform()->SetGlobalPos(lastCamPos);
+	}
 }

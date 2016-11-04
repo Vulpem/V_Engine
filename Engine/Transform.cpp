@@ -300,4 +300,67 @@ void Transform::LookAt(const float3 & Spot)
 {
 		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
 		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
+		UpdateEditorValues();
+}
+
+
+
+float3 Transform::Up()
+{
+	return globalTransform.Transposed().WorldY().Normalized();
+}
+
+float3 Transform::Down()
+{
+	return -Up();
+}
+
+float3 Transform::Left()
+{
+	return globalTransform.Transposed().WorldX().Normalized();
+}
+
+float3 Transform::Right()
+{
+	return -Left();
+}
+
+float3 Transform::Forward()
+{
+	return globalTransform.Transposed().WorldZ().Normalized();
+}
+
+float3 Transform::Backward()
+{
+	return -Forward();
+}
+
+float3 Transform::WorldUp()
+{
+	return float3(0,1,0);
+}
+
+float3 Transform::WorldDown()
+{
+	return float3(0, -1, 0);
+}
+
+float3 Transform::WorldLeft()
+{
+	return float3(1, 0, 0);
+}
+
+float3 Transform::WorldRight()
+{
+	return float3(-1, 0, 0);
+}
+
+float3 Transform::WorldForward()
+{
+	return float3(0, 0,1);
+}
+
+float3 Transform::WorldBackward()
+{
+	return float3(0, 0,-1);
 }

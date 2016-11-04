@@ -47,8 +47,10 @@ private:
 	bool hasCulling = false;
 public:
 	bool frustumChanged = true;
-	float aspectRatio = 1.77777777f;
+	float aspectRatio = 1.4222222f;
 	math::float3 positionOffset = float3::zero;
+	float2 otherFOV = float2::zero;
+
 };
 
 #endif

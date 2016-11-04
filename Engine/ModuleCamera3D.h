@@ -32,6 +32,8 @@ public:
 
 	Camera* GetActiveCamera();
 	float3 GetCamPos();
+private:
+	void MoveWithKeys();
 
 public:
 	float camSpeed = 0.4f;
