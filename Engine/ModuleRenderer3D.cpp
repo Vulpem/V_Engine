@@ -214,3 +214,69 @@ void ModuleRenderer3D::UpdateProjectionMatrix()
 	glLoadMatrixf(App->camera->GetProjectionMatrix());
 	glMatrixMode(GL_MODELVIEW);
 }
+
+void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
+{
+	glDisable(GL_LIGHTING);
+	glLineWidth(2.0f);
+	glColor4f(color.x, color.y, color.z, color.w);
+
+	glBegin(GL_LINES);
+
+	glVertex3fv(a.ptr()); glVertex3fv(b.ptr());
+
+	glEnd();
+
+	glLineWidth(1.0f);
+	glEnable(GL_LIGHTING);
+}
+
+void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
+{
+	glDisable(GL_LIGHTING);
+	glLineWidth(2.0f);
+	glColor4f(color.x, color.y, color.z, color.w);
+
+	glBegin(GL_LINES);
+
+	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[1].ptr());
+	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[2].ptr());
+	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[4].ptr());
+	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[1].ptr());
+	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[2].ptr());
+	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[7].ptr());
+	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[1].ptr());
+	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[4].ptr());
+	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[7].ptr());
+	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[2].ptr());
+	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[4].ptr());
+	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[7].ptr());
+
+	glEnd();
+
+	glLineWidth(1.0f);
+	glEnable(GL_LIGHTING);
+}
+
+void ModuleRenderer3D::DrawLocator(float3 center, float4 color)
+{
+	glDisable(GL_LIGHTING);
+	// Draw Axis Grid
+	glLineWidth(2.0f);
+
+	glBegin(GL_LINES);
+
+	glColor4f(color.x, color.y, color.z, color.w);
+
+	glVertex3f(1.0f, 0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f); glVertex3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.0f, 0.0f, -1.0f);
+	//Arrow indicating forward
+	glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.1f, 0.0f, 0.9f);
+	glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(-0.1f, 0.0f, 0.9f);
+
+	glEnd();
+
+	glLineWidth(1.0f);
+	glEnable(GL_LIGHTING);
+}

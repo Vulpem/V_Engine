@@ -13,6 +13,7 @@
 #include "Application.h"
 #include "ModuleCamera3D.h"
 #include "ModuleWindow.h"
+#include "ModuleRenderer3D.h"
 
 
 //------------------------- Camera --------------------------------------------------------------------------------
@@ -223,7 +224,7 @@ void Camera::Draw()
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);
-		object->DrawBox(corners);
+		App->renderer3D->DrawBox(corners);
 	}
 }
 

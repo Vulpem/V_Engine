@@ -8,6 +8,7 @@
 
 #include "Application.h"
 #include "ModuleCamera3D.h"
+#include "ModuleRenderer3D.h"
 
 //------------------------- NODE --------------------------------------------------------------------------------
 GameObject::GameObject()
@@ -202,80 +203,33 @@ void GameObject::DrawOnEditor()
 
 void GameObject::DrawLocator()
 {
-		glDisable(GL_LIGHTING);
-		// Draw Axis Grid
-		glLineWidth(2.0f);
-
-		glBegin(GL_LINES);
-
-		if (selected)
+	float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f);
+	if (selected)
+	{
+		if (parent->selected)
 		{
-			if (parent->selected)
-			{
-				glColor4f(0, 0.5f, 0.5f, 1);
-			}
-			else
-			{
-				glColor4f(0, 0.8f, 0.8f, 1);
-			}
+			color = float4(0, 0.5f, 0.5f, 1);
 		}
 		else
 		{
-			glColor4f(0.1f, 0.58f, 0.2f, 1.0f);
+			color = float4(0, 0.8f, 0.8f, 1);
 		}
+	}
 
-		glVertex3f(1.0f, 0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, 0.0f);
-		glVertex3f(0.0f, 1.0f, 0.0f); glVertex3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.0f, 0.0f, -1.0f);
-		//Arrow indicating forward
-		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(0.1f, 0.0f, 0.9f);
-		glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(-0.1f, 0.0f, 0.9f);
+	App->renderer3D->DrawLocator(float3(0.0f, 0.0f, 0.0f), color);
 
-		if (childs.empty() == false)
+	if (childs.empty() == false)
+	{
+		for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
 		{
-			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+			if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
 			{
-				if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
-				{
-					glLineWidth(0.8f);
-					math::float3 childPos(GetTransform()->GetLocalPos());
-					glVertex3f(0.0f, 0.0f, 0.0f);
-					glVertex3f(childPos.x, childPos.y, childPos.z);
-				}
+				math::float3 childPos((*it)->GetTransform()->GetLocalPos());
+				App->renderer3D->DrawLine(float3::zero, childPos, color);
 			}
 		}
+	}
 
-		glEnd();
-
-		glLineWidth(1.0f);
-		glEnable(GL_LIGHTING);
-}
-
-void GameObject::DrawBox(float3* corners)
-{
-	glDisable(GL_LIGHTING);
-	glLineWidth(2.0f);
-	glColor4f(1.0f, 1.0f, 0.6f, 1.0f);
-
-	glBegin(GL_LINES);
-
-	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[1].ptr());
-	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[2].ptr());
-	glVertex3fv(corners[0].ptr()); glVertex3fv(corners[4].ptr());
-	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[1].ptr());
-	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[2].ptr());
-	glVertex3fv(corners[3].ptr()); glVertex3fv(corners[7].ptr());
-	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[1].ptr());
-	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[4].ptr());
-	glVertex3fv(corners[5].ptr()); glVertex3fv(corners[7].ptr());
-	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[2].ptr());
-	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[4].ptr());
-	glVertex3fv(corners[6].ptr()); glVertex3fv(corners[7].ptr());
-
-	glEnd();
-
-	glLineWidth(1.0f);
-	glEnable(GL_LIGHTING);
 }
 
 void GameObject::DrawAABB()
@@ -284,7 +238,7 @@ void GameObject::DrawAABB()
 	{
 		math::float3 corners[8];
 		aabb.GetCornerPoints(corners);
-		DrawBox(corners);
+		App->renderer3D->DrawBox(corners);
 	}
 }
 
