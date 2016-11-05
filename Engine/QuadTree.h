@@ -8,12 +8,15 @@
 class QuadNode
 {
 public:
+	//Just for the root node!
+	QuadNode(float3 minPoint, float3 maxPoint);
+	//Default constructor
 	QuadNode(QuadNode* parent);
 	~QuadNode();
 
 private:
 	QuadNode* parent;
-	QuadNode* childs[4];
+	std::vector<QuadNode> childs;
 	AABB box;
 
 	std::vector<GameObject*> GOs;
@@ -22,11 +25,17 @@ public:
 	Won't be added and return false if the object's aabb doesn't collide with this node
 	Will return true if it's added*/
 	bool Add(GameObject* GO);
+	bool Remove(GameObject* GO);
+
+	std::vector<GameObject*> FilterCollisions(float3 col);
+	std::vector<GameObject*> FilterCollisions(AABB col);
+
+	bool Collides(AABB aabb);
 
 	void Draw();
 
 	AABB GetBox() { return box; }
-	void SetBox(int n);
+	void SetBox(int n, float2 breakPoint);
 private:
 	void CreateChilds();
 
@@ -36,12 +45,17 @@ private:
 class Quad_Tree
 {
 public:
-	Quad_Tree();
+	Quad_Tree(float3 minPoint, float3 maxPoint);
 	~Quad_Tree();
+
+	void Add(GameObject* GO);
+	void Remove(GameObject* GO);
+
+	std::vector<GameObject*> FilterCollisions(AABB col);
 
 	void Draw();
 private:
-	QuadNode* root = nullptr;
+	QuadNode root;
 
 };
 

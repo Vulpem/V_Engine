@@ -9,6 +9,7 @@
 #include "Application.h"
 #include "ModuleCamera3D.h"
 #include "ModuleRenderer3D.h"
+#include "ModuleGOmanager.h"
 
 //------------------------- NODE --------------------------------------------------------------------------------
 GameObject::GameObject()
@@ -353,6 +354,21 @@ void GameObject::SetStatic(bool Static)
 	if (Static != this->Static)
 	{
 		this->Static = Static;
+		if (aabb.IsFinite())
+		{
+			if (Static)
+			{
+				App->GO->quadTree.Add(this);
+				if (parent != nullptr)
+				{
+					parent->SetStatic(true);
+				}
+			}
+			else
+			{
+				App->GO->quadTree.Remove(this);
+			}
+		}
 	}
 }
 

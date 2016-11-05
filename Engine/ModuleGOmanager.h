@@ -6,6 +6,7 @@
 
 #include "Math.h"
 #include <vector>
+#include "QuadTree.h"
 
 #include "GameObject.h"
 
@@ -37,6 +38,8 @@ private:
 	void CreateRootGameObject();
 public:
 	std::vector<uint> id_textures;
+
+	Quad_Tree quadTree;
 
 	GameObject* root = nullptr;
 };

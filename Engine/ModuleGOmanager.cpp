@@ -12,7 +12,7 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(-300,-10,-300), float3(300, 10, 300))
 {
 	name.create("ModuleGeometry");
 }
@@ -70,6 +70,8 @@ update_status ModuleGoManager::Update(float dt)
 		(*it)->Update();
 		it++;
 	}
+
+	quadTree.Draw();
 
 	return UPDATE_CONTINUE;
 }

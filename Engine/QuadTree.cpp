@@ -1,14 +1,17 @@
 #include "QuadTree.h"
-#include "ModuleRenderer3D.h"
+
 #include "Application.h"
+#include "ModuleRenderer3D.h"
+
+QuadNode::QuadNode(float3 minPoint, float3 maxPoint): parent(nullptr)
+{
+	box.minPoint = minPoint;
+	box.maxPoint = maxPoint;
+}
 
 QuadNode::QuadNode(QuadNode* _parent): parent(_parent)
 {
 	box = parent->GetBox();
-	for (int n = 0; n < 4; n++)
-	{
-		childs[n] = nullptr;
-	}
 }
 
 QuadNode::~QuadNode()
@@ -17,14 +20,89 @@ QuadNode::~QuadNode()
 
 bool QuadNode::Add(GameObject* GO)
 {
-	bool ret = true;
-
-	if (GOs.size() >= QUAD_GO_SIZE)
+	bool ret = false;
+	if (Collides(GO->aabb))
 	{
+		if (childs.empty() == true)
+		{
+			GOs.push_back(GO);
 
+			if (GOs.size() > QUAD_GO_SIZE)
+			{
+				CreateChilds();
+			}
+		}
+		else
+		{
+			std::vector<QuadNode*> collidedWith;
+			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				if (it->Collides(GO->aabb))
+				{
+					collidedWith.push_back(&*it);
+				}
+			}
+			if (collidedWith.size() == 1)
+			{
+				collidedWith.front()->Add(GO);
+			}
+			else if (collidedWith.size() > 1)
+			{
+				GOs.push_back(GO);
+			}
+		}
+		ret = true;
 	}
-
 	return ret;
+}
+
+bool QuadNode::Remove(GameObject * GO)
+{
+	return false;
+}
+
+std::vector<GameObject*> QuadNode::FilterCollisions(float3 col)
+{
+	return std::vector<GameObject*>();
+}
+
+std::vector<GameObject*> QuadNode::FilterCollisions(AABB col)
+{
+	std::vector<GameObject*> ret;
+	if (Collides(col))
+	{
+		if (GOs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+			{
+				ret.push_back(*it);
+			}
+		}
+		if (childs.empty() == false)
+		{
+			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				std::vector<GameObject*> toAdd = it->FilterCollisions(col);
+				if (toAdd.empty() == false)
+				{
+					for (std::vector<GameObject*>::iterator it = toAdd.begin(); it != toAdd.end(); it++)
+					{
+						ret.push_back(*it);
+					}
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+bool QuadNode::Collides(AABB aabb)
+{
+	if (box.Intersects(aabb) == true)
+	{
+		return true;
+	}
+	return false;
 }
 
 void QuadNode::Draw()
@@ -32,52 +110,53 @@ void QuadNode::Draw()
 	float3 corners[8];
 	box.GetCornerPoints(corners);
 	App->renderer3D->DrawBox(corners);
-
-	for (int n = 0; n < 4; n++)
+	
+	for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
 	{
-		if (childs[n] != nullptr)
-		{
-			childs[n]->Draw();
-		}
+		it->Draw();
 	}
 
 }
 
-void QuadNode::SetBox(int n)
+void QuadNode::SetBox(int n, float2 breakPoint)
 {
 	AABB parentBox = parent->GetBox();
+	//TMP
+	breakPoint.x = parentBox.CenterPoint().x;
+	breakPoint.y = parentBox.CenterPoint().z;
+	////////
 	switch (n)
 	{
 	case 0:
 	{
 		box.minPoint.x = parentBox.minPoint.x;
-		box.minPoint.z = parentBox.CenterPoint().z;
-		box.maxPoint.x = parentBox.CenterPoint().x;
+		box.minPoint.z = breakPoint.y;
+		box.maxPoint.x = breakPoint.x;
 		box.maxPoint.z = parentBox.maxPoint.z;
 		break;
 	}
 	case 1:
 	{
-		box.minPoint.x = parentBox.CenterPoint().x;
-		box.minPoint.z = parentBox.CenterPoint().z;
+		box.minPoint.x = breakPoint.x;
+		box.minPoint.z = breakPoint.y;
 		box.maxPoint.x = parentBox.maxPoint.x;
 		box.maxPoint.z = parentBox.maxPoint.z;
 		break;
 	}
 	case 2:
 	{
-		box.minPoint.x = parentBox.CenterPoint().x;
+		box.minPoint.x = breakPoint.x;
 		box.minPoint.z = parentBox.minPoint.z;
 		box.maxPoint.x = parentBox.maxPoint.x;
-		box.maxPoint.z = parentBox.CenterPoint().z;
+		box.maxPoint.z = breakPoint.y;
 		break;
 	}
 	case 3:
 	{
 		box.minPoint.x = parentBox.minPoint.x;
 		box.minPoint.z = parentBox.minPoint.z;
-		box.maxPoint.x = parentBox.CenterPoint().x;
-		box.maxPoint.z = parentBox.CenterPoint().z;
+		box.maxPoint.x = breakPoint.x;
+		box.maxPoint.z = breakPoint.y;
 		break;
 	}
 	}
@@ -85,15 +164,33 @@ void QuadNode::SetBox(int n)
 
 void QuadNode::CreateChilds()
 {
+	float2 centerPoint = float2::zero;
+	int n = 0;
+	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	{
+		centerPoint.x += (*it)->aabb.CenterPoint().x;
+		centerPoint.y += (*it)->aabb.CenterPoint().z;
+		n++;
+	}
+	centerPoint /= n;
+
 	for (int n = 0; n < 4; n++)
 	{
-		childs[n] = new QuadNode(this);
-		childs[n]->SetBox(n);
+		childs.push_back(QuadNode(this));
+		childs.back().SetBox(n, centerPoint);
+	}
+
+	std::vector<GameObject*> tmp = GOs;
+	GOs.clear();
+
+	for (std::vector<GameObject*>::iterator it = tmp.begin(); it != tmp.end(); it++)
+	{
+		Add(*it);
 	}
 }
 
 
-Quad_Tree::Quad_Tree()
+Quad_Tree::Quad_Tree(float3 minPoint, float3 maxPoint): root(minPoint, maxPoint)
 {
 }
 
@@ -101,10 +198,21 @@ Quad_Tree::~Quad_Tree()
 {
 }
 
+void Quad_Tree::Add(GameObject * GO)
+{
+	root.Add(GO);
+}
+
+void Quad_Tree::Remove(GameObject * GO)
+{
+}
+
+std::vector<GameObject*> Quad_Tree::FilterCollisions(AABB col)
+{
+	return root.FilterCollisions(col);
+}
+
 void Quad_Tree::Draw()
 {
-	if (root != nullptr)
-	{
-		root->Draw();
-	}
+	root.Draw();
 }
