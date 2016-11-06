@@ -354,15 +354,15 @@ void GameObject::SetStatic(bool Static)
 	if (Static != this->Static)
 	{
 		this->Static = Static;
+		if (parent != nullptr)
+		{
+			parent->SetStatic(Static);
+		}
 		if (aabb.IsFinite())
 		{
 			if (Static)
 			{
 				App->GO->quadTree.Add(this);
-				if (parent != nullptr)
-				{
-					parent->SetStatic(true);
-				}
 			}
 			else
 			{
