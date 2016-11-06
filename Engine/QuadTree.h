@@ -38,6 +38,7 @@ public:
 	void SetBox(int n, float2 breakPoint);
 private:
 	void CreateChilds();
+	void Clean();
 
 };
 

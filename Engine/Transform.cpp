@@ -129,23 +129,25 @@ void Transform::UpdateEditorValues()
 
 void Transform::SetLocalPos(float x, float y, float z)
 {
-	localPosition.x = x;
-	localPosition.y = y;
-	localPosition.z = z;
-
-	object->UpdateTransformMatrix();
-
-	std::vector<Camera*> cams = object->GetComponent<Camera>();
-	if (cams.empty() == false)
+	if (object->IsStatic() == false)
 	{
-		std::vector<Camera*>::iterator it = cams.begin();
-		while (it != cams.end())
+		localPosition.x = x;
+		localPosition.y = y;
+		localPosition.z = z;
+
+		object->UpdateTransformMatrix();
+
+		std::vector<Camera*> cams = object->GetComponent<Camera>();
+		if (cams.empty() == false)
 		{
-			(*it)->UpdatePos();
-			it++;
+			std::vector<Camera*>::iterator it = cams.begin();
+			while (it != cams.end())
+			{
+				(*it)->UpdatePos();
+				it++;
+			}
 		}
 	}
-
 }
 
 void Transform::SetLocalPos(float3 pos)
@@ -160,23 +162,26 @@ math::float3 Transform::GetLocalPos()
 
 void Transform::SetGlobalPos(float x, float y, float z)
 {
-	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+	if (object->IsStatic() == false)
 	{
-		//TODO
-		//Needs cleaning
-		Transform* parentTrans = object->parent->GetTransform();
+		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+		{
+			//TODO
+			//Needs cleaning
+			Transform* parentTrans = object->parent->GetTransform();
 
-		float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
-		float4x4 parentGlobal = parentTrans->GetGlobalTransform();
+			float4x4 myGlobal = (float4x4::FromTRS(float3(x, y, z), GetGlobalRotQuat(), GetGlobalScale()));
+			float4x4 parentGlobal = parentTrans->GetGlobalTransform();
 
-		float4x4 localMat = myGlobal.Transposed() * parentGlobal.Inverted();
-		localMat.Transpose();
+			float4x4 localMat = myGlobal.Transposed() * parentGlobal.Inverted();
+			localMat.Transpose();
 
-		SetLocalPos(localMat.TranslatePart().x, localMat.TranslatePart().y, localMat.TranslatePart().z);
-	}
-	else
-	{
-		SetLocalPos(x, y, z);
+			SetLocalPos(localMat.TranslatePart().x, localMat.TranslatePart().y, localMat.TranslatePart().z);
+		}
+		else
+		{
+			SetLocalPos(x, y, z);
+		}
 	}
 }
 
@@ -193,24 +198,30 @@ math::float3 Transform::GetGlobalPos()
 
 void Transform::SetLocalRot(float x, float y, float z)
 {
-	while (x < 0) { x += 360; }
-	while (y < 0) { y += 360; }
-	while (z < 0) { z += 360; }
+	if (object->IsStatic() == false)
+	{
+		while (x < 0) { x += 360; }
+		while (y < 0) { y += 360; }
+		while (z < 0) { z += 360; }
 
-	x *= DEGTORAD;
-	y *= DEGTORAD;
-	z *= DEGTORAD;
+		x *= DEGTORAD;
+		y *= DEGTORAD;
+		z *= DEGTORAD;
 
-	localRotation = math::Quat::FromEulerXYZ(x, y, z);
+		localRotation = math::Quat::FromEulerXYZ(x, y, z);
 
-	object->UpdateTransformMatrix();
+		object->UpdateTransformMatrix();
+	}
 }
 
 void Transform::SetLocalRot(float x, float y, float z, float w)
 {
-	localRotation.Set(x, y, z, w);
+	if (object->IsStatic() == false)
+	{
+		localRotation.Set(x, y, z, w);
 
-	object->UpdateTransformMatrix();
+		object->UpdateTransformMatrix();
+	}
 }
 
 math::float3 Transform::GetLocalRot()
@@ -229,27 +240,30 @@ math::float3 Transform::GetLocalRot()
 
 void Transform::SetGlobalRot(float x, float y, float z)
 {
-	if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+	if (object->IsStatic() == false)
 	{
-		//TODO
-		//Needs cleaning
-		x *= DEGTORAD;
-		y *= DEGTORAD;
-		z *= DEGTORAD;
+		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
+		{
+			//TODO
+			//Needs cleaning
+			x *= DEGTORAD;
+			y *= DEGTORAD;
+			z *= DEGTORAD;
 
-		Transform* parentTrans = object->parent->GetTransform();
+			Transform* parentTrans = object->parent->GetTransform();
 
-		float4x4 localMat = (float4x4::FromTRS(GetGlobalPos(), float3x3::FromEulerXYZ(x, y, z), GetGlobalScale())).Transposed() * parentTrans->GetGlobalTransform().Inverted();
-		localMat.Transposed();
+			float4x4 localMat = (float4x4::FromTRS(GetGlobalPos(), float3x3::FromEulerXYZ(x, y, z), GetGlobalScale())).Transposed() * parentTrans->GetGlobalTransform().Inverted();
+			localMat.Transposed();
 
-		float3 localEuler = localMat.ToEulerXYZ();
-		localEuler *= RADTODEG;
+			float3 localEuler = localMat.ToEulerXYZ();
+			localEuler *= RADTODEG;
 
-		SetLocalRot(localEuler.x, localEuler.y, localEuler.z);
-	}
-	else
-	{
-		SetLocalRot(x, y, z);
+			SetLocalRot(localEuler.x, localEuler.y, localEuler.z);
+		}
+		else
+		{
+			SetLocalRot(x, y, z);
+		}
 	}
 }
 
@@ -278,11 +292,14 @@ math::float3 Transform::GetGlobalRot()
 
 void Transform::SetLocalScale(float x, float y, float z)
 {
-	if (x != 0 && y != 0 && z != 0)
+	if (object->IsStatic() == false)
 	{
-		localScale.Set(x, y, z);
+		if (x != 0 && y != 0 && z != 0)
+		{
+			localScale.Set(x, y, z);
 
-		object->UpdateTransformMatrix();
+			object->UpdateTransformMatrix();
+		}
 	}
 }
 
@@ -298,9 +315,12 @@ math::float3 Transform::GetGlobalScale()
 
 void Transform::LookAt(const float3 & Spot)
 {
+	if (object->IsStatic() == false)
+	{
 		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
 		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
 		UpdateEditorValues();
+	}
 }
 
 

@@ -58,7 +58,32 @@ bool QuadNode::Add(GameObject* GO)
 
 bool QuadNode::Remove(GameObject * GO)
 {
-	return false;
+	bool ret = false;
+	if (GOs.empty() == false)
+	{
+		for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+		{
+			if ((*it) == GO)
+			{
+				GOs.erase(it);
+				return true;
+			}
+		}
+	}
+
+	if (childs.empty() == false)
+	{
+		for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end() && ret == false; it++)
+		{
+			ret = it->Remove(GO);
+		}
+	}
+
+	if (ret == true)
+	{
+		Clean();
+	}
+	return ret;
 }
 
 std::vector<GameObject*> QuadNode::FilterCollisions(float3 col)
@@ -189,6 +214,33 @@ void QuadNode::CreateChilds()
 	}
 }
 
+void QuadNode::Clean()
+{
+	std::vector<GameObject*> childsGOs;
+	for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+	{
+		if (it->childs.empty() == false)
+		{
+			//If a child has childs, we shouldn't erase any of them! Just in case
+			childsGOs.clear();
+			break;
+		}
+		for (std::vector<GameObject*>::iterator childIt = it->GOs.begin(); childIt != it->GOs.end(); childIt++)
+		{
+			childsGOs.push_back(*childIt);
+		}
+	}
+
+	if (childsGOs.empty() == false && childsGOs.size() + GOs.size() <= QUAD_GO_SIZE)
+	{
+		for (std::vector<GameObject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
+		{
+			GOs.push_back(*it);
+		}
+		childs.clear();
+	}
+}
+
 
 Quad_Tree::Quad_Tree(float3 minPoint, float3 maxPoint): root(minPoint, maxPoint)
 {
@@ -205,6 +257,7 @@ void Quad_Tree::Add(GameObject * GO)
 
 void Quad_Tree::Remove(GameObject * GO)
 {
+	root.Remove(GO);
 }
 
 std::vector<GameObject*> Quad_Tree::FilterCollisions(AABB col)
