@@ -354,20 +354,21 @@ void GameObject::SetStatic(bool Static)
 	if (Static != this->Static)
 	{
 		this->Static = Static;
-		if (parent != nullptr)
+		if (Static)
 		{
-			parent->SetStatic(Static);
+			if (parent != nullptr)
+			{
+				parent->SetStatic(true);
+			}
+			App->GO->quadTree.Add(this);
 		}
-		if (aabb.IsFinite())
+		else
 		{
-			if (Static)
+			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
 			{
-				App->GO->quadTree.Add(this);
+				(*it)->SetStatic(false);
 			}
-			else
-			{
-				App->GO->quadTree.Remove(this);
-			}
+			App->GO->quadTree.Remove(this);
 		}
 	}
 }

@@ -146,10 +146,6 @@ void QuadNode::Draw()
 void QuadNode::SetBox(int n, float2 breakPoint)
 {
 	AABB parentBox = parent->GetBox();
-	//TMP
-	breakPoint.x = parentBox.CenterPoint().x;
-	breakPoint.y = parentBox.CenterPoint().z;
-	////////
 	switch (n)
 	{
 	case 0:
@@ -199,10 +195,35 @@ void QuadNode::CreateChilds()
 	}
 	centerPoint /= n;
 
+	
+	//Checking if GOs collide with the X plane
+	float2 newCenterPoint = centerPoint;
+	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	{
+		while (Plane(float3(newCenterPoint.x, 0, newCenterPoint.y), float3(0, 0, 1)).Intersects((*it)->aabb) == true)
+		{
+			newCenterPoint.y++;
+		}
+	}
+	//Checking if GOs collide with the Y plane
+	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	{
+		while (Plane(float3(newCenterPoint.x, 0, newCenterPoint.y), float3(1, 0, 0)).Intersects((*it)->aabb) == true)
+		{
+			newCenterPoint.x++;
+		}
+	}
+
+	if (newCenterPoint.x >= box.maxPoint.x || newCenterPoint.y >= box.maxPoint.z)
+	{
+		newCenterPoint.x = box.CenterPoint().x;
+		newCenterPoint.y = box.CenterPoint().z;
+	}
+
 	for (int n = 0; n < 4; n++)
 	{
 		childs.push_back(QuadNode(this));
-		childs.back().SetBox(n, centerPoint);
+		childs.back().SetBox(n, newCenterPoint);
 	}
 
 	std::vector<GameObject*> tmp = GOs;
@@ -252,12 +273,18 @@ Quad_Tree::~Quad_Tree()
 
 void Quad_Tree::Add(GameObject * GO)
 {
-	root.Add(GO);
+	if (GO->aabb.IsFinite())
+	{
+		root.Add(GO);
+	}
 }
 
 void Quad_Tree::Remove(GameObject * GO)
 {
-	root.Remove(GO);
+	if (GO->aabb.IsFinite())
+	{
+		root.Remove(GO);
+	}
 }
 
 std::vector<GameObject*> Quad_Tree::FilterCollisions(AABB col)
