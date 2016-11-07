@@ -27,9 +27,10 @@ public:
 	bool Add(GameObject* GO);
 	bool Remove(GameObject* GO);
 
-	std::vector<GameObject*> FilterCollisions(float3 col);
+	std::vector<GameObject*> FilterCollisions(LineSegment col);
 	std::vector<GameObject*> FilterCollisions(AABB col);
 
+	bool Collides(LineSegment segment);
 	bool Collides(AABB aabb);
 
 	void Draw();
@@ -52,6 +53,7 @@ public:
 	void Add(GameObject* GO);
 	void Remove(GameObject* GO);
 
+	std::vector<GameObject*> FilterCollisions(LineSegment col);
 	std::vector<GameObject*> FilterCollisions(AABB col);
 
 	void Draw();

@@ -86,12 +86,7 @@ bool QuadNode::Remove(GameObject * GO)
 	return ret;
 }
 
-std::vector<GameObject*> QuadNode::FilterCollisions(float3 col)
-{
-	return std::vector<GameObject*>();
-}
-
-std::vector<GameObject*> QuadNode::FilterCollisions(AABB col)
+std::vector<GameObject*> QuadNode::FilterCollisions(LineSegment col)
 {
 	std::vector<GameObject*> ret;
 	if (Collides(col))
@@ -100,7 +95,10 @@ std::vector<GameObject*> QuadNode::FilterCollisions(AABB col)
 		{
 			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
 			{
-				ret.push_back(*it);
+				if ((*it)->aabb.Intersects(col) == true)
+				{
+					ret.push_back(*it);
+				}
 			}
 		}
 		if (childs.empty() == false)
@@ -119,6 +117,48 @@ std::vector<GameObject*> QuadNode::FilterCollisions(AABB col)
 		}
 	}
 	return ret;
+}
+
+std::vector<GameObject*> QuadNode::FilterCollisions(AABB col)
+{
+	std::vector<GameObject*> ret;
+	if (Collides(col))
+	{
+		if (GOs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+			{
+				if ((*it)->aabb.Intersects(col) == true)
+				{
+					ret.push_back(*it);
+				}
+			}
+		}
+		if (childs.empty() == false)
+		{
+			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				std::vector<GameObject*> toAdd = it->FilterCollisions(col);
+				if (toAdd.empty() == false)
+				{
+					for (std::vector<GameObject*>::iterator it = toAdd.begin(); it != toAdd.end(); it++)
+					{
+						ret.push_back(*it);
+					}
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+bool QuadNode::Collides(LineSegment segment)
+{
+	if (box.Intersects(segment))
+	{
+		return true;
+	}
+	return false;
 }
 
 bool QuadNode::Collides(AABB aabb)
@@ -299,6 +339,11 @@ void Quad_Tree::Remove(GameObject * GO)
 	{
 		root.Remove(GO);
 	}
+}
+
+std::vector<GameObject*> Quad_Tree::FilterCollisions(LineSegment col)
+{
+	return root.FilterCollisions(col);
 }
 
 std::vector<GameObject*> Quad_Tree::FilterCollisions(AABB col)

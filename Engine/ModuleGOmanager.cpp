@@ -36,7 +36,6 @@ bool ModuleGoManager::Init()
 
 bool ModuleGoManager::Start()
 {
-
 	return true;
 }
 
@@ -101,7 +100,10 @@ update_status ModuleGoManager::Update(float dt)
 		ImGui::End();
 	}
 
-	quadTree.Draw();
+	if (drawQuadTree)
+	{
+		quadTree.Draw();
+	}
 
 	return UPDATE_CONTINUE;
 }

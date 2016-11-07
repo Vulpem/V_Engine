@@ -231,11 +231,11 @@ void ModuleCamera3D::MoveWithKeys()
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Forward() * speed * mouseWheel;
+			lastCamPos += cam->object->GetTransform()->Forward() * speed * mouseWheel * 10;
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * mouseWheel);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * mouseWheel * 10);
 		}
 	}
 

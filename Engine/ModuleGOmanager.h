@@ -40,6 +40,7 @@ public:
 	std::vector<uint> id_textures;
 
 	Quad_Tree quadTree;
+	bool drawQuadTree = false;
 
 	GameObject* root = nullptr;
 
