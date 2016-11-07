@@ -23,6 +23,8 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 
+	SetStatic(false);
+
 	if (parent != nullptr)
 	{
 		std::vector<GameObject*>::iterator it = parent->childs.begin();
