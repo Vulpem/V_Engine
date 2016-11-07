@@ -190,6 +190,36 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	
 }
 
+std::vector<GameObject*> ModuleGoManager::FilterCollisions(LineSegment col)
+{
+	std::vector<GameObject*> ret = quadTree.FilterCollisions(col);
+
+	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
+	{
+		if ((*it)->aabb.Intersects(col) == true)
+		{
+			ret.push_back(*it);
+		}
+	}
+
+	return ret;
+}
+
+std::vector<GameObject*> ModuleGoManager::FilterCollisions(AABB col)
+{
+	std::vector<GameObject*> ret = quadTree.FilterCollisions(col);
+
+	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
+	{
+		if ((*it)->aabb.Intersects(col) == true)
+		{
+			ret.push_back(*it);
+		}
+	}
+
+	return ret;
+}
+
 void ModuleGoManager::CreateRootGameObject()
 {
 	if (root == nullptr)

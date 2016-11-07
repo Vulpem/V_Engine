@@ -34,6 +34,9 @@ public:
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 
+	std::vector<GameObject*> FilterCollisions(LineSegment col);
+	std::vector<GameObject*> FilterCollisions(AABB col);
+
 	const GameObject* GetRoot() { return root; }
 
 private:

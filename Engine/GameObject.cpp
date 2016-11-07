@@ -63,25 +63,6 @@ void GameObject::PreUpdate()
 {
 	if (active)
 	{
-		disabledByCulling = false;
-		if (App->camera->cullingCameras.empty() == false)
-		{
-			if (aabb.IsFinite())
-			{
-				for (std::vector<Camera*>::iterator it = App->camera->cullingCameras.begin(); it != App->camera->cullingCameras.end(); it++)
-				{
-					if ((*it)->Collides(aabb) == FrustumCollision::outside)
-					{
-						disabledByCulling = true;
-					}
-				}
-			}
-			else
-			{
-				disabledByCulling = true;
-			}
-		}
-
 		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
 		{
 			(*it)->PreUpdate();
@@ -99,6 +80,10 @@ void GameObject::Update()
 {
 	if (active)
 	{
+		if (cullingChecked == false)
+		{
+			disabledByCulling = true;
+		}
 		glPushMatrix();
 
 		if (HasComponent(Component::Type::C_transform))
@@ -160,6 +145,8 @@ void GameObject::PostUpdate()
 			it++;
 		}
 	}
+	cullingChecked = false;
+	disabledByCulling = false;
 }
 
 void GameObject::DrawOnEditor()

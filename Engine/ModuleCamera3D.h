@@ -30,9 +30,6 @@ public:
 	void SetCameraToRight();
 	void SetCameraToFront();
 	void SetCameraToCamera(GameObject* setTo);
-	void AddCamCulling(Camera* toAdd);
-	void RemoveCamCulling(Camera* toRemove);
-	void ClearCamCulling();
 
 	Camera* GetActiveCamera();
 	float3 GetCamPos();
@@ -52,7 +49,6 @@ private:
 	GameObject* rightView = nullptr;
 	GameObject* frontView = nullptr;
 public:
-	std::vector<Camera*> cullingCameras;
 };
 
 #endif

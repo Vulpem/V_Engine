@@ -11,6 +11,7 @@
 #include "OpenGL.h"
 
 #include "Application.h"
+#include "ModuleGOmanager.h"
 #include "ModuleCamera3D.h"
 #include "ModuleWindow.h"
 #include "ModuleRenderer3D.h"
@@ -50,15 +51,25 @@ Camera::~Camera()
 	{
 		App->camera->SetCameraToDefault();
 	}
-	if (hasCulling)
-	{
-		App->camera->RemoveCamCulling(this);
-	}
 }
 
 void Camera::DoPreUpdate()
 {
-
+	if (hasCulling || App->camera->GetActiveCamera() == this)
+	{
+		std::vector<GameObject*> GOs = App->GO->FilterCollisions(frustum.MinimalEnclosingAABB());
+		for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+		{
+			if ((*it)->disabledByCulling == false)
+			{
+				if (Collides((*it)->aabb) == FrustumCollision::outside)
+				{
+					(*it)->disabledByCulling = true;
+				}
+				(*it)->cullingChecked = true;
+			}
+		}
+	}
 }
 
 void Camera::DoUpdate()
@@ -152,17 +163,7 @@ void Camera::EditorContent()
 	{
 		App->camera->SetActiveCamera(this);
 	}
-	if (ImGui::Checkbox("Culling", &hasCulling))
-	{
-		if (hasCulling == true)
-		{
-			App->camera->AddCamCulling(this);
-		}
-		else
-		{
-			App->camera->RemoveCamCulling(this);
-		}
-	}
+	ImGui::Checkbox("Culling", &hasCulling);
 	bool persp = true;
 	bool ortho = false;
 	if (frustum.type == FrustumType::OrthographicFrustum)

@@ -174,32 +174,6 @@ void ModuleCamera3D::SetCameraToCamera(GameObject * setTo)
 	}
 }
 
-void ModuleCamera3D::AddCamCulling(Camera * toAdd)
-{
-	cullingCameras.push_back(toAdd);
-}
-
-void ModuleCamera3D::RemoveCamCulling(Camera * toRemove)
-{
-	if (cullingCameras.empty() == false)
-	{
-		std::vector<Camera*>::iterator it = cullingCameras.begin();
-		while (it != cullingCameras.end())
-		{
-			if ((*it) == toRemove)
-			{
-				cullingCameras.erase(it);
-				return;
-			}
-			it++;
-		}
-	}
-}
-
-void ModuleCamera3D::ClearCamCulling()
-{
-	cullingCameras.clear();
-}
 
 Camera * ModuleCamera3D::GetActiveCamera()
 {
