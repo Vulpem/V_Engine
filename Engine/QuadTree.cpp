@@ -143,7 +143,7 @@ void QuadNode::Draw()
 
 }
 
-void QuadNode::SetBox(int n, float2 breakPoint)
+void QuadNode::SetBox(int n, float3 breakPoint)
 {
 	AABB parentBox = parent->GetBox();
 	switch (n)
@@ -151,7 +151,7 @@ void QuadNode::SetBox(int n, float2 breakPoint)
 	case 0:
 	{
 		box.minPoint.x = parentBox.minPoint.x;
-		box.minPoint.z = breakPoint.y;
+		box.minPoint.z = breakPoint.z;
 		box.maxPoint.x = breakPoint.x;
 		box.maxPoint.z = parentBox.maxPoint.z;
 		break;
@@ -159,7 +159,7 @@ void QuadNode::SetBox(int n, float2 breakPoint)
 	case 1:
 	{
 		box.minPoint.x = breakPoint.x;
-		box.minPoint.z = breakPoint.y;
+		box.minPoint.z = breakPoint.z;
 		box.maxPoint.x = parentBox.maxPoint.x;
 		box.maxPoint.z = parentBox.maxPoint.z;
 		break;
@@ -169,7 +169,7 @@ void QuadNode::SetBox(int n, float2 breakPoint)
 		box.minPoint.x = breakPoint.x;
 		box.minPoint.z = parentBox.minPoint.z;
 		box.maxPoint.x = parentBox.maxPoint.x;
-		box.maxPoint.z = breakPoint.y;
+		box.maxPoint.z = breakPoint.z;
 		break;
 	}
 	case 3:
@@ -177,7 +177,7 @@ void QuadNode::SetBox(int n, float2 breakPoint)
 		box.minPoint.x = parentBox.minPoint.x;
 		box.minPoint.z = parentBox.minPoint.z;
 		box.maxPoint.x = breakPoint.x;
-		box.maxPoint.z = breakPoint.y;
+		box.maxPoint.z = breakPoint.z;
 		break;
 	}
 	}
@@ -185,8 +185,8 @@ void QuadNode::SetBox(int n, float2 breakPoint)
 
 void QuadNode::CreateChilds()
 {
-	float2 centerPoint = float2::zero;
-	int n = 0;
+	float3 centerPoint = float3::zero;
+	/*int n = 0;
 	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
 	{
 		centerPoint.x += (*it)->aabb.CenterPoint().x;
@@ -218,7 +218,8 @@ void QuadNode::CreateChilds()
 	{
 		newCenterPoint.x = box.CenterPoint().x;
 		newCenterPoint.y = box.CenterPoint().z;
-	}
+	}*/
+	float3 newCenterPoint = box.CenterPoint();
 
 	for (int n = 0; n < 4; n++)
 	{
@@ -252,7 +253,11 @@ void QuadNode::Clean()
 		}
 	}
 
-	if (childsGOs.empty() == false && childsGOs.size() + GOs.size() <= QUAD_GO_SIZE)
+	if (childsGOs.empty() == true)
+	{
+		childs.clear();
+	}
+	else if (childsGOs.size() + GOs.size() <= QUAD_GO_SIZE)
 	{
 		for (std::vector<GameObject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
 		{

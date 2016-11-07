@@ -99,7 +99,7 @@ bool ModuleGoManager::CleanUp()
 	return true;
 }
 
-GameObject * ModuleGoManager::CreateEmpty()
+GameObject * ModuleGoManager::CreateEmpty(const char* name)
 {
 	GameObject* empty = new GameObject();
 
@@ -107,13 +107,17 @@ GameObject * ModuleGoManager::CreateEmpty()
 
 	empty->parent = root;
 	root->childs.push_back(empty);
+	if (name != NULL && name != "")
+	{
+		empty->SetName(name);
+	}
 
 	return empty;
 }
 
-GameObject* ModuleGoManager::CreateCamera()
+GameObject* ModuleGoManager::CreateCamera(const char* name)
 {
-	GameObject* camera = CreateEmpty();
+	GameObject* camera = CreateEmpty(name);
 	camera->AddComponent(Component::Type::C_camera);
 	return camera;
 }

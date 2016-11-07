@@ -26,6 +26,21 @@ bool ModuleCamera3D::Start()
 	defaultCamera = *defaultCameraGO->GetComponent<Camera>().begin();
 	defaultCameraGO->SetName("Default editor camera");
 
+	topView = App->GO->CreateCamera("TopView");
+	topView->GetTransform()->SetLocalPos(0, 100, 0);
+	topView->GetTransform()->SetLocalRot(90, 0, 0);
+	topView->GetComponent<Camera>().front()->SwitchViewType();
+
+	frontView = App->GO->CreateCamera("FrontView");
+	frontView->GetTransform()->SetLocalPos(0, 0, -100);
+	frontView->GetTransform()->SetLocalRot(0, 0, 0);
+	frontView->GetComponent<Camera>().front()->SwitchViewType();
+
+	rightView = App->GO->CreateCamera("RightView");
+	rightView->GetTransform()->SetLocalPos(-100, 0, 0);
+	rightView->GetTransform()->SetLocalRot(0, 90, 0);
+	rightView->GetComponent<Camera>().front()->SwitchViewType();
+
 	return ret;
 }
 

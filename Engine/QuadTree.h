@@ -35,7 +35,7 @@ public:
 	void Draw();
 
 	AABB GetBox() { return box; }
-	void SetBox(int n, float2 breakPoint);
+	void SetBox(int n, float3 breakPoint);
 private:
 	void CreateChilds();
 	void Clean();

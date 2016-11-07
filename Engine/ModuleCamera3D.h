@@ -43,6 +43,10 @@ private:
 	GameObject* defaultCameraGO = nullptr;
 	Camera* defaultCamera = nullptr;
 	Camera* activeCamera = nullptr;
+
+	GameObject* topView = nullptr;
+	GameObject* rightView = nullptr;
+	GameObject* frontView = nullptr;
 public:
 	std::vector<Camera*> cullingCameras;
 };
