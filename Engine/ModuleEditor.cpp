@@ -281,8 +281,8 @@ update_status ModuleEditor::PreUpdate(float dt)
 			ImGui::Text(importResult.GetString());
 		}
 
-			std::vector<GameObject*>::iterator node = App->GO->root->childs.begin();
-			while (node != App->GO->root->childs.end())
+			std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
+			while (node != App->GO->GetRoot()->childs.end())
 			{
 					//std::vector<GameObject*>::iterator childNodes = (*node)->childs.begin();
 					//while (childNodes != (*node)->childs.end())

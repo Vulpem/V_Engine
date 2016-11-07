@@ -34,6 +34,8 @@ public:
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 
+	const GameObject* GetRoot() { return root; }
+
 private:
 	void CreateRootGameObject();
 public:
@@ -41,8 +43,10 @@ public:
 
 	Quad_Tree quadTree;
 	bool drawQuadTree = false;
-
+private:
 	GameObject* root = nullptr;
+public:
+	std::vector<GameObject*> dynamicGO;
 
 	//UI TMP STUFF
 	GameObject* setting = nullptr;

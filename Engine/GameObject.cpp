@@ -17,6 +17,7 @@ GameObject::GameObject()
 	aabb.SetNegativeInfinity();
 	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
+	App->GO->dynamicGO.push_back(this);
 }
 
 
@@ -371,6 +372,14 @@ void GameObject::SetStatic(bool Static)
 				parent->SetStatic(true);
 			}
 			App->GO->quadTree.Add(this);
+			for (std::vector<GameObject*>::iterator it = App->GO->dynamicGO.begin(); it != App->GO->dynamicGO.end(); it++)
+			{
+				if ((*it) == this)
+				{
+					App->GO->dynamicGO.erase(it);
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -379,6 +388,7 @@ void GameObject::SetStatic(bool Static)
 				(*it)->SetStatic(false);
 			}
 			App->GO->quadTree.Remove(this);
+			App->GO->dynamicGO.push_back(this);
 		}
 	}
 }
