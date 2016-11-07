@@ -220,7 +220,7 @@ void Camera::EditorContent()
 
 void Camera::Draw()
 {
-	if (App->camera->GetActiveCamera() != this)
+	if (App->camera->GetActiveCamera() != this && object->selected)
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);

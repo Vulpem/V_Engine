@@ -56,6 +56,7 @@ public:
 	bool IsOpenTestWindow = false;
 	bool IsOpenOutliner = true;
 	bool IsOpenAttributes = true;
+	bool IsOpenCameraSelector = true;
 
 	bool showPlane = true;
 	bool showAxis = true;

@@ -26,6 +26,10 @@ public:
 	void SetActiveCamera(Camera* activeCamera);
 	void SetActiveCamera(GameObject* activeCamera);
 	void SetCameraToDefault();
+	void SetCameraToTop();
+	void SetCameraToRight();
+	void SetCameraToFront();
+	void SetCameraToCamera(GameObject* setTo);
 	void AddCamCulling(Camera* toAdd);
 	void RemoveCamCulling(Camera* toRemove);
 	void ClearCamCulling();

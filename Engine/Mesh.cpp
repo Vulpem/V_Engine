@@ -131,7 +131,7 @@ void mesh::RealRender(bool wired)
 
 		if (object->HasComponent(C_material))
 		{
-			Material* mat = *object->GetComponent<Material>().begin();
+			Material* mat = object->GetComponent<Material>().front();
 			glColor4f(mat->GetColor().x, mat->GetColor().y, mat->GetColor().z, mat->GetColor().w);
 			uint textureID = mat->GetTexture(texMaterialIndex);
 			if (textureID)

@@ -5,6 +5,7 @@
 
 #include "ModuleInput.h"
 #include "ModuleImporter.h"
+#include "imGUI\imgui.h"
 
 #include "AllComponents.h"
 
@@ -69,6 +70,35 @@ update_status ModuleGoManager::Update(float dt)
 	{
 		(*it)->Update();
 		it++;
+	}
+
+	if (setting != nullptr)
+	{
+		ImGui::SetNextWindowSize(ImVec2(250, 75));
+
+		ImGui::Begin("##SetStaticChilds");
+		if (settingStatic)
+		{
+			ImGui::Text("Set childs to Static too?");
+		}
+		else
+		{
+			ImGui::Text("Set childs to non Static too?");
+		}
+		ImGui::NewLine();
+		ImGui::SameLine(30);
+		if (ImGui::Button("Yes##yesSetStatic"))
+		{
+			setting->SetChildsStatic(settingStatic);
+			setting = nullptr;
+		}
+		ImGui::SameLine(150);
+		if (ImGui::Button("No##NoSetStatic"))
+		{
+			setting->SetStatic(settingStatic);
+			setting = nullptr;
+		}
+		ImGui::End();
 	}
 
 	quadTree.Draw();

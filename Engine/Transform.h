@@ -41,6 +41,7 @@ public:
 	math::float3 GetGlobalPos();
 
 	void SetLocalRot(float x, float y, float z);
+	void SetLocalRot(float3 rot);
 	void SetLocalRot(float x, float y, float z, float w);
 	math::float3 GetLocalRot();
 

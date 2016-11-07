@@ -70,7 +70,6 @@ update_status ModuleEditor::PreUpdate(float dt)
 	ImGuiStyle style = ImGui::GetStyle();
 	style.Alpha = 0.9f;
 
-
 #pragma region MenuBar
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -254,7 +253,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 	}
 #pragma endregion
 
-#pragma region outliner
+#pragma region Outliner
 	if (IsOpenOutliner)
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
@@ -324,6 +323,45 @@ update_status ModuleEditor::PreUpdate(float dt)
 				}
 			}
 		}
+		ImGui::End();
+	}
+#pragma endregion
+
+#pragma region CameraSelector
+	if (IsOpenCameraSelector)
+	{
+		ImGui::SetNextWindowPos(ImVec2(screenW - 530, 20));
+		ImGui::SetNextWindowSize(ImVec2(200, 175));
+
+		ImGui::Begin("Camera Selector", &IsOpenCameraSelector, ImVec2(500, 300), 0.8f);
+		ImGui::Text("Active Camera:\n%s", App->camera->GetActiveCamera()->object->GetName());
+		ImGui::NewLine();
+		ImGui::Separator();
+		if (ImGui::Button("Switch View Type##CamSwitch"))
+		{
+			App->camera->GetActiveCamera()->SwitchViewType();
+		}
+		ImGui::Separator();
+		if (ImGui::Button("Default##SetDefaultCam"))
+		{
+			App->camera->SetCameraToDefault();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Top##SetTopCam"))
+		{
+			App->camera->SetCameraToTop();
+		}
+		if (ImGui::Button("Front##SetFrontCam"))
+		{
+			App->camera->SetCameraToFront();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Right##SetRightCam"))
+		{
+			App->camera->SetCameraToRight();
+		}
+
+
 		ImGui::End();
 	}
 #pragma endregion

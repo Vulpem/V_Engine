@@ -66,6 +66,7 @@ bool QuadNode::Remove(GameObject * GO)
 			if ((*it) == GO)
 			{
 				GOs.erase(it);
+				Clean();
 				return true;
 			}
 		}
@@ -73,15 +74,14 @@ bool QuadNode::Remove(GameObject * GO)
 
 	if (childs.empty() == false)
 	{
-		for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end() && ret == false; it++)
+		for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
 		{
 			ret = it->Remove(GO);
+			if (ret == true)
+			{
+				break;
+			}
 		}
-	}
-
-	if (ret == true)
-	{
-		Clean();
 	}
 	return ret;
 }
@@ -238,13 +238,14 @@ void QuadNode::CreateChilds()
 
 void QuadNode::Clean()
 {
+	bool childsHaveChilds = false;
 	std::vector<GameObject*> childsGOs;
 	for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
 	{
 		if (it->childs.empty() == false)
 		{
 			//If a child has childs, we shouldn't erase any of them! Just in case
-			childsGOs.clear();
+			childsHaveChilds = true;
 			break;
 		}
 		for (std::vector<GameObject*>::iterator childIt = it->GOs.begin(); childIt != it->GOs.end(); childIt++)
@@ -253,17 +254,25 @@ void QuadNode::Clean()
 		}
 	}
 
-	if (childsGOs.empty() == true)
+	if (childsHaveChilds == false)
 	{
-		childs.clear();
-	}
-	else if (childsGOs.size() + GOs.size() <= QUAD_GO_SIZE)
-	{
-		for (std::vector<GameObject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
+		if (childsGOs.empty() == true)
 		{
-			GOs.push_back(*it);
+			childs.clear();
 		}
-		childs.clear();
+		else if (childsGOs.size() + GOs.size() <= QUAD_GO_SIZE)
+		{
+			for (std::vector<GameObject*>::iterator it = childsGOs.begin(); it != childsGOs.end(); it++)
+			{
+				GOs.push_back(*it);
+			}
+			childs.clear();
+		}
+
+		if (parent != nullptr)
+		{
+			parent->Clean();
+		}
 	}
 }
 

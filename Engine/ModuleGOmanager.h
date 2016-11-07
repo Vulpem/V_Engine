@@ -42,6 +42,10 @@ public:
 	Quad_Tree quadTree;
 
 	GameObject* root = nullptr;
+
+	//UI TMP STUFF
+	GameObject* setting = nullptr;
+	bool settingStatic = true;
 };
 
 #endif

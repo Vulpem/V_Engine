@@ -191,9 +191,17 @@ void GameObject::DrawOnEditor()
 	ImGui::SameLine();
 	bool isStatic = IsStatic();
 	ImGui::Checkbox("##isObjectStatic", &isStatic);
-	if (isStatic != IsStatic())
+	if (isStatic != IsStatic() && App->GO->setting == nullptr)
 	{
-		SetStatic(isStatic);
+		if (childs.empty() == true)
+		{
+			SetStatic(isStatic);
+		}
+		else
+		{
+			App->GO->setting = this;
+			App->GO->settingStatic = isStatic;
+		}
 	}
 
 	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
@@ -369,6 +377,21 @@ void GameObject::SetStatic(bool Static)
 				(*it)->SetStatic(false);
 			}
 			App->GO->quadTree.Remove(this);
+		}
+	}
+}
+
+void GameObject::SetChildsStatic(bool Static)
+{
+	SetStatic(Static);
+	if (Static == true)
+	{
+		if (childs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				(*it)->SetChildsStatic(Static);
+			}
 		}
 	}
 }

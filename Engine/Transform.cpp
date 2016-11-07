@@ -214,6 +214,11 @@ void Transform::SetLocalRot(float x, float y, float z)
 	}
 }
 
+void Transform::SetLocalRot(float3 rot)
+{
+	SetLocalRot(rot.x, rot.y, rot.z);
+}
+
 void Transform::SetLocalRot(float x, float y, float z, float w)
 {
 	if (object->IsStatic() == false)

@@ -22,24 +22,27 @@ bool ModuleCamera3D::Start()
 	LOG("Setting up the camera");
 	bool ret = true;
 
-	defaultCameraGO = App->GO->CreateCamera();
-	defaultCamera = *defaultCameraGO->GetComponent<Camera>().begin();
-	defaultCameraGO->SetName("Default editor camera");
+	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
+	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
+	defaultCameraGO->HideFromOutliner();
 
 	topView = App->GO->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 100, 0);
 	topView->GetTransform()->SetLocalRot(90, 0, 0);
 	topView->GetComponent<Camera>().front()->SwitchViewType();
+	topView->HideFromOutliner();
 
 	frontView = App->GO->CreateCamera("FrontView");
 	frontView->GetTransform()->SetLocalPos(0, 0, -100);
 	frontView->GetTransform()->SetLocalRot(0, 0, 0);
 	frontView->GetComponent<Camera>().front()->SwitchViewType();
+	frontView->HideFromOutliner();
 
 	rightView = App->GO->CreateCamera("RightView");
 	rightView->GetTransform()->SetLocalPos(-100, 0, 0);
 	rightView->GetTransform()->SetLocalRot(0, 90, 0);
 	rightView->GetComponent<Camera>().front()->SwitchViewType();
+	rightView->HideFromOutliner();
 
 	return ret;
 }
@@ -131,13 +134,44 @@ void ModuleCamera3D::SetActiveCamera(GameObject * activeCamera)
 	std::vector<Camera*> cam = activeCamera->GetComponent<Camera>();
 	if (cam.empty() == false)
 	{
-		SetActiveCamera(*cam.begin());
+		SetActiveCamera(cam.front());
 	}
 }
 
 void ModuleCamera3D::SetCameraToDefault()
 {
 	SetActiveCamera((Camera*)nullptr);
+}
+
+void ModuleCamera3D::SetCameraToTop()
+{
+	SetCameraToDefault();
+	SetCameraToCamera(topView);
+}
+
+void ModuleCamera3D::SetCameraToRight()
+{
+	SetCameraToDefault();
+	SetCameraToCamera(rightView);
+}
+
+void ModuleCamera3D::SetCameraToFront()
+{
+	SetCameraToDefault();
+	SetCameraToCamera(frontView);
+}
+
+void ModuleCamera3D::SetCameraToCamera(GameObject * setTo)
+{
+	if (setTo->GetComponent<Camera>().empty() == false && setTo->GetTransform() != nullptr)
+	{
+		GetActiveCamera()->object->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
+		GetActiveCamera()->object->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());
+		if (GetActiveCamera()->GetFrustum()->type != setTo->GetComponent<Camera>().front()->GetFrustum()->type)
+		{
+			GetActiveCamera()->SwitchViewType();
+		}
+	}
 }
 
 void ModuleCamera3D::AddCamCulling(Camera * toAdd)
