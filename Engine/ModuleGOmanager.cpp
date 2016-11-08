@@ -117,6 +117,7 @@ update_status ModuleGoManager::PostUpdate(float dt)
 		it++;
 	}
 
+	DeleteGOs();
 	return UPDATE_CONTINUE;
 }
 
@@ -182,8 +183,7 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 {
 	if (toErase)
 	{
-		LOG("Erasing GO %s", toErase->GetName());
-		delete toErase;
+		toDelete.push(toErase);
 		return true;
 	}
 	return false;
@@ -241,5 +241,15 @@ void ModuleGoManager::CreateRootGameObject()
 	else
 	{
 		LOG("Be careful! You almost created a second root node!");
+	}
+}
+
+void ModuleGoManager::DeleteGOs()
+{
+	while (toDelete.empty() == false)
+	{
+		LOG("Erasing GO %s", toDelete.top()->GetName());
+		delete toDelete.top();
+		toDelete.pop();
 	}
 }

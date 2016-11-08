@@ -298,36 +298,6 @@ update_status ModuleEditor::PreUpdate(float dt)
 	}
 #pragma endregion
 
-#pragma region Attributes window
-	if (IsOpenAttributes)
-	{
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(330, 510));
-		ImGui::Begin("Attribute Editor", &IsOpenAttributes, 0.8f);
-		if (selectedGameObject)
-		{
-			selectedGameObject->DrawOnEditor();
-			ImGui::Separator();
-			if (selectedGameObject->HasComponent(Component::Type::C_transform))
-			{
-				if (ImGui::Button("Look at"))
-				{
-					float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
-					App->camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
-				}
-				ImGui::NewLine();
-				ImGui::Text("Danger Zone:");
-				if (ImGui::Button("Delete"))
-				{
-					App->GO->DeleteGameObject(selectedGameObject);
-					selectedGameObject = nullptr;
-				}
-			}
-		}
-		ImGui::End();
-	}
-#pragma endregion
-
 #pragma region CameraSelector
 	if (IsOpenCameraSelector)
 	{
@@ -363,6 +333,36 @@ update_status ModuleEditor::PreUpdate(float dt)
 		}
 
 
+		ImGui::End();
+	}
+#pragma endregion
+
+#pragma region Attributes window
+	if (IsOpenAttributes)
+	{
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
+		ImGui::SetNextWindowSize(ImVec2(330, 510));
+		ImGui::Begin("Attribute Editor", &IsOpenAttributes, 0.8f);
+		if (selectedGameObject)
+		{
+			selectedGameObject->DrawOnEditor();
+			ImGui::Separator();
+			if (selectedGameObject->HasComponent(Component::Type::C_transform))
+			{
+				if (ImGui::Button("Look at"))
+				{
+					float3 toLook = selectedGameObject->GetTransform()->GetGlobalPos();
+					App->camera->LookAt(float3(toLook.x, toLook.y, toLook.z));
+				}
+				ImGui::NewLine();
+				ImGui::Text("Danger Zone:");
+				if (ImGui::Button("Delete"))
+				{
+					App->GO->DeleteGameObject(selectedGameObject);
+					selectedGameObject = nullptr;
+				}
+			}
+		}
 		ImGui::End();
 	}
 #pragma endregion

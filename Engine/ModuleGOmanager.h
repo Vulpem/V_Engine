@@ -6,6 +6,7 @@
 
 #include "Math.h"
 #include <vector>
+#include <stack>
 #include "QuadTree.h"
 
 #include "GameObject.h"
@@ -41,6 +42,8 @@ public:
 
 private:
 	void CreateRootGameObject();
+	void DeleteGOs();
+	std::stack<GameObject*> toDelete;
 public:
 	std::vector<uint> id_textures;
 

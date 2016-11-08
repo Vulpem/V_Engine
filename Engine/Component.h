@@ -21,7 +21,7 @@ public:
 
 
 	Component(GameObject* linkedTo, int id);
-	~Component();
+	virtual ~Component();
 
 	virtual void Enable();
 	virtual void Disable();
