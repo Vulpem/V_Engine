@@ -68,7 +68,9 @@ bool ModuleWindow::Init()
 		{
 			//Get window surface
 			screen_surface = SDL_GetWindowSurface(window);
-			UpdateWindowSize();
+			int w, h;
+			SDL_GetWindowSize(window, &w, &h);
+			OnScreenResize(w,h);
 		}
 	}
 
@@ -96,9 +98,10 @@ void ModuleWindow::SetTitle(const char* title)
 	SDL_SetWindowTitle(window, title);
 }
 
-void ModuleWindow::UpdateWindowSize()
+void ModuleWindow::OnScreenResize(int width, int heigth)
 {
-	SDL_GetWindowSize(window, &windowWidth, &windowHeigth);
+	windowWidth = width;
+	windowHeigth = heigth;
 }
 
 float2 ModuleWindow::GetWindowSize()
