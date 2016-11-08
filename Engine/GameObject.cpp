@@ -11,7 +11,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleGOmanager.h"
 
-//------------------------- NODE --------------------------------------------------------------------------------
+
 GameObject::GameObject()
 {
 	aabb.SetNegativeInfinity();
@@ -24,7 +24,7 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 
-	SetStatic(false);
+	App->GO->SetStatic(false, this);
 
 	if (parent != nullptr)
 	{
@@ -179,13 +179,13 @@ void GameObject::DrawOnEditor()
 	ImGui::SameLine();
 	ImGui::Text("Static: ");
 	ImGui::SameLine();
-	bool isStatic = IsStatic();
+	bool isStatic = Static;
 	ImGui::Checkbox("##isObjectStatic", &isStatic);
-	if (isStatic != IsStatic() && App->GO->setting == nullptr)
+	if (isStatic != Static && App->GO->setting == nullptr)
 	{
 		if (childs.empty() == true)
 		{
-			SetStatic(isStatic);
+			App->GO->SetStatic(isStatic, this);
 		}
 		else
 		{
@@ -347,56 +347,6 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 }
 
-void GameObject::SetStatic(bool Static)
-{
-	if (Static != this->Static)
-	{
-		this->Static = Static;
-		if (Static)
-		{
-			if (parent != nullptr)
-			{
-				parent->SetStatic(true);
-			}
-			App->GO->quadTree.Add(this);
-			for (std::vector<GameObject*>::iterator it = App->GO->dynamicGO.begin(); it != App->GO->dynamicGO.end(); it++)
-			{
-				if ((*it) == this)
-				{
-					App->GO->dynamicGO.erase(it);
-					break;
-				}
-			}
-		}
-		else
-		{
-			if (childs.empty() == false)
-			{
-				for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
-				{
-					(*it)->SetStatic(false);
-				}
-			}
-			App->GO->quadTree.Remove(this);
-			App->GO->dynamicGO.push_back(this);
-		}
-	}
-}
-
-void GameObject::SetChildsStatic(bool Static)
-{
-	SetStatic(Static);
-	if (Static == true)
-	{
-		if (childs.empty() == false)
-		{
-			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
-			{
-				(*it)->SetChildsStatic(Static);
-			}
-		}
-	}
-}
 
 void GameObject::SetName(const char * newName)
 {

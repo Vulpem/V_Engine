@@ -88,13 +88,13 @@ update_status ModuleGoManager::Update(float dt)
 		ImGui::SameLine(30);
 		if (ImGui::Button("Yes##yesSetStatic"))
 		{
-			setting->SetChildsStatic(settingStatic);
+			SetChildsStatic(settingStatic, setting);
 			setting = nullptr;
 		}
 		ImGui::SameLine(150);
 		if (ImGui::Button("No##NoSetStatic"))
 		{
-			setting->SetStatic(settingStatic);
+			SetStatic(settingStatic, setting);
 			setting = nullptr;
 		}
 		ImGui::End();
@@ -188,6 +188,57 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	}
 	return false;
 	
+}
+
+void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
+{
+	if (Static != GO->Static)
+	{
+		GO->Static = Static;
+		if (Static)
+		{
+			if (GO->parent != nullptr)
+			{
+				SetStatic(true, GO->parent);
+			}
+			App->GO->quadTree.Add(GO);
+			for (std::vector<GameObject*>::iterator it = App->GO->dynamicGO.begin(); it != App->GO->dynamicGO.end(); it++)
+			{
+				if ((*it) == GO)
+				{
+					dynamicGO.erase(it);
+					break;
+				}
+			}
+		}
+		else
+		{
+			if (GO->childs.empty() == false)
+			{
+				for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+				{
+					SetStatic(false, (*it));
+				}
+			}
+			quadTree.Remove(GO);
+			dynamicGO.push_back(GO);
+		}
+	}
+}
+
+void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
+{
+	SetStatic(Static, GO);
+	if (Static == true)
+	{
+		if (GO->childs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+			{
+				SetChildsStatic(Static,(*it));
+			}
+		}
+	}
 }
 
 std::vector<GameObject*> ModuleGoManager::FilterCollisions(LineSegment col)

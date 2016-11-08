@@ -7,6 +7,7 @@
 #include "Math.h"
 #include <vector>
 #include <stack>
+#include <map>
 #include "QuadTree.h"
 
 #include "GameObject.h"
@@ -35,15 +36,21 @@ public:
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 
+	void SetStatic(bool Static, GameObject* GO);
+	void SetChildsStatic(bool Static, GameObject* GO);
+
 	std::vector<GameObject*> FilterCollisions(LineSegment col);
 	std::vector<GameObject*> FilterCollisions(AABB col);
 
 	const GameObject* GetRoot() { return root; }
 
 private:
+	void AddGO(GameObject* GO);
 	void CreateRootGameObject();
 	void DeleteGOs();
 	std::stack<GameObject*> toDelete;
+
+	std::multimap<Component::Type, Component*> components;
 public:
 	std::vector<uint> id_textures;
 

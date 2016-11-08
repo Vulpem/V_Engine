@@ -28,8 +28,9 @@ private:
 	bool active = true;
 	bool publicActive = true;
 	bool hiddenOnOutliner = false;
+public:
 	bool Static = false;
-
+private:
 	bool drawAABB = true;
 	AABB originalAABB;
 
@@ -69,10 +70,6 @@ public:
 
 	void SetActive(bool state, bool justPublic = false);
 	bool IsActive() { return publicActive; }
-
-	void SetStatic(bool Static);
-	void SetChildsStatic(bool Static);
-	bool IsStatic() { return Static; }
 
 	void SetName(const char* newName);
 	const char* GetName();
