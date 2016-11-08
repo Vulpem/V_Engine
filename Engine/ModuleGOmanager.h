@@ -12,7 +12,6 @@
 
 #include "GameObject.h"
 
-
 class GameObject;
 
 class ModuleGoManager : public Module
@@ -41,6 +40,9 @@ public:
 
 	std::vector<GameObject*> FilterCollisions(LineSegment col);
 	std::vector<GameObject*> FilterCollisions(AABB col);
+
+	Mesh_RenderInfo GetMeshData(mesh* getFrom);
+	void RenderGOs(const math::Frustum& frustum);
 
 	const GameObject* GetRoot() { return root; }
 

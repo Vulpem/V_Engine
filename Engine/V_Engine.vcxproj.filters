@@ -366,6 +366,9 @@
     <ClInclude Include="QuadTree.h">
       <Filter>Sources\Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh_RenderInfo.h">
+      <Filter>Sources\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">

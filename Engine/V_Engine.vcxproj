@@ -94,6 +94,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="glmath.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Mesh_RenderInfo.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="imGUI\imconfig.h" />
     <ClInclude Include="imGUI\imgui.h" />

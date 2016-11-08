@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "Component.h"
 
+struct Mesh_RenderInfo;
 struct aiMesh;
 struct aiNode;
 struct aiScene;
@@ -16,33 +17,25 @@ public:
 
 	uint id_vertices = 0;
 	uint num_vertices = 0;
-	float* vertices = nullptr;
 
 	uint id_indices = 0;
 	uint num_indices = 0;
-	uint* indices = nullptr;
 
 	uint id_normals = 0;
 	uint num_normals;
-	float* normals = nullptr;
 
 	uint id_textureCoords = 0;
 	uint num_textureCoords = 0;
-	float* textureCoords = nullptr;
 
 	int texMaterialIndex = -1;
 
 	bool wires = false;
 
-	void DoUpdate();
+	Mesh_RenderInfo GetMeshInfo();
+
 	void EditorContent();
 
 	static Type GetType() { return Type::C_mesh; }
-
-	void Draw();
-private:
-	void RealRender(bool wired = false);
-	void RenderNormals();
 };
 
 #endif

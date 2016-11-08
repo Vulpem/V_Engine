@@ -8,6 +8,8 @@
 
 #define MAX_LIGHTS 8
 
+struct Mesh_RenderInfo;
+
 class ModuleRenderer3D : public Module
 {
 public:
@@ -26,7 +28,12 @@ public:
 	void DrawLine(float3 a, float3 b, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawBox(float3* corners, float4 color = float4(1.0f, 1.0f, 0.6f, 1.0f));
 	void DrawLocator(float3 center = float3(0.0f, 0.0f, 0.0f), float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
-
+	void DrawMesh(Mesh_RenderInfo meshInfo);
+private:
+	void RenderMeshWired(const Mesh_RenderInfo& data);
+	void RenderMeshFilled(const Mesh_RenderInfo& data);
+	void RenderNormals(const Mesh_RenderInfo& data);
+public:
 	Light lights[MAX_LIGHTS];
 private:
 	SDL_GLContext context;

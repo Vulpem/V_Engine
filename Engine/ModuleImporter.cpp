@@ -302,17 +302,17 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				It += bytes;
 
 				//Actual vertices
-				newMesh->vertices = new float[newMesh->num_vertices * 3];
+				float* vertices = new float[newMesh->num_vertices * 3];
 				bytes = sizeof(float) * newMesh->num_vertices * 3;
-				memcpy(newMesh->vertices, It, bytes);
+				memcpy(vertices, It, bytes);
 				It += bytes;
 
 				//Generating vertices buffer
 				glGenBuffers(1, (GLuint*) &(newMesh->id_vertices));
 				glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_vertices);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, vertices, GL_STATIC_DRAW);
 				//endof Generating vertices buffer
-				RELEASE_ARRAY(newMesh->vertices);
+				RELEASE_ARRAY(vertices);
 
 
 				//Num normals
@@ -323,17 +323,17 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				if (newMesh->num_normals > 0)
 				{
 					//Normals
-					newMesh->normals = new float[newMesh->num_vertices * 3];
+					float* normals = new float[newMesh->num_vertices * 3];
 					bytes = sizeof(float) * newMesh->num_normals * 3;
-					memcpy(newMesh->normals, It, bytes);
+					memcpy(normals, It, bytes);
 					It += bytes;
 
 					//Generating normals buffer
 					glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
 					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, normals, GL_STATIC_DRAW);
 					//endOf Generating normals buffer
-					RELEASE_ARRAY(newMesh->normals);
+					RELEASE_ARRAY(normals);
 				}
 
 				//Num texture coords
@@ -344,17 +344,17 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				if (newMesh->num_textureCoords > 0)
 				{
 					//Texture coords
-					newMesh->textureCoords = new float[newMesh->num_vertices * 2];
+					float* textureCoords = new float[newMesh->num_vertices * 2];
 					bytes = sizeof(float) * newMesh->num_normals * 2;
-					memcpy(newMesh->textureCoords, It, bytes);
+					memcpy(textureCoords, It, bytes);
 					It += bytes;
 
 					//Generating UVs buffer
 					glGenBuffers(1, (GLuint*) &(newMesh->id_textureCoords));
 					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, newMesh->textureCoords, GL_STATIC_DRAW);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, textureCoords, GL_STATIC_DRAW);
 					//endOF Generatinv UVs buffer
-					RELEASE_ARRAY(newMesh->textureCoords);
+					RELEASE_ARRAY(textureCoords);
 				}
 
 				//Texture name Len
@@ -389,18 +389,18 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				It += bytes;
 
 				//Actual indices
-				newMesh->indices = new uint[newMesh->num_indices];
+				uint* indices = new uint[newMesh->num_indices];
 				bytes = sizeof(uint) * newMesh->num_indices;
-				memcpy(newMesh->indices, It, bytes);
+				memcpy(indices, It, bytes);
 				It += bytes;
 
 				//Generating indices buffer
 				glGenBuffers(1, (GLuint*) &(newMesh->id_indices));
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, indices, GL_STATIC_DRAW);
 				//endOf generating indices buffer
 
-				RELEASE_ARRAY(newMesh->indices);
+				RELEASE_ARRAY(indices);
 			}
 
 			//AABB box

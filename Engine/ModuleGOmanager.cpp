@@ -5,10 +5,13 @@
 
 #include "ModuleInput.h"
 #include "ModuleImporter.h"
+#include "ModuleCamera3D.h"
+#include "ModuleRenderer3D.h"
 #include "imGUI\imgui.h"
 
-#include "AllComponents.h"
+#include "Mesh_RenderInfo.h"
 
+#include "AllComponents.h"
 
 
 //------------------------- MODULE --------------------------------------------------------------------------------
@@ -70,6 +73,8 @@ update_status ModuleGoManager::Update(float dt)
 		(*it)->Update();
 		it++;
 	}
+
+	RenderGOs(*App->camera->GetActiveCamera()->GetFrustum());
 
 	if (setting != nullptr)
 	{
@@ -137,13 +142,13 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 	GameObject* empty = new GameObject();
 
 	empty->AddComponent(Component::Type::C_transform);
-
-	AddGOtoRoot(empty);
 	
 	if (name != NULL && name != "")
 	{
 		empty->SetName(name);
 	}
+
+	AddGOtoRoot(empty);
 
 	return empty;
 }
@@ -270,6 +275,37 @@ std::vector<GameObject*> ModuleGoManager::FilterCollisions(AABB col)
 	return ret;
 }
 
+Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
+{
+	Mesh_RenderInfo ret = getFrom->GetMeshInfo();
+
+	ret.transform = getFrom->object->GetTransform()->GetGlobalTransform();
+
+	if (getFrom->object->HasComponent(Component::Type::C_material))
+	{
+		Material* mat = getFrom->object->GetComponent<Material>().front();
+		ret.meshColor = mat->GetColor();
+		ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
+	}
+	return ret;
+}
+
+void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
+{
+	std::vector<GameObject*> GOs = FilterCollisions(frustum.MinimalEnclosingAABB());
+	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	{
+		std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
+		if (meshes.empty() == false)
+		{
+			for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
+			{
+				App->renderer3D->DrawMesh(GetMeshData(*mesh));
+			}
+		}
+	}
+}
+
 void ModuleGoManager::AddGOtoRoot(GameObject * GO)
 {
 	GO->parent = root;
@@ -281,9 +317,12 @@ void ModuleGoManager::SetUpGO(GameObject * GO)
 {
 	dynamicGO.push_back(GO);
 
-	for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+	if (GO->childs.empty() == false)
 	{
-		SetUpGO(*it);
+		for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+		{
+			SetUpGO(*it);
+		}
 	}
 }
 

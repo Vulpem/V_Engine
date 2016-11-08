@@ -8,6 +8,8 @@
 
 #include "OpenGL.h"
 
+#include "Mesh_RenderInfo.h"
+
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
 #pragma comment (lib, "Glew/libx86/glew32.lib") /* link Microsoft OpenGL lib   */
@@ -276,4 +278,116 @@ void ModuleRenderer3D::DrawLocator(float3 center, float4 color)
 
 	glLineWidth(1.0f);
 	glEnable(GL_LIGHTING);
+}
+
+void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
+{
+	glPushMatrix();
+	glMultMatrixf(meshInfo.transform.ptr());
+
+	if (meshInfo.renderNormals)
+	{
+		RenderNormals(meshInfo);
+	}
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	//Setting vertex
+	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.vertexBuffer);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+	if (meshInfo.textureCoordsBuffer > 0)
+	{
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		//Setting texture coords
+		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.textureCoordsBuffer);
+		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+
+		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
+	}
+	if (meshInfo.normalsBuffer > 0)
+	{
+		glEnableClientState(GL_NORMAL_ARRAY);
+		//Setting Normals
+		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.normalsBuffer);
+		glNormalPointer(GL_FLOAT, 0, NULL);
+	}
+
+	//Setting index
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
+	if (meshInfo.wired)
+	{
+		RenderMeshWired(meshInfo);
+	}
+	if (meshInfo.filled)
+	{
+		RenderMeshFilled(meshInfo);
+	}
+
+	glDrawElements(GL_TRIANGLES, meshInfo.num_indices, GL_UNSIGNED_INT, NULL);
+
+	//Cleaning
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glPopMatrix();
+}
+
+void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
+{
+		glDisable(GL_LIGHTING);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glLineWidth(1.0f);
+		glColor4fv(data.wiresColor.ptr());
+		if (data.doubleSidedFaces)
+		{
+			glDisable(GL_CULL_FACE);
+		}
+
+		glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
+
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_LIGHTING);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void ModuleRenderer3D::RenderMeshFilled(const Mesh_RenderInfo& data)
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_CULL_FACE);
+	glColor4fv(data.meshColor.ptr());
+	glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
+}
+
+void ModuleRenderer3D::RenderNormals(const Mesh_RenderInfo & data)
+{
+	if (data.normalsBuffer > 0)
+	{
+		float* normals = new float[data.num_vertices * 3];
+		glBindBuffer(GL_ARRAY_BUFFER, data.normalsBuffer);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.num_vertices * 3, normals);
+
+		float* vertices = new float[data.num_vertices * 3];
+		glBindBuffer(GL_ARRAY_BUFFER, data.vertexBuffer);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.num_vertices * 3, vertices);
+
+		for (uint n = 0; n < data.num_vertices; n++)
+		{
+			DrawLine(
+				float3(vertices[n * 3], vertices[n * 3 + 1], vertices[n * 3 + 2]),
+				float3(vertices[n * 3] + normals[n * 3], vertices[n * 3 + 1] + normals[n * 3 + 1], vertices[n * 3 + 2] + normals[n * 3 + 2]),
+				float4(0.54f, 0.0f, 0.54f, 1.0f));
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		RELEASE_ARRAY(normals);
+		RELEASE_ARRAY(vertices);
+	}
 }
