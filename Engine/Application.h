@@ -17,7 +17,6 @@ class ModuleCamera3D;
 class ModuleEditor;
 class ModuleGoManager;
 class ModulePhysics3D;
-class ModuleScene;
 class ModuleFileSystem;
 class ModuleImporter;
 
@@ -38,8 +37,6 @@ public:
 	ModuleImporter* importer;
 	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
-
-	ModuleScene* scene;
 
 	float ms_frame[EDITOR_FRAME_SAMPLES];
 	float framerate[EDITOR_FRAME_SAMPLES];

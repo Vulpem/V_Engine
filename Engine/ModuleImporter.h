@@ -7,8 +7,8 @@
 #include "Math.h"
 #include <vector>
 
-class aiScene;
-class aiNode;
+struct aiScene;
+struct aiNode;
 class GameObject;
 class Material;
 

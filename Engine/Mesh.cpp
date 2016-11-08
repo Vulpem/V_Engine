@@ -202,7 +202,7 @@ void mesh::RenderNormals()
 
 		glColor4f(0.54f, 0.0f, 0.54f, 1.0f);
 
-		for (int n = 0; n < num_normals; n++)
+		for (uint n = 0; n < num_normals; n++)
 		{
 			glVertex3f(vertices[n * 3], vertices[n * 3 + 1], vertices[n * 3 + 2]);
 

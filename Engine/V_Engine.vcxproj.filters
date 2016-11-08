@@ -16,9 +16,6 @@
     <Filter Include="Sources\Helpers">
       <UniqueIdentifier>{121f8e6b-df36-4ab0-be0d-601ddfc9e503}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Scenes">
-      <UniqueIdentifier>{cd86892a-2f6a-49fa-a8d8-50beaddca8bd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\GameObjectStuff">
       <UniqueIdentifier>{3e399d53-bf8a-4fd1-9004-dbcf29af7956}</UniqueIdentifier>
     </Filter>
@@ -300,9 +297,6 @@
     <ClInclude Include="MathGeoLib\include\Algorithm\Random\LCG.h">
       <Filter>Sources\Libraries\Math\MathGeoLib\Algorithm\Random</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleScene.h">
-      <Filter>Sources\Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleFileSystem.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
@@ -526,9 +520,6 @@
     </ClCompile>
     <ClCompile Include="MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>Sources\Libraries\Math\MathGeoLib\Algorithm\Random</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleScene.cpp">
-      <Filter>Sources\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="ModuleFileSystem.cpp">
       <Filter>Sources\Modules</Filter>

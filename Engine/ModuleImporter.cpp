@@ -99,7 +99,7 @@ void ModuleImporter::ImportFromFolder(const char * path)
 	std::vector<std::string> files;
 	App->fs->GetFilesIn(path, &folders, &files);
 
-	for (int n = 0; n < files.size(); n++)
+	for (uint n = 0; n < files.size(); n++)
 	{
 		std::string toSend(path);
 		toSend += "/";
@@ -111,7 +111,7 @@ void ModuleImporter::ImportFromFolder(const char * path)
 
 	}
 	files.clear();
-	for (int n = 0; n < folders.size(); n++)
+	for (uint n = 0; n < folders.size(); n++)
 	{
 		std::string toSend(path);
 		toSend += "/";
@@ -127,7 +127,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 	std::string fmt = FileFormat(filePath);
 	std::string supportedFormats;
 	supportedFormats += " FBX";
-	for (int n = 0; n < aiGetImportFormatCount(); n++)
+	for (uint n = 0; n < aiGetImportFormatCount(); n++)
 	{
 		supportedFormats += " ";
 		supportedFormats += aiGetImportFormatDescription(n)->mFileExtensions;		
@@ -286,7 +286,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 			It += bytes;
 
 			//Loading each mesh
-			for (int n = 0; n < _nMeshes; n++)
+			for (uint n = 0; n < _nMeshes; n++)
 			{
 				mesh* newMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
 
@@ -431,7 +431,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 
 				std::vector<std::string> childs;
 				//Loading each child name into a separate string
-				for (int n = 0; n < nChilds; n++)
+				for (uint n = 0; n < nChilds; n++)
 				{
 					char* name = new char[sizeOfChilds[n]];
 					bytes = sizeof(char) * sizeOfChilds[n];
@@ -595,7 +595,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		char** meshes = new char*[nMeshes];
 		uint* meshSize = new uint[nMeshes];
 
-		for (int n = 0; n < nMeshes; n++)
+		for (uint n = 0; n < nMeshes; n++)
 		{
 			aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
 
@@ -605,7 +605,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 			memcpy_s(vertices, sizeof(float) * num_vertices * 3, toLoad->mVertices, sizeof(float) * num_vertices * 3);
 
 			float* it = vertices;
-			for (int n = 0; n < num_vertices * 3; n += 3)
+			for (uint n = 0; n < num_vertices * 3; n += 3)
 			{
 				float* x = it;
 				float* y = x;
@@ -635,7 +635,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 				textureCoords = new float[num_vertices * 2];
 
 				aiVector3D* tmpVect = toLoad->mTextureCoords[0];
-				for (int n = 0; n < num_vertices * 2; n += 2)
+				for (uint n = 0; n < num_vertices * 2; n += 2)
 				{
 					textureCoords[n] = tmpVect->x;
 					textureCoords[n + 1] = tmpVect->y;
@@ -665,7 +665,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 			num_indices = toLoad->mNumFaces * 3;
 			indices = new uint[num_indices];
-			for (int i = 0; i < num_indices; i += 3)
+			for (uint i = 0; i < num_indices; i += 3)
 			{
 				if (currentFace->mNumIndices != 3)
 				{
@@ -767,7 +767,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 
 		//Loading child nodes
-		for (int n = 0; n < nChilds; n++)
+		for (uint n = 0; n < nChilds; n++)
 		{
 			std::string toPush(NodetoLoad->mChildren[n]->mName.data);
 			childs.push_back(toPush);
@@ -784,7 +784,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		//size of each child
 		childsIt = CopyMem<uint>(childsIt, childsSize, nChilds);
 
-		for (int n = 0; n < nChilds; n++)
+		for (uint n = 0; n < nChilds; n++)
 		{
 			//a child
 			childsIt = CopyMem<char>(childsIt, (childs[n].data()), childsSize[n]);
@@ -793,7 +793,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		//Getting the total size of the real file
 		uint realFileSize = 0;
 		realFileSize += file_0Size;
-		for (int n = 0; n < nMeshes; n++)
+		for (uint n = 0; n < nMeshes; n++)
 		{
 			realFileSize += meshSize[n];
 		}
@@ -807,7 +807,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		//file_0
 		realIt = CopyMem<char>(realIt, file_0, file_0Size);
 
-		for (int n = 0; n < nMeshes; n++)
+		for (uint n = 0; n < nMeshes; n++)
 		{
 			//each mesh
 			realIt = CopyMem<char>(realIt, meshes[n], meshSize[n]);
@@ -851,7 +851,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 		RELEASE_ARRAY(realFile);
 	//Importing also all the childs
-	for (int n = 0; n < NodetoLoad->mNumChildren; n++)
+	for (uint n = 0; n < NodetoLoad->mNumChildren; n++)
 	{
 		if (isChild)
 		{

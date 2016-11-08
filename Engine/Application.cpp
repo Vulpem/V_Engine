@@ -10,7 +10,6 @@
 #include "ModulePhysics3D.h"
 #include "ModuleEditor.h"
 #include "ModuleGoManager.h"
-#include "ModuleScene.h"
 #include "ModuleFileSystem.h"
 #include "ModuleImporter.h"
 
@@ -33,8 +32,6 @@ Application::Application()
 	GO = new ModuleGoManager(this);
 	importer = new ModuleImporter(this);
 
-	scene = new ModuleScene(this);
-
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
 	// They will CleanUp() in reverse order
@@ -49,10 +46,6 @@ Application::Application()
 	AddModule(physics);
 	AddModule(importer);
 	AddModule(GO);
-	
-	// Scenes
-	AddModule(scene);
-
 
 	// Renderer last!
 	AddModule(renderer3D);

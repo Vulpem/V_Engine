@@ -171,7 +171,6 @@
     <ClInclude Include="ModuleImporter.h" />
     <ClInclude Include="ModulePhysics3D.h" />
     <ClInclude Include="ModuleRenderer3D.h" />
-    <ClInclude Include="ModuleScene.h" />
     <ClInclude Include="ModuleGOmanager.h" />
     <ClInclude Include="ModuleEditor.h" />
     <ClInclude Include="OpenGL.h" />
@@ -239,7 +238,6 @@
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModulePhysics3D.cpp" />
     <ClCompile Include="ModuleRenderer3D.cpp" />
-    <ClCompile Include="ModuleScene.cpp" />
     <ClCompile Include="ModuleGOmanager.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />

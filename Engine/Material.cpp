@@ -21,7 +21,7 @@ void Material::EditorContent()
 {
 	ImGui::ColorEdit3("Color", color);
 
-	for (int n = 0; n < textures.size(); n++)
+	for (uint n = 0; n < textures.size(); n++)
 	{
 		ImGui::Separator();
 		char tmp[524];

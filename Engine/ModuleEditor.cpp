@@ -8,7 +8,6 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
-#include "ModuleScene.h"
 #include "ModuleGOmanager.h"
 
 #include "AllComponents.h"
@@ -59,11 +58,16 @@ update_status ModuleEditor::PreUpdate(float dt)
 	update_status ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
-	int screenW = App->window->GetWindowSize().x;
-	int screenH = App->window->GetWindowSize().y;
+	return ret;
+}
 
-	ImGuiStyle style = ImGui::GetStyle();
-	style.Alpha = 0.9f;
+update_status ModuleEditor::Update(float dt)
+{
+	update_status ret = UPDATE_CONTINUE;
+	if (IsOpenTestWindow)
+	{
+		ImGui::ShowTestWindow(&IsOpenTestWindow);
+	}
 
 	ret = MenuBar();
 	Editor();
@@ -72,22 +76,13 @@ update_status ModuleEditor::PreUpdate(float dt)
 	CameraSelector();
 	AttributeWindow();
 
-	return ret;
-}
-
-update_status ModuleEditor::Update(float dt)
-{
-	if (IsOpenTestWindow)
-	{
-		ImGui::ShowTestWindow(&IsOpenTestWindow);
-	}
 	if (showPlane)
 	{
 		P_Plane p(0, 0, 0, 1);
 		p.axis = true;
 		p.Render();
 	}
-	return UPDATE_CONTINUE;
+	return ret;
 }
 
 update_status ModuleEditor::PostUpdate(float dt)
@@ -343,7 +338,7 @@ void ModuleEditor::Console()
 	if (IsOpenConsole)
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
-		ImGui::SetNextWindowSize(ImVec2(screenW - 330, 200));
+		ImGui::SetNextWindowSize(ImVec2(screenW - 330.0f, 200.0f));
 
 		ImGui::Begin("Console", &IsOpenConsole, ImVec2(500, 300), 0.8f);
 
@@ -367,7 +362,7 @@ void ModuleEditor::Outliner()
 	if (IsOpenOutliner)
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(300, screenH - 220));
+		ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 220.0f));
 
 		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 0.8f);
 		if (ImGui::CollapsingHeader("Load Geometry"))
