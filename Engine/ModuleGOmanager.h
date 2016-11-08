@@ -45,7 +45,8 @@ public:
 	const GameObject* GetRoot() { return root; }
 
 private:
-	void AddGO(GameObject* GO);
+	void AddGOtoRoot(GameObject* GO);
+	void SetUpGO(GameObject* GO);
 	void CreateRootGameObject();
 	void DeleteGOs();
 	std::stack<GameObject*> toDelete;

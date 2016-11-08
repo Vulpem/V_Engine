@@ -138,8 +138,8 @@ GameObject * ModuleGoManager::CreateEmpty(const char* name)
 
 	empty->AddComponent(Component::Type::C_transform);
 
-	empty->parent = root;
-	root->childs.push_back(empty);
+	AddGOtoRoot(empty);
+	
 	if (name != NULL && name != "")
 	{
 		empty->SetName(name);
@@ -163,8 +163,7 @@ std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 	{
 		for (std::vector<GameObject*>::iterator childs = sceneRoot->childs.begin(); childs != sceneRoot->childs.end(); childs++)
 		{
-			(*childs)->parent = root;
-			root->childs.push_back((*childs));
+			AddGOtoRoot(*childs);
 			ret.push_back((*childs));
 		}
 		//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
@@ -271,6 +270,23 @@ std::vector<GameObject*> ModuleGoManager::FilterCollisions(AABB col)
 	return ret;
 }
 
+void ModuleGoManager::AddGOtoRoot(GameObject * GO)
+{
+	GO->parent = root;
+	root->childs.push_back(GO);
+	SetUpGO(GO);
+}
+
+void ModuleGoManager::SetUpGO(GameObject * GO)
+{
+	dynamicGO.push_back(GO);
+
+	for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
+	{
+		SetUpGO(*it);
+	}
+}
+
 void ModuleGoManager::CreateRootGameObject()
 {
 	if (root == nullptr)
@@ -300,6 +316,18 @@ void ModuleGoManager::DeleteGOs()
 	while (toDelete.empty() == false)
 	{
 		LOG("Erasing GO %s", toDelete.top()->GetName());
+		SetStatic(false, toDelete.top());
+		if (dynamicGO.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
+			{
+				if ((*it) == toDelete.top())
+				{
+					dynamicGO.erase(it);
+					break;
+				}
+			}
+		}		
 		delete toDelete.top();
 		toDelete.pop();
 	}

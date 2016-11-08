@@ -17,15 +17,11 @@ GameObject::GameObject()
 	aabb.SetNegativeInfinity();
 	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
-	App->GO->dynamicGO.push_back(this);
 }
 
 
 GameObject::~GameObject()
 {
-
-	App->GO->SetStatic(false, this);
-
 	if (parent != nullptr)
 	{
 		std::vector<GameObject*>::iterator it = parent->childs.begin();
@@ -159,7 +155,6 @@ void GameObject::DrawOnEditor()
 		}
 		ImGui::EndPopup();
 	}
-
 
 	bool isActive = IsActive();
 	ImGui::Checkbox("", &isActive);
