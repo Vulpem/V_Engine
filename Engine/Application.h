@@ -75,6 +75,7 @@ public:
 	const char* GetOrganization();
 	const char* GetTitle();
 
+	void OnScreenResize(int width, int heigth);
 private:
 
 	void AddModule(Module* mod);

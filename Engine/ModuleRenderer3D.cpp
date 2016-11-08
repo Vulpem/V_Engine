@@ -194,9 +194,9 @@ bool ModuleRenderer3D::CleanUp()
 }
 
 
-void ModuleRenderer3D::OnResize(int width, int height)
+void ModuleRenderer3D::OnScreenResize(int width, int heigth)
 {
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, width, heigth);
 
 	UpdateProjectionMatrix();
 

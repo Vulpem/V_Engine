@@ -21,7 +21,7 @@ public:
 	void SetTitle(const char* title);
 
 	SDL_Window* GetWindow() { return window; }
-	void UpdateWindowSize();
+	void OnScreenResize(int width, int heigth);
 	float2 GetWindowSize();
 
 private:

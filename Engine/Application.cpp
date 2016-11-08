@@ -252,6 +252,14 @@ const char* Application::GetTitle()
 	return title.GetString();
 }
 
+void Application::OnScreenResize(int width, int heigth)
+{
+	for (std::vector<Module*>::iterator it = list_modules.begin(); it != list_modules.end(); it++)
+	{
+		(*it)->OnScreenResize(width, heigth);
+	}
+}
+
 void Application::AddModule(Module* mod)
 {
 	list_modules.push_back(mod);

@@ -20,7 +20,7 @@ public:
 	update_status PostUpdate(float dt);
 	bool CleanUp();
 
-	void OnResize(int width, int height);
+	void OnScreenResize(int width, int heigth);
 	void UpdateProjectionMatrix();
 
 	void DrawLine(float3 a, float3 b, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));

@@ -38,6 +38,8 @@ public:
 
 	bool CleanUp();
 
+	void OnScreenResize(int width, int heigth);
+
 	void HandleInput(SDL_Event* event);
 
 	void ModuleEditor::Log(const char* input);
@@ -46,11 +48,14 @@ private:
 	void SceneTreeGameObject(GameObject* node);
 	void SelectGameObject(GameObject* node);
 
+	update_status MenuBar();
+	void Editor();
+	void Console();
+	void Outliner();
+	void CameraSelector();
+	void AttributeWindow();
+
 public:
-
-	bool capture_mouse = false;
-	bool capture_keyboard = false;
-
 	bool IsOpenConsole = true;
 	bool IsOpenEditor = true;
 	bool IsOpenTestWindow = false;
@@ -62,13 +67,14 @@ public:
 	bool showAxis = true;
 	bool renderNormals = false;
 
-	char* testConsoleInput;
-
 private:
+	int screenW = 0;
+	int screenH = 0;
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;
 
 	char toImport[256];
+	char testConsoleInput[256];
 	C_String importResult;
 	math::float3 changeGeometryPos;
 

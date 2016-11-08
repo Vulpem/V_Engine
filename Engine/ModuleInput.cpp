@@ -145,8 +145,7 @@ update_status ModuleInput::PreUpdate(float dt)
 			{
 				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
-					App->window->UpdateWindowSize();
-					App->renderer3D->OnResize(e.window.data1, e.window.data2);
+					App->OnScreenResize(e.window.data1, e.window.data2);
 				}
 			}
 		}
