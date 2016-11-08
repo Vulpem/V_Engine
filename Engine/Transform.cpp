@@ -129,7 +129,7 @@ void Transform::UpdateEditorValues()
 
 void Transform::SetLocalPos(float x, float y, float z)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		localPosition.x = x;
 		localPosition.y = y;
@@ -162,7 +162,7 @@ math::float3 Transform::GetLocalPos()
 
 void Transform::SetGlobalPos(float x, float y, float z)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 		{
@@ -198,7 +198,7 @@ math::float3 Transform::GetGlobalPos()
 
 void Transform::SetLocalRot(float x, float y, float z)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		while (x < 0) { x += 360; }
 		while (y < 0) { y += 360; }
@@ -221,7 +221,7 @@ void Transform::SetLocalRot(float3 rot)
 
 void Transform::SetLocalRot(float x, float y, float z, float w)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		localRotation.Set(x, y, z, w);
 
@@ -245,7 +245,7 @@ math::float3 Transform::GetLocalRot()
 
 void Transform::SetGlobalRot(float x, float y, float z)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 		{
@@ -297,7 +297,7 @@ math::float3 Transform::GetGlobalRot()
 
 void Transform::SetLocalScale(float x, float y, float z)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		if (x != 0 && y != 0 && z != 0)
 		{
@@ -320,7 +320,7 @@ math::float3 Transform::GetGlobalScale()
 
 void Transform::LookAt(const float3 & Spot)
 {
-	if (object->Static == false)
+	if (object->IsStatic() == false)
 	{
 		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
 		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);

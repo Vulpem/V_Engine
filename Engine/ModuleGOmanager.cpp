@@ -192,9 +192,9 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 
 void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 {
-	if (Static != GO->Static)
+	if (Static != GO->IsStatic())
 	{
-		GO->Static = Static;
+		GO->SetStatic(Static);
 		if (Static)
 		{
 			if (GO->parent != nullptr)
