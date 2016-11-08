@@ -50,13 +50,13 @@ GameObject::~GameObject()
 		}
 	}
 
-	std::vector<Component*>::iterator comp = components.begin();
-	while (comp != components.end())
+	std::vector<Component*>::reverse_iterator comp = components.rbegin();
+	while (comp != components.rend())
 	{
 		delete *comp;
 		comp++;
 	}
-
+	components.clear();
 }
 
 void GameObject::PreUpdate()
@@ -370,9 +370,12 @@ void GameObject::SetStatic(bool Static)
 		}
 		else
 		{
-			for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+			if (childs.empty() == false)
 			{
-				(*it)->SetStatic(false);
+				for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+				{
+					(*it)->SetStatic(false);
+				}
 			}
 			App->GO->quadTree.Remove(this);
 			App->GO->dynamicGO.push_back(this);
