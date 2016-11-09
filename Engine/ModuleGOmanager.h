@@ -53,8 +53,8 @@ private:
 	void DeleteGOs();
 	std::stack<GameObject*> toDelete;
 
-	std::multimap<Component::Type, Component*> components;
 public:
+	std::multimap<Component::Type, Component*> components;
 	std::vector<uint> id_textures;
 
 	Quad_Tree quadTree;

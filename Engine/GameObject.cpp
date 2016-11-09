@@ -5,6 +5,7 @@
 #include "imGUI\imgui.h"
 
 #include "OpenGL.h"
+#include <map>
 
 #include "Application.h"
 #include "ModuleCamera3D.h"
@@ -19,9 +20,27 @@ GameObject::GameObject()
 	strcpy(name, "Unnamed");
 }
 
-
 GameObject::~GameObject()
 {
+	if (IsStatic() == false)
+	{
+		if (App->GO->dynamicGO.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = App->GO->dynamicGO.begin(); it != App->GO->dynamicGO.end(); it++)
+			{
+				if ((*it) == this)
+				{
+					App->GO->dynamicGO.erase(it);
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		App->GO->quadTree.Remove(this);
+	}
+
 	if (parent != nullptr)
 	{
 		std::vector<GameObject*>::iterator it = parent->childs.begin();
@@ -49,6 +68,16 @@ GameObject::~GameObject()
 	std::vector<Component*>::reverse_iterator comp = components.rbegin();
 	while (comp != components.rend())
 	{
+		std::multimap<Component::Type, Component*>::iterator it = App->GO->components.find((*comp)->GetType());
+		for (; it->first == (*comp)->GetType(); it++)
+		{		
+			if (it->second == (*comp))
+			{
+				App->GO->components.erase(it);
+				break;
+			}
+		}
+
 		delete *comp;
 		comp++;
 	}
@@ -401,6 +430,8 @@ Component* GameObject::AddComponent(Component::Type type)
 	{
 		components.push_back(toAdd);
 	}
+	App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
+
 	return toAdd;
 }
 

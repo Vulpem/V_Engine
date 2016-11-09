@@ -354,19 +354,7 @@ void ModuleGoManager::DeleteGOs()
 {
 	while (toDelete.empty() == false)
 	{
-		LOG("Erasing GO %s", toDelete.top()->GetName());
-		SetStatic(false, toDelete.top());
-		if (dynamicGO.empty() == false)
-		{
-			for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
-			{
-				if ((*it) == toDelete.top())
-				{
-					dynamicGO.erase(it);
-					break;
-				}
-			}
-		}		
+		LOG("Erasing GO %s", toDelete.top()->GetName());			
 		delete toDelete.top();
 		toDelete.pop();
 	}
