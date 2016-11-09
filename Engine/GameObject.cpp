@@ -18,6 +18,7 @@ GameObject::GameObject()
 	aabb.SetNegativeInfinity();
 	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
+	App->GO->dynamicGO.push_back(this);
 }
 
 GameObject::~GameObject()

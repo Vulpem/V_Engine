@@ -313,20 +313,6 @@ void ModuleGoManager::AddGOtoRoot(GameObject * GO)
 {
 	GO->parent = root;
 	root->childs.push_back(GO);
-	SetUpGO(GO);
-}
-
-void ModuleGoManager::SetUpGO(GameObject * GO)
-{
-	dynamicGO.push_back(GO);
-
-	if (GO->childs.empty() == false)
-	{
-		for (std::vector<GameObject*>::iterator it = GO->childs.begin(); it != GO->childs.end(); it++)
-		{
-			SetUpGO(*it);
-		}
-	}
 }
 
 void ModuleGoManager::CreateRootGameObject()

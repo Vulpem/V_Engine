@@ -17,8 +17,7 @@ public:
 		C_mesh,
 		C_camera
 	};
-
-
+	
 
 	Component(GameObject* linkedTo, int id);
 	virtual ~Component();
