@@ -55,28 +55,12 @@ Camera::~Camera()
 
 void Camera::DoPreUpdate()
 {
-	if (hasCulling || App->camera->GetActiveCamera() == this)
-	{
-		std::vector<GameObject*> GOs = App->GO->FilterCollisions(frustum.MinimalEnclosingAABB());
-		for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
-		{
-			if ((*it)->disabledByCulling == false)
-			{
-				if (Collides((*it)->aabb) == FrustumCollision::outside)
-				{
-					(*it)->disabledByCulling = true;
-				}
-				(*it)->cullingChecked = true;
-			}
-		}
-	}
+
 }
 
 void Camera::DoUpdate()
 {
-	if (IsEnabled())
-	{
-	}
+
 }
 
 void Camera::UpdateCamMatrix()

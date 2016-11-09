@@ -27,6 +27,8 @@ public:
 
 	FrustumCollision Collides(AABB boundingBox);
 	FrustumCollision Collides(float3 point);
+	void SetCulling(bool culling) { hasCulling = culling; }
+	bool HasCulling() { return hasCulling; }
 
 	math::FrustumType SwitchViewType();
 

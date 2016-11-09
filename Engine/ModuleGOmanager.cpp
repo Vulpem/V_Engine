@@ -13,6 +13,8 @@
 
 #include "AllComponents.h"
 
+#include <set>
+
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
@@ -21,7 +23,6 @@ ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(
 	name.create("ModuleGeometry");
 }
 
-// DestructorF
 ModuleGoManager::~ModuleGoManager()
 {
 
@@ -292,8 +293,23 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
 {
-	std::vector<GameObject*> GOs = FilterCollisions(frustum.MinimalEnclosingAABB());
-	for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+	std::set<GameObject*> toRender;
+
+	std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
+	for (; it != components.end() && it->first == Component::Type::C_camera; it++)
+	{
+		if (((Camera*)(it->second))->HasCulling())
+		{
+			std::vector<GameObject*> GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+			for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
+			{
+				toRender.insert(*toInsert);
+			}
+		}
+	}
+
+
+	for (std::set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
 	{
 		std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
 		if (meshes.empty() == false)
