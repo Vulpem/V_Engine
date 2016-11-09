@@ -57,6 +57,8 @@ private:
 	void AttributeWindow();
 
 public:
+	bool singleViewPort = true;
+
 	bool IsOpenConsole = true;
 	bool IsOpenEditor = true;
 	bool IsOpenTestWindow = false;
@@ -71,6 +73,8 @@ public:
 private:
 	int screenW = 0;
 	int screenH = 0;
+	float2 viewPortMin;
+	float2 viewPortMax;
 	std::vector<viewPort> viewPorts;
 
 	ImGuiTextBuffer buffer;

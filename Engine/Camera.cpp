@@ -53,8 +53,7 @@ Camera::~Camera()
 
 void Camera::Draw()
 {
-	//TMP
-	if (object->HiddenFromOutliner() == false || true)
+	if (object->HiddenFromOutliner() == false)
 	{
 		DrawFrustum();
 	}
@@ -202,13 +201,12 @@ void Camera::EditorContent()
 
 void Camera::DrawFrustum()
 {
-	//TMP
-	//if (App->camera->GetActiveCamera() != this && object->selected)
-	//{
+	if (App->camera->GetActiveCamera() != this && object->selected)
+	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);
 		App->renderer3D->DrawBox(corners);
-	//}
+	}
 }
 
 void Camera::SetHorizontalFOV(float horizontalFOV)

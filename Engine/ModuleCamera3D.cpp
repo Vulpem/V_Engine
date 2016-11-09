@@ -21,10 +21,9 @@ bool ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
 	bool ret = true;
-	//TMP
 	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
-	//defaultCameraGO->HideFromOutliner();
+	defaultCameraGO->HideFromOutliner();
 
 	topView = App->GO->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 100, 0);

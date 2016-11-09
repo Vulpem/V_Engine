@@ -291,7 +291,15 @@ void ModuleGoManager::RenderGOs(viewPort & port)
 		if (((Camera*)(it->second))->HasCulling())
 		{
 			aCamHadCulling = true;
-			std::vector<GameObject*> GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
+			std::vector<GameObject*> GOs;
+			if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+			{
+				GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
+			}
+			else
+			{
+				GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+			}
 			for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
 			{
 				toRender.insert(*toInsert);
@@ -302,7 +310,15 @@ void ModuleGoManager::RenderGOs(viewPort & port)
 	//If no cameras had culling active, we'll cull from the Current Active camera
 	if (aCamHadCulling == false)
 	{
-		std::vector<GameObject*> GOs = FilterCollisions(*App->camera->GetActiveCamera()->GetFrustum());
+		std::vector<GameObject*> GOs;
+		if (port.camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+		{
+			GOs = FilterCollisions(*port.camera->GetFrustum());
+		}
+		else
+		{
+			GOs = FilterCollisions(port.camera->GetFrustum()->MinimalEnclosingAABB());
+		}
 		for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
 		{
 			toRender.insert(*toInsert);
