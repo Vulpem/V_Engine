@@ -12,6 +12,8 @@ class Transform : public Component
 public:
 	Transform(GameObject* linkedTo, int id);
 	~Transform();
+
+	void Update();
 private:
 	math::Quat localRotation = math::Quat::identity;
 	math::float3 localPosition = math::float3::zero;

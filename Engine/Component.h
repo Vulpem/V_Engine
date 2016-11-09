@@ -13,8 +13,8 @@ public:
 	{
 		C_None,
 		C_transform,
-		C_mesh,
 		C_material,
+		C_mesh,
 		C_camera
 	};
 
@@ -26,21 +26,18 @@ public:
 	virtual void Enable();
 	virtual void Disable();
 
-	void PreUpdate();
-	void Update();
-	void PostUpdate();
-	void DrawOnEditor();
+	virtual void PreUpdate() {};
+	virtual void Update() {};
+	virtual void PostUpdate() {};
+	virtual void DrawOnEditor();
 
 	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS
 	Type GetType() { return type; }
 	bool IsEnabled() { return enabled; }
 
 protected:
-	virtual void DoPreUpdate() {}
-	virtual void DoUpdate() {}
-	virtual void DoPostUpdate() {}
-	virtual void DoEnable() {}
-	virtual void DoDisable() {}
+	virtual void OnEnable() {}
+	virtual void OnDisable() {}
 
 	virtual void EditorContent() {};
 

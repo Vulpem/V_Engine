@@ -19,18 +19,12 @@ public:
 	char name[NAME_MAX_LEN];
 	AABB aabb;
 
-	bool disabledByCulling = false;
-	//Since we're optimizing the code and there are a lot of objects we're not even checking for the culling,
-	//we need to disable them, because if they're not checked they're not even close to the frustum.
-	bool cullingChecked = false;
-
 private:
 	bool active = true;
 	bool publicActive = true;
 	bool hiddenOnOutliner = false;
 	bool Static = false;
 
-	bool drawAABB = true;
 	AABB originalAABB;
 
 	Transform* transform = nullptr;
@@ -45,10 +39,6 @@ public:
 	std::vector<Component*> components;
 	bool selected = false;
 	bool renderNormals = false;
-
-	void PreUpdate();
-	void Update();
-	void PostUpdate();
 
 	void DrawOnEditor();
 

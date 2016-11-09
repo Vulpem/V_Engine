@@ -53,14 +53,12 @@ Camera::~Camera()
 	}
 }
 
-void Camera::DoPreUpdate()
+void Camera::Update()
 {
-
-}
-
-void Camera::DoUpdate()
-{
-
+	if (object->HiddenFromOutliner() == false)
+	{
+		Draw();
+	}
 }
 
 void Camera::UpdateCamMatrix()

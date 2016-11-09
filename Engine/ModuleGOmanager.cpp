@@ -48,11 +48,13 @@ update_status ModuleGoManager::PreUpdate(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
-	std::vector<GameObject*>::iterator it = root->childs.begin();
-	while (it != root->childs.end())
+	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	for (; comp != components.end(); comp++)
 	{
-		(*it)->PreUpdate();
-		it++;
+		if (comp->second->object->IsActive())
+		{
+			comp->second->PreUpdate();
+		}
 	}
 
 	return ret;
@@ -68,11 +70,13 @@ update_status ModuleGoManager::Update(float dt)
 		LoadGO(onlyName.data());
 	}
 
-	std::vector<GameObject*>::iterator it = root->childs.begin();
-	while (it != root->childs.end())
+	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	for (; comp != components.end(); comp++)
 	{
-		(*it)->Update();
-		it++;
+		if (comp->second->object->IsActive())
+		{
+			comp->second->Update();
+		}
 	}
 
 	RenderGOs(*App->camera->GetActiveCamera()->GetFrustum());
@@ -116,11 +120,13 @@ update_status ModuleGoManager::Update(float dt)
 
 update_status ModuleGoManager::PostUpdate(float dt)
 {
-	std::vector<GameObject*>::iterator it = root->childs.begin();
-	while (it != root->childs.end())
+	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	for (; comp != components.end(); comp++)
 	{
-		(*it)->PostUpdate();
-		it++;
+		if (comp->second->object->IsActive())
+		{
+			comp->second->PostUpdate();
+		}
 	}
 
 	DeleteGOs();

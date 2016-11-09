@@ -26,6 +26,19 @@ Transform::~Transform()
 {
 }
 
+void Transform::Update()
+{
+	if (object->HasComponent(Component::Type::C_mesh) == false)
+	{
+		object->DrawLocator();
+	}
+	//Drawing AABB independantly of object transform
+	if (object->selected)
+	{
+		object->DrawAABB();
+	}
+}
+
 void Transform::EditorContent()
 {
 	float tmp[3];

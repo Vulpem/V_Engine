@@ -27,7 +27,7 @@ public:
 
 	void DrawLine(float3 a, float3 b, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawBox(float3* corners, float4 color = float4(1.0f, 1.0f, 0.6f, 1.0f));
-	void DrawLocator(float3 center = float3(0.0f, 0.0f, 0.0f), float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
+	void DrawLocator(float4x4 transform = float4x4::identity, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawMesh(Mesh_RenderInfo meshInfo);
 private:
 	void RenderMeshWired(const Mesh_RenderInfo& data);

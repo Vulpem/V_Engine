@@ -84,96 +84,6 @@ GameObject::~GameObject()
 	components.clear();
 }
 
-void GameObject::PreUpdate()
-{
-	if (active)
-	{
-		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
-		{
-			(*it)->PreUpdate();
-		}
-		std::vector<GameObject*>::iterator it = childs.begin();
-		while (it != childs.end())
-		{
-			(*it)->PreUpdate();
-			it++;
-		}
-	}
-}
-
-void GameObject::Update()
-{
-	if (active)
-	{
-		if (cullingChecked == false)
-		{
-			disabledByCulling = true;
-		}
-		glPushMatrix();
-
-		if (HasComponent(Component::Type::C_transform))
-		{			
-			glMultMatrixf(GetTransform()->GetGlobalTransform().ptr());
-		}
-
-		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
-		{
-			(*it)->Update();
-		}
-
-		if (HasComponent(Component::Type::C_mesh) == false)
-		{
-			DrawLocator();
-		}
-		glPopMatrix();
-
-		//Drawing AABB independantly of object transform
-		if (drawAABB && selected)
-		{
-			DrawAABB();
-		}
-
-		//Drawing Camera independantly of object transform
-		std::vector<Camera*> cams = GetComponent<Camera>();
-		if (cams.empty() == false)
-		{
-			std::vector<Camera*>::iterator it = cams.begin();
-			while (it != cams.end())
-			{
-				(*it)->Draw();
-				it++;
-			}
-		}
-
-		std::vector<GameObject*>::iterator it = childs.begin();
-		while (it != childs.end())
-		{
-			(*it)->Update();
-			it++;
-		}
-	}
-}
-
-void GameObject::PostUpdate()
-{
-	if (active)
-	{
-
-		for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); it++)
-		{
-			(*it)->PostUpdate();
-		}
-		std::vector<GameObject*>::iterator it = childs.begin();
-		while (it != childs.end())
-		{
-			(*it)->PostUpdate();
-			it++;
-		}
-	}
-	cullingChecked = false;
-	disabledByCulling = false;
-}
-
 void GameObject::DrawOnEditor()
 {
 	if (ImGui::BeginPopup("Add Component"))
@@ -239,7 +149,7 @@ void GameObject::DrawLocator()
 		}
 	}
 
-	App->renderer3D->DrawLocator(float3(0.0f, 0.0f, 0.0f), color);
+	App->renderer3D->DrawLocator(GetTransform()->GetGlobalTransform(), color);
 
 	if (childs.empty() == false)
 	{

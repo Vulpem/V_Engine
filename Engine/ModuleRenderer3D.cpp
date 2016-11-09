@@ -257,8 +257,10 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 	glEnable(GL_LIGHTING);
 }
 
-void ModuleRenderer3D::DrawLocator(float3 center, float4 color)
+void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 {
+	glPushMatrix();
+	glMultMatrixf(transform.ptr());
 	glDisable(GL_LIGHTING);
 	// Draw Axis Grid
 	glLineWidth(2.0f);
@@ -278,6 +280,7 @@ void ModuleRenderer3D::DrawLocator(float3 center, float4 color)
 
 	glLineWidth(1.0f);
 	glEnable(GL_LIGHTING);
+	glPopMatrix();
 }
 
 void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)

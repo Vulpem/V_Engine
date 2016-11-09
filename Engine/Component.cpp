@@ -17,7 +17,7 @@ void Component::Enable()
 {
 	if (enabled == false)
 	{
-		DoEnable();
+		OnEnable();
 		enabled = true;
 	}
 }
@@ -26,33 +26,8 @@ void Component::Disable()
 { 
 	if (enabled == true)
 	{
-		DoDisable();
+		OnDisable();
 		enabled = false;
-	}
-}
-
-void Component::PreUpdate()
-{
-	if (enabled)
-	{
-		DoPreUpdate();
-	}
-}
-
-
-void Component::Update()
-{
-	if (enabled)
-	{
-		DoUpdate();
-	}
-}
-
-void Component::PostUpdate()
-{
-	if (enabled)
-	{
-		DoPostUpdate();
 	}
 }
 
