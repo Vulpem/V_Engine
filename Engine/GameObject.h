@@ -68,7 +68,7 @@ public:
 	void UpdateTransformMatrix();
 
 	void SetActive(bool state, bool justPublic = false);
-	bool IsActive() { return publicActive; }
+	bool IsActive();
 
 	void SetStatic(bool Stat) { Static = Stat; }
 	bool IsStatic() { return Static; }

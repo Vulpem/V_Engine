@@ -39,41 +39,43 @@ mesh::~mesh()
 Mesh_RenderInfo mesh::GetMeshInfo()
 {
 	Mesh_RenderInfo ret;
-	if (wires == true || object->selected)
+	if (object->IsActive())
 	{
-		ret.wired = true;
-		if (wires == true)
+		if (wires == true || object->selected)
 		{
-			ret.doubleSidedFaces = true;
-			ret.wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
+			ret.wired = true;
+			if (wires == true)
+			{
+				ret.doubleSidedFaces = true;
+				ret.wiresColor = float4(0.f, 0.f, 0.f, 1.0f);
+			}
+			if (object->selected)
+			{
+				if (object->parent && object->parent->selected)
+				{
+					ret.wiresColor = float4(0, 0.5f, 0.5f, 1);
+				}
+				else
+				{
+					ret.wiresColor = float4(0, 0.8f, 0.8f, 1);
+				}
+			}
 		}
-		if (object->selected)
+		if (wires == false)
 		{
-			if (object->parent && object->parent->selected)
-			{
-				ret.wiresColor = float4(0, 0.5f, 0.5f, 1);
-			}
-			else
-			{
-				ret.wiresColor = float4(0, 0.8f, 0.8f, 1);
-			}
+			ret.filled = true;
 		}
+
+		ret.renderNormals = object->renderNormals;
+
+		ret.num_indices = num_indices;
+		ret.num_vertices = num_vertices;
+
+		ret.vertexBuffer = id_vertices;
+		ret.normalsBuffer = id_normals;
+		ret.textureCoordsBuffer = id_textureCoords;
+		ret.indicesBuffer = id_indices;
 	}
-	if (wires == false)
-	{
-		ret.filled = true;
-	}
-
-	ret.renderNormals = object->renderNormals;
-
-	ret.num_indices = num_indices;
-	ret.num_vertices = num_vertices;
-
-	ret.vertexBuffer = id_vertices;
-	ret.normalsBuffer = id_normals;
-	ret.textureCoordsBuffer = id_textureCoords;
-	ret.indicesBuffer = id_indices;
-
 	return ret;
 }
 

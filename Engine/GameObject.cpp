@@ -321,15 +321,14 @@ void GameObject::SetActive(bool state, bool justPublic)
 		return;
 	}
 	publicActive = state;
-	if (state == false)
-	{
+
 		std::vector<GameObject*>::iterator childIt = childs.begin();
 		while (childIt != childs.end())
 		{
 			(*childIt)->SetActive(state, true);
 			childIt++;
 		}
-	}
+
 	if (justPublic)
 	{		
 		return;
@@ -340,6 +339,15 @@ void GameObject::SetActive(bool state, bool justPublic)
 	{
 		parent->SetActive(true);
 	}
+}
+
+bool GameObject::IsActive()
+{
+	if (active == false)
+	{
+		return false;
+	}
+	return publicActive; 
 }
 
 
