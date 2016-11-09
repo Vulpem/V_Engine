@@ -183,6 +183,7 @@
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="ViewPort.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />

@@ -8,8 +8,6 @@
 
 #include "Math.h"
 
-#include "OpenGL.h"
-
 #include "Application.h"
 #include "ModuleGOmanager.h"
 #include "ModuleCamera3D.h"
@@ -53,7 +51,7 @@ Camera::~Camera()
 	}
 }
 
-void Camera::Update()
+void Camera::Draw()
 {
 	if (object->HiddenFromOutliner() == false)
 	{
@@ -201,7 +199,7 @@ void Camera::EditorContent()
 	}
 }
 
-void Camera::Draw()
+void Camera::DrawFrustum()
 {
 	if (App->camera->GetActiveCamera() != this && object->selected)
 	{

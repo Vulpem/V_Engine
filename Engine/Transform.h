@@ -13,7 +13,7 @@ public:
 	Transform(GameObject* linkedTo, int id);
 	~Transform();
 
-	void Update();
+	void Draw();
 private:
 	math::Quat localRotation = math::Quat::identity;
 	math::float3 localPosition = math::float3::zero;

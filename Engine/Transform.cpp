@@ -26,7 +26,7 @@ Transform::~Transform()
 {
 }
 
-void Transform::Update()
+void Transform::Draw()
 {
 	if (object->HasComponent(Component::Type::C_mesh) == false)
 	{

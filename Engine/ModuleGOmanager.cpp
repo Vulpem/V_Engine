@@ -270,9 +270,19 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
 {
-	std::unordered_set<GameObject*> toRender;
+	//Call the Draw function of all the components, so they do what they need to
+	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	for (; comp != components.end(); comp++)
+	{
+		if (comp->second->object->IsActive())
+		{
+			comp->second->Draw();
+		}
+	}
 
+	std::unordered_set<GameObject*> toRender;
 	bool aCamHadCulling = false;
+	//Finding all the cameras that have culling on, and collecting all the GOs we need to render
 	std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
 	for (; it != components.end() && it->first == Component::Type::C_camera; it++)
 	{
@@ -287,6 +297,7 @@ void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
 		}
 	}
 
+	//If no cameras had culling active, we'll cull from the Current Active camera
 	if (aCamHadCulling == false)
 	{
 		std::vector<GameObject*> GOs = FilterCollisions(*App->camera->GetActiveCamera()->GetFrustum());
@@ -296,6 +307,7 @@ void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
 		}
 	}
 
+	//And now, we render them
 	for (std::unordered_set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
 	{
 		std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();

@@ -369,6 +369,9 @@
     <ClInclude Include="QuadTree.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="ViewPort.h">
+      <Filter>Sources\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">

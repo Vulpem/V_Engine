@@ -28,6 +28,7 @@ public:
 	virtual void PreUpdate() {};
 	virtual void Update() {};
 	virtual void PostUpdate() {};
+	virtual void Draw() {};
 	virtual void DrawOnEditor();
 
 	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS

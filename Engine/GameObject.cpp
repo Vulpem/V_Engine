@@ -158,8 +158,8 @@ void GameObject::DrawLocator()
 		{
 			if ((*it)->HasComponent(Component::Type::C_transform) && !(*it)->HasComponent(Component::Type::C_mesh))
 			{
-				math::float3 childPos((*it)->GetTransform()->GetLocalPos());
-				App->renderer3D->DrawLine(float3::zero, childPos, color);
+				math::float3 childPos((*it)->GetTransform()->GetGlobalPos());
+				App->renderer3D->DrawLine(GetTransform()->GetGlobalPos(), childPos, color);
 			}
 		}
 	}

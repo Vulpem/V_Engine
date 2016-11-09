@@ -17,7 +17,6 @@ public:
 	Camera(GameObject* linkedTo, int id);
 	~Camera();
 
-	void Update();
 	void EditorContent();
 
 	void UpdateCamMatrix();
@@ -36,6 +35,7 @@ public:
 	static Type GetType() { return Type::C_camera; }
 
 	void Draw();
+	void DrawFrustum();
 
 	void SetHorizontalFOV(float horizontalFOV);
 
