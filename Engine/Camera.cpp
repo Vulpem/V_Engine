@@ -53,9 +53,10 @@ Camera::~Camera()
 
 void Camera::Draw()
 {
-	if (object->HiddenFromOutliner() == false)
+	//TMP
+	if (object->HiddenFromOutliner() == false || true)
 	{
-		Draw();
+		DrawFrustum();
 	}
 }
 
@@ -201,12 +202,13 @@ void Camera::EditorContent()
 
 void Camera::DrawFrustum()
 {
-	if (App->camera->GetActiveCamera() != this && object->selected)
-	{
+	//TMP
+	//if (App->camera->GetActiveCamera() != this && object->selected)
+	//{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);
 		App->renderer3D->DrawBox(corners);
-	}
+	//}
 }
 
 void Camera::SetHorizontalFOV(float horizontalFOV)
@@ -218,7 +220,7 @@ void Camera::SetHorizontalFOV(float horizontalFOV)
 
 float4x4 Camera::GetViewMatrix()
 {
-	return frustum.ViewMatrix();
+	return float4x4(frustum.ViewMatrix()).Transposed();
 }
 
 float4x4 Camera::GetProjectionMatrix()

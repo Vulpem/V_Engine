@@ -10,6 +10,8 @@
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
+#include "ViewPort.h"
+
 
 #include "AllComponents.h"
 
@@ -78,8 +80,6 @@ update_status ModuleGoManager::Update(float dt)
 			comp->second->Update();
 		}
 	}
-
-	RenderGOs(*App->camera->GetActiveCamera()->GetFrustum());
 
 	if (setting != nullptr)
 	{
@@ -268,8 +268,10 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 	return ret;
 }
 
-void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
+void ModuleGoManager::RenderGOs(viewPort & port)
 {
+	App->renderer3D->SetViewPort(port);
+
 	//Call the Draw function of all the components, so they do what they need to
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)

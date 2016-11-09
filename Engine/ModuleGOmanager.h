@@ -12,7 +12,7 @@
 
 #include "GameObject.h"
 
-class GameObject;
+struct viewPort;
 
 class ModuleGoManager : public Module
 {
@@ -42,7 +42,7 @@ public:
 	std::vector<GameObject*> FilterCollisions(C col);
 
 	Mesh_RenderInfo GetMeshData(mesh* getFrom);
-	void RenderGOs(const math::Frustum& frustum);
+	void RenderGOs(viewPort& frustum);
 
 	const GameObject* GetRoot() { return root; }
 

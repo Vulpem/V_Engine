@@ -5,6 +5,7 @@
 #include "Globals.h"
 
 #include "Math.h"
+#include "ViewPort.h"
 
 #include "ImGui\imgui.h"
 
@@ -70,6 +71,8 @@ public:
 private:
 	int screenW = 0;
 	int screenH = 0;
+	std::vector<viewPort> viewPorts;
+
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;
 

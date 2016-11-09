@@ -9,6 +9,8 @@
 #define MAX_LIGHTS 8
 
 struct Mesh_RenderInfo;
+struct viewPort;
+class Camera;
 
 class ModuleRenderer3D : public Module
 {
@@ -23,12 +25,14 @@ public:
 	bool CleanUp();
 
 	void OnScreenResize(int width, int heigth);
-	void UpdateProjectionMatrix();
+	void UpdateProjectionMatrix(Camera* cam);
 
 	void DrawLine(float3 a, float3 b, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawBox(float3* corners, float4 color = float4(1.0f, 1.0f, 0.6f, 1.0f));
 	void DrawLocator(float4x4 transform = float4x4::identity, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawMesh(Mesh_RenderInfo meshInfo);
+
+	void SetViewPort(viewPort port);
 private:
 	void RenderMeshWired(const Mesh_RenderInfo& data);
 	void RenderMeshFilled(const Mesh_RenderInfo& data);

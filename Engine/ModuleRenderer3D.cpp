@@ -9,6 +9,7 @@
 #include "OpenGL.h"
 
 #include "Mesh_RenderInfo.h"
+#include "ViewPort.h"
 
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
@@ -61,7 +62,6 @@ bool ModuleRenderer3D::Init()
 		if (VSYNC && SDL_GL_SetSwapInterval(1) < 0)
 			LOG("Warning: Unable to set VSync! SDL Error: %s", SDL_GetError());
 
-
 		//Check for error
 		GLenum error = glGetError();
 		if (error != GL_NO_ERROR)
@@ -69,6 +69,8 @@ bool ModuleRenderer3D::Init()
 			LOG("Error initializing OpenGL! %s\n", gluErrorString(error));
 			ret = false;
 		}
+
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 		glClearDepth(10.0f);
@@ -157,23 +159,9 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	if (App->camera->GetActiveCamera()->frustumChanged == true)
-	{
-		UpdateProjectionMatrix();
-		App->camera->GetActiveCamera()->frustumChanged = false;
-	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(App->camera->GetViewMatrix());
-
 	// light 0 on cam pos
 	float3 camPos = App->camera->GetCamPos();
 	lights[0].SetPos(camPos.x, camPos.y, camPos.z);
-
-	for (uint i = 0; i < MAX_LIGHTS; ++i)
-	{
-		lights[i].Render();
-	}
 
 	return UPDATE_CONTINUE;
 }
@@ -181,6 +169,11 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 // PostUpdate present buffer to screen
 update_status ModuleRenderer3D::PostUpdate(float dt)
 {
+	for (uint i = 0; i < MAX_LIGHTS; ++i)
+	{
+		lights[i].Render();
+	}
+
 	SDL_GL_SwapWindow(App->window->GetWindow());
 	return UPDATE_CONTINUE;
 }
@@ -198,19 +191,13 @@ bool ModuleRenderer3D::CleanUp()
 
 void ModuleRenderer3D::OnScreenResize(int width, int heigth)
 {
-	glViewport(0, 0, width, heigth);
-
-	UpdateProjectionMatrix();
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
-void ModuleRenderer3D::UpdateProjectionMatrix()
+void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glLoadMatrixf(App->camera->GetProjectionMatrix());
+	glLoadMatrixf(cam->GetProjectionMatrix().ptr());
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -339,6 +326,16 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glPopMatrix();
+}
+
+void ModuleRenderer3D::SetViewPort(viewPort port)
+{
+	port.SetCameraMatrix();
+	glViewport(port.pos.x, App->window->GetWindowSize().y - (port.size.y + port.pos.y), port.size.x, port.size.y);
+	UpdateProjectionMatrix(port.camera);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(port.camera->GetViewMatrix().ptr());
 }
 
 void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)

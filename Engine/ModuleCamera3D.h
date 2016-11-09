@@ -23,6 +23,10 @@ public:
 	float* GetViewMatrix();
 	float* GetProjectionMatrix();
 
+	Camera* GetTopCam();
+	Camera* GetRightCam();
+	Camera* GetFrontCam();
+
 	void SetActiveCamera(Camera* activeCamera);
 	void SetActiveCamera(GameObject* activeCamera);
 	void SetCameraToDefault();

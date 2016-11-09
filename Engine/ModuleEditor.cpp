@@ -49,6 +49,11 @@ bool ModuleEditor::Start()
 
 	screenW = App->window->GetWindowSize().x;
 	screenH = App->window->GetWindowSize().y;
+
+	viewPorts.push_back(viewPort(float2(300, 20), float2((screenW - 630)/2, screenH - 220), App->camera->GetActiveCamera()));
+
+	viewPorts.push_back(viewPort(float2(300 + (screenW - 630) / 2, 20), float2((screenW - 630) / 2, screenH - 220), App->camera->GetTopCam()));
+
 	return true;
 }
 
@@ -64,6 +69,17 @@ update_status ModuleEditor::PreUpdate(float dt)
 update_status ModuleEditor::Update(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
+	viewPorts.front().camera = App->camera->GetActiveCamera();
+
+	if (viewPorts.empty() == false)
+	{
+		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
+		{
+			App->GO->RenderGOs(*port);
+		}
+	}
+
+
 	if (IsOpenTestWindow)
 	{
 		ImGui::ShowTestWindow(&IsOpenTestWindow);

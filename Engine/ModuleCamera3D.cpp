@@ -21,10 +21,10 @@ bool ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
 	bool ret = true;
-
+	//TMP
 	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
-	defaultCameraGO->HideFromOutliner();
+	//defaultCameraGO->HideFromOutliner();
 
 	topView = App->GO->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 100, 0);
@@ -108,12 +108,27 @@ void ModuleCamera3D::SetPos(const float3 &Pos)
 // -----------------------------------------------------------------
 float* ModuleCamera3D::GetViewMatrix()
 {
-	return GetActiveCamera()->GetViewMatrix().Transposed().ptr();
+	return GetActiveCamera()->GetViewMatrix().ptr();
 }
 
 float* ModuleCamera3D::GetProjectionMatrix()
 {
 	return GetActiveCamera()->GetProjectionMatrix().ptr();
+}
+
+Camera * ModuleCamera3D::GetTopCam()
+{
+	return topView->GetComponent<Camera>().front();
+}
+
+Camera * ModuleCamera3D::GetRightCam()
+{
+	return rightView->GetComponent<Camera>().front();
+}
+
+Camera * ModuleCamera3D::GetFrontCam()
+{
+	return frontView->GetComponent<Camera>().front();
 }
 
 void ModuleCamera3D::SetActiveCamera(Camera * activeCamera)
