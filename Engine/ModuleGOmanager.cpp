@@ -13,7 +13,7 @@
 
 #include "AllComponents.h"
 
-#include <set>
+#include <unordered_set>
 
 
 //------------------------- MODULE --------------------------------------------------------------------------------
@@ -246,35 +246,6 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 	}
 }
 
-std::vector<GameObject*> ModuleGoManager::FilterCollisions(LineSegment col)
-{
-	std::vector<GameObject*> ret = quadTree.FilterCollisions(col);
-
-	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
-	{
-		if ((*it)->aabb.Intersects(col) == true)
-		{
-			ret.push_back(*it);
-		}
-	}
-
-	return ret;
-}
-
-std::vector<GameObject*> ModuleGoManager::FilterCollisions(AABB col)
-{
-	std::vector<GameObject*> ret = quadTree.FilterCollisions(col);
-
-	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
-	{
-		if ((*it)->aabb.Intersects(col) == true)
-		{
-			ret.push_back(*it);
-		}
-	}
-
-	return ret;
-}
 
 Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 {
@@ -293,14 +264,16 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
 {
-	std::set<GameObject*> toRender;
+	std::unordered_set<GameObject*> toRender;
 
+	bool aCamHadCulling = false;
 	std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
 	for (; it != components.end() && it->first == Component::Type::C_camera; it++)
 	{
 		if (((Camera*)(it->second))->HasCulling())
 		{
-			std::vector<GameObject*> GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+			aCamHadCulling = true;
+			std::vector<GameObject*> GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
 			for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
 			{
 				toRender.insert(*toInsert);
@@ -308,8 +281,16 @@ void ModuleGoManager::RenderGOs(const math::Frustum & frustum)
 		}
 	}
 
+	if (aCamHadCulling == false)
+	{
+		std::vector<GameObject*> GOs = FilterCollisions(*App->camera->GetActiveCamera()->GetFrustum());
+		for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
+		{
+			toRender.insert(*toInsert);
+		}
+	}
 
-	for (std::set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
+	for (std::unordered_set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
 	{
 		std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
 		if (meshes.empty() == false)

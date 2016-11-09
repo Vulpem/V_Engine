@@ -21,7 +21,7 @@ QuadNode::~QuadNode()
 bool QuadNode::Add(GameObject* GO)
 {
 	bool ret = false;
-	if (Collides(GO->aabb))
+	if (box.Intersects(GO->aabb))
 	{
 		if (childs.empty() == true)
 		{
@@ -37,7 +37,7 @@ bool QuadNode::Add(GameObject* GO)
 			std::vector<QuadNode*> collidedWith;
 			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
 			{
-				if (it->Collides(GO->aabb))
+				if (it->box.Intersects(GO->aabb))
 				{
 					collidedWith.push_back(&*it);
 				}
@@ -84,90 +84,6 @@ bool QuadNode::Remove(GameObject * GO)
 		}
 	}
 	return ret;
-}
-
-std::vector<GameObject*> QuadNode::FilterCollisions(LineSegment col)
-{
-	std::vector<GameObject*> ret;
-	if (Collides(col))
-	{
-		if (GOs.empty() == false)
-		{
-			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
-			{
-				if ((*it)->aabb.Intersects(col) == true)
-				{
-					ret.push_back(*it);
-				}
-			}
-		}
-		if (childs.empty() == false)
-		{
-			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
-			{
-				std::vector<GameObject*> toAdd = it->FilterCollisions(col);
-				if (toAdd.empty() == false)
-				{
-					for (std::vector<GameObject*>::iterator it = toAdd.begin(); it != toAdd.end(); it++)
-					{
-						ret.push_back(*it);
-					}
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-std::vector<GameObject*> QuadNode::FilterCollisions(AABB col)
-{
-	std::vector<GameObject*> ret;
-	if (Collides(col))
-	{
-		if (GOs.empty() == false)
-		{
-			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
-			{
-				if ((*it)->aabb.Intersects(col) == true)
-				{
-					ret.push_back(*it);
-				}
-			}
-		}
-		if (childs.empty() == false)
-		{
-			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
-			{
-				std::vector<GameObject*> toAdd = it->FilterCollisions(col);
-				if (toAdd.empty() == false)
-				{
-					for (std::vector<GameObject*>::iterator it = toAdd.begin(); it != toAdd.end(); it++)
-					{
-						ret.push_back(*it);
-					}
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-bool QuadNode::Collides(LineSegment segment)
-{
-	if (box.Intersects(segment))
-	{
-		return true;
-	}
-	return false;
-}
-
-bool QuadNode::Collides(AABB aabb)
-{
-	if (box.Intersects(aabb) == true)
-	{
-		return true;
-	}
-	return false;
 }
 
 void QuadNode::Draw()
@@ -341,15 +257,6 @@ void Quad_Tree::Remove(GameObject * GO)
 	}
 }
 
-std::vector<GameObject*> Quad_Tree::FilterCollisions(LineSegment col)
-{
-	return root.FilterCollisions(col);
-}
-
-std::vector<GameObject*> Quad_Tree::FilterCollisions(AABB col)
-{
-	return root.FilterCollisions(col);
-}
 
 void Quad_Tree::Draw()
 {

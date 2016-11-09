@@ -27,11 +27,8 @@ public:
 	bool Add(GameObject* GO);
 	bool Remove(GameObject* GO);
 
-	std::vector<GameObject*> FilterCollisions(LineSegment col);
-	std::vector<GameObject*> FilterCollisions(AABB col);
-
-	bool Collides(LineSegment segment);
-	bool Collides(AABB aabb);
+	template <typename C>
+	std::vector<GameObject*> FilterCollisions(C col);
 
 	void Draw();
 
@@ -53,8 +50,8 @@ public:
 	void Add(GameObject* GO);
 	void Remove(GameObject* GO);
 
-	std::vector<GameObject*> FilterCollisions(LineSegment col);
-	std::vector<GameObject*> FilterCollisions(AABB col);
+	template <typename c>
+	std::vector<GameObject*> FilterCollisions(c col);
 
 	void Draw();
 private:
@@ -62,5 +59,47 @@ private:
 
 };
 
+//QuadNode
+template<typename C>
+inline std::vector<GameObject*> QuadNode::FilterCollisions(C col)
+{
+	std::vector<GameObject*> ret;
+	if (box.Intersects(col))
+	{
+		if (GOs.empty() == false)
+		{
+			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
+			{
+				if (col.Intersects((*it)->aabb) == true)
+				{
+					ret.push_back(*it);
+				}
+			}
+		}
+		if (childs.empty() == false)
+		{
+			for (std::vector<QuadNode>::iterator it = childs.begin(); it != childs.end(); it++)
+			{
+				std::vector<GameObject*> toAdd = it->FilterCollisions(col);
+				if (toAdd.empty() == false)
+				{
+					for (std::vector<GameObject*>::iterator it = toAdd.begin(); it != toAdd.end(); it++)
+					{
+						ret.push_back(*it);
+					}
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+
+//QuadTree
+template<typename c>
+inline std::vector<GameObject*> Quad_Tree::FilterCollisions(c col)
+{
+	return root.FilterCollisions(col);
+}
 
 #endif // !__QUADTREE__

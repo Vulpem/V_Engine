@@ -24,7 +24,6 @@ bool ModuleCamera3D::Start()
 
 	defaultCameraGO = App->GO->CreateCamera("DefaultEditorCamera");
 	defaultCamera = defaultCameraGO->GetComponent<Camera>().front();
-	defaultCamera->SetCulling(true);
 	defaultCameraGO->HideFromOutliner();
 
 	topView = App->GO->CreateCamera("TopView");

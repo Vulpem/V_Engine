@@ -363,10 +363,10 @@
     <ClInclude Include="Camera.h">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
-    <ClInclude Include="QuadTree.h">
-      <Filter>Sources\Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh_RenderInfo.h">
+      <Filter>Sources\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
       <Filter>Sources\Containers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -555,7 +555,7 @@
       <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
     <ClCompile Include="QuadTree.cpp">
-      <Filter>Sources\Helpers</Filter>
+      <Filter>Sources\Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

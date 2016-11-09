@@ -38,8 +38,8 @@ public:
 	void SetStatic(bool Static, GameObject* GO);
 	void SetChildsStatic(bool Static, GameObject* GO);
 
-	std::vector<GameObject*> FilterCollisions(LineSegment col);
-	std::vector<GameObject*> FilterCollisions(AABB col);
+	template <typename C>
+	std::vector<GameObject*> FilterCollisions(C col);
 
 	Mesh_RenderInfo GetMeshData(mesh* getFrom);
 	void RenderGOs(const math::Frustum& frustum);
@@ -68,5 +68,21 @@ public:
 	GameObject* setting = nullptr;
 	bool settingStatic = true;
 };
+
+
+template<typename C>
+inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
+{
+	std::vector<GameObject*> ret = quadTree.FilterCollisions(col);
+
+	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
+	{
+		if ((*it)->aabb.Intersects(col) == true)
+		{
+			ret.push_back(*it);
+		}
+	}
+	return ret;
+}
 
 #endif
