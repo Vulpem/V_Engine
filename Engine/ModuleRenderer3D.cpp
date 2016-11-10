@@ -5,6 +5,7 @@
 #include "ModuleCamera3D.h"
 
 #include "Camera.h"
+#include "imGUI\imgui.h"
 
 #include "OpenGL.h"
 
@@ -126,6 +127,8 @@ bool ModuleRenderer3D::Init()
 
 		glShadeModel(GL_SMOOTH);		 // Enables Smooth Shading
 
+		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->camera->GetActiveCamera(), viewPorts.size()));
+
 	}
 
 	return ret;
@@ -150,6 +153,7 @@ bool ModuleRenderer3D::Start()
 		LOG("Error initializing OpenGL! %s\n", gluErrorString(error));
 		ret = false;
 	}
+
 	return ret;
 }
 
@@ -174,6 +178,27 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 		lights[i].Render();
 	}
 
+	viewPorts.front().camera = App->camera->GetActiveCamera();
+
+	if (viewPorts.empty() == false)
+	{
+		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
+		{
+			if (port->active)
+			{
+				port->SetCameraMatrix();
+				SetViewPort(*port);
+				App->Render(*port);
+			}
+		}
+	}
+	else
+	{
+		LOG("Warning, there are no viewPorts!");
+	}
+
+	ImGui::Render();
+
 	SDL_GL_SwapWindow(App->window->GetWindow());
 	return UPDATE_CONTINUE;
 }
@@ -191,6 +216,7 @@ bool ModuleRenderer3D::CleanUp()
 
 void ModuleRenderer3D::OnScreenResize(int width, int heigth)
 {
+	viewPorts.front().size = float2(width, heigth);
 }
 
 void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
@@ -328,7 +354,38 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
 	glPopMatrix();
 }
 
-void ModuleRenderer3D::SetViewPort(viewPort port)
+uint ModuleRenderer3D::AddViewPort(float2 pos, float2 size, Camera * cam)
+{
+	viewPorts.push_back(viewPort(pos, size, cam, viewPorts.size()));
+	return viewPorts.back().ID;
+}
+
+viewPort * ModuleRenderer3D::FindViewPort(uint ID)
+{
+	for (std::vector<viewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
+	{
+		if (it->ID == ID)
+		{
+			return it._Ptr;
+		}
+	}
+	return nullptr;
+}
+
+bool ModuleRenderer3D::DeleteViewPort(uint ID)
+{
+	for (std::vector<viewPort>::iterator it = viewPorts.begin(); it != viewPorts.end(); it++)
+	{
+		if (it->ID == ID)
+		{
+			viewPorts.erase(it);
+			return true;
+		}
+	}
+	return false;
+}
+
+void ModuleRenderer3D::SetViewPort(viewPort& port)
 {
 	port.SetCameraMatrix();
 	glViewport(port.pos.x, App->window->GetWindowSize().y - (port.size.y + port.pos.y), port.size.x, port.size.y);

@@ -28,6 +28,8 @@ public:
 	update_status Update(float dt);
 	update_status PostUpdate(float dt);
 
+	void Render(const viewPort& port);
+
 	bool CleanUp();
 
 	GameObject* CreateEmpty(const char* name = NULL);
@@ -41,12 +43,12 @@ public:
 	template <typename C>
 	std::vector<GameObject*> FilterCollisions(C col);
 
-	Mesh_RenderInfo GetMeshData(mesh* getFrom);
-	void RenderGOs(viewPort& viewPort);
-
 	const GameObject* GetRoot() { return root; }
 
 private:
+	Mesh_RenderInfo GetMeshData(mesh* getFrom);
+	void RenderGOs(const viewPort& viewPort);
+
 	void AddGOtoRoot(GameObject* GO);
 	void CreateRootGameObject();
 	void DeleteGOs();

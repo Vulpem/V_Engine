@@ -39,6 +39,8 @@ public:
 
 	bool CleanUp();
 
+	void Render(const viewPort& port);
+
 	void OnScreenResize(int width, int heigth);
 
 	void HandleInput(SDL_Event* event);
@@ -55,9 +57,10 @@ private:
 	void Outliner();
 	void CameraSelector();
 	void AttributeWindow();
+	void SwitchViewPorts();
 
 public:
-	bool singleViewPort = true;
+	bool orthogonalViews = false;
 
 	bool IsOpenConsole = true;
 	bool IsOpenEditor = true;
@@ -73,9 +76,11 @@ public:
 private:
 	int screenW = 0;
 	int screenH = 0;
+
 	float2 viewPortMin;
 	float2 viewPortMax;
-	std::vector<viewPort> viewPorts;
+	uint singleViewPort;
+	uint multipleViewPorts[4];
 
 	ImGuiTextBuffer buffer;
 	bool scrollToBottom;

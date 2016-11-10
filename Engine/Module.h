@@ -3,6 +3,7 @@
 
 class Application;
 struct PhysBody3D;
+struct viewPort;
 
 #include "C_String.h"
 #include "PugiXml\src\pugixml.hpp"
@@ -69,6 +70,11 @@ public:
 	virtual update_status Update(float dt)
 	{
 		return UPDATE_CONTINUE;
+	}
+
+	virtual void Render(const viewPort& port)
+	{
+
 	}
 
 	virtual update_status PostUpdate(float dt)

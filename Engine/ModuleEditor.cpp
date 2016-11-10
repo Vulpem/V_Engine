@@ -47,12 +47,16 @@ bool ModuleEditor::Start()
 
 	selectedGameObject = nullptr;
 
-	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
+	App->renderer3D->FindViewPort(0)->active = false;
 
-	viewPorts.push_back(viewPort(float2(0, 0), float2(100,100), App->camera->GetActiveCamera()));
-	viewPorts.push_back(viewPort(float2(0, 0), float2(100, 100), App->camera->GetTopCam()));
-	viewPorts.push_back(viewPort(float2(0, 0), float2(100, 100), App->camera->GetRightCam()));
-	viewPorts.push_back(viewPort(float2(0, 0), float2(100, 100), App->camera->GetFrontCam()));
+	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetActiveCamera());
+	multipleViewPorts[0] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetActiveCamera());
+	multipleViewPorts[1] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetTopCam());
+	multipleViewPorts[2] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetRightCam());
+	multipleViewPorts[3] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetFrontCam());
+
+	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
+	SwitchViewPorts();
 
 	return true;
 }
@@ -69,47 +73,9 @@ update_status ModuleEditor::PreUpdate(float dt)
 update_status ModuleEditor::Update(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
-	viewPorts.front().camera = App->camera->GetActiveCamera();
-	if (viewPorts.empty() == false)
-	{
-		viewPorts.front().camera = App->camera->GetActiveCamera();
-		if (singleViewPort)
-		{
-			viewPorts.front().pos = viewPortMin;
-			viewPorts.front().size.x = viewPortMax.x - viewPortMin.x;
-			viewPorts.front().size.y = viewPortMax.y - viewPortMin.y;
-			App->GO->RenderGOs(viewPorts.front());
-		}
-		else
-		{
-			std::vector<viewPort>::iterator p = viewPorts.begin();
-			float2 size((viewPortMax.x - viewPortMin.x) / 2, (viewPortMax.y - viewPortMin.y) / 2);
-			p->pos = viewPortMin;
-			p->size = size;
-			p++;
 
-			p->pos = viewPortMin;
-			p->pos.x += size.x;
-			p->size = size;
-			p++;
-
-			p->pos = viewPortMin;
-			p->pos.y += size.y;
-			p->size = size;
-			p++;
-
-			p->pos = viewPortMin;
-			p->pos.x += size.x;
-			p->pos.y += size.y;
-			p->size = size;
-
-
-			for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
-			{
-				App->GO->RenderGOs(*port);
-			}
-		}
-	}
+	App->renderer3D->FindViewPort(singleViewPort)->camera = App->camera->GetActiveCamera();
+	App->renderer3D->FindViewPort(multipleViewPorts[0])->camera = App->camera->GetActiveCamera();
 
 	if (IsOpenTestWindow)
 	{
@@ -123,18 +89,11 @@ update_status ModuleEditor::Update(float dt)
 	CameraSelector();
 	AttributeWindow();
 
-	if (showPlane)
-	{
-		P_Plane p(0, 0, 0, 1);
-		p.axis = true;
-		p.Render();
-	}
 	return ret;
 }
 
 update_status ModuleEditor::PostUpdate(float dt)
 {
-	ImGui::Render();
 	return UPDATE_CONTINUE;
 }
 
@@ -148,6 +107,16 @@ bool ModuleEditor::CleanUp()
 	return true;
 }
 
+void ModuleEditor::Render(const viewPort & port)
+{
+	if (showPlane)
+	{
+		P_Plane p(0, 0, 0, 1);
+		p.axis = true;
+		p.Render();
+	}
+}
+
 void ModuleEditor::OnScreenResize(int width, int heigth)
 {
 	screenW = width;
@@ -156,6 +125,35 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	viewPortMax.y = screenH - 200;
 	viewPortMin.x = 300;
 	viewPortMin.y = 20;
+
+	//Setting the single viewPort data
+	viewPort* port = App->renderer3D->FindViewPort(singleViewPort);
+	port->pos = viewPortMin;
+	port->size.x = viewPortMax.x - viewPortMin.x;
+	port->size.y = viewPortMax.y - viewPortMin.y;
+
+	//Setting the multiple viewPort data
+	float2 size((viewPortMax.x - viewPortMin.x) / 2, (viewPortMax.y - viewPortMin.y) / 2);
+	port = App->renderer3D->FindViewPort(multipleViewPorts[0]);
+	port->pos = viewPortMin;
+	port->size = size;
+
+	port = App->renderer3D->FindViewPort(multipleViewPorts[1]);
+	port->pos = viewPortMin;
+	port->pos.x += size.x;
+	port->size = size;
+
+	port = App->renderer3D->FindViewPort(multipleViewPorts[2]);
+	port->pos = viewPortMin;
+	port->pos.y += size.y;
+	port->size = size;
+
+	port = App->renderer3D->FindViewPort(multipleViewPorts[3]);
+	port->pos = viewPortMin;
+	port->pos.x += size.x;
+	port->pos.y += size.y;
+	port->size = size;
+
 }
 
 void ModuleEditor::HandleInput(SDL_Event* event)
@@ -239,7 +237,10 @@ update_status ModuleEditor::MenuBar()
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			ImGui::Checkbox("Orthogonal Views", &singleViewPort);
+			if (ImGui::Checkbox("Orthogonal Views", &orthogonalViews))
+			{
+				SwitchViewPorts();
+			}
 			ImGui::Checkbox("Outliner", &IsOpenOutliner);
 			ImGui::Checkbox("Editor", &IsOpenEditor);
 			ImGui::Checkbox("Attribute Editor", &IsOpenAttributes);
@@ -514,5 +515,14 @@ void ModuleEditor::AttributeWindow()
 			}
 		}
 		ImGui::End();
+	}
+}
+
+void ModuleEditor::SwitchViewPorts()
+{
+	App->renderer3D->FindViewPort(singleViewPort)->active = !orthogonalViews;
+	for (int n = 0; n < 4; n++)
+	{
+		App->renderer3D->FindViewPort(multipleViewPorts[n])->active = orthogonalViews;
 	}
 }

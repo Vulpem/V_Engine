@@ -216,6 +216,20 @@ bool Application::CleanUp()
 	return ret;
 }
 
+void Application::Render(const viewPort& port)
+{
+	std::vector<Module*>::iterator item = list_modules.begin();
+
+	while (item != list_modules.end())
+	{
+		if ((*item)->IsEnabled())
+		{
+			(*item)->Render(port);
+		}
+		item++;
+	}
+}
+
 
 bool Application::OpenBrowser(const char* link)
 {

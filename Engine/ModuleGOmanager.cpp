@@ -128,6 +128,15 @@ update_status ModuleGoManager::PostUpdate(float dt)
 	return UPDATE_CONTINUE;
 }
 
+void ModuleGoManager::Render(const viewPort& port)
+{
+	App->GO->RenderGOs(port);
+	if (drawQuadTree)
+	{
+		quadTree.Draw();
+	}
+}
+
 // Called before quitting
 bool ModuleGoManager::CleanUp()
 {
@@ -263,15 +272,8 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 	return ret;
 }
 
-void ModuleGoManager::RenderGOs(viewPort & port)
+void ModuleGoManager::RenderGOs(const viewPort & port)
 {
-	App->renderer3D->SetViewPort(port);
-
-	if (drawQuadTree)
-	{
-		quadTree.Draw();
-	}
-
 	//Call the Draw function of all the components, so they do what they need to
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)

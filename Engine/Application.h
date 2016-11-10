@@ -20,6 +20,8 @@ class ModulePhysics3D;
 class ModuleFileSystem;
 class ModuleImporter;
 
+struct viewPort;
+
 #include "MathGeoLib\include\MathGeoLibFwd.h"
 
 class Application
@@ -65,6 +67,8 @@ public:
 	bool Init();
 	update_status Update();
 	bool CleanUp();
+
+	void Render(const viewPort& port);
 
 	bool OpenBrowser(const char* link);
 	void Log(char* str);
