@@ -11,18 +11,6 @@
 
 class GameObject;
 
-union SDL_Event;
-
-class Panel;
-class PanelConsole;
-class PanelGOTree;
-class PanelProperties;
-class PanelConfiguration;
-class PanelAbout;
-class PanelResources;
-class PanelQuickBar;
-class GameObject;
-
 class ModuleEditor : public Module
 {
 public:
@@ -60,16 +48,10 @@ private:
 
 public:
 	bool orthogonalViews = false;
-	uint PortToChangeCam = 0;
 
-	bool IsOpenConsole = true;
-	bool IsOpenEditor = true;
 	bool IsOpenTestWindow = false;
-	bool IsOpenOutliner = true;
-	bool IsOpenAttributes = true;
-	bool IsOpenCameraSelector = true;
 
-	bool showPlane = true;
+	bool showPlane = false;
 	bool showAxis = true;
 	bool renderNormals = false;
 

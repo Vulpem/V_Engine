@@ -307,10 +307,6 @@ update_status ModuleEditor::MenuBar()
 			{
 				SwitchViewPorts();
 			}
-			ImGui::Checkbox("Outliner", &IsOpenOutliner);
-			ImGui::Checkbox("Editor", &IsOpenEditor);
-			ImGui::Checkbox("Attribute Editor", &IsOpenAttributes);
-			ImGui::Checkbox("Console", &IsOpenConsole);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
 			ImGui::Checkbox("InGame Plane", &showPlane);
 			ImGui::Checkbox("QuadTree", &App->GO->drawQuadTree);
@@ -363,12 +359,10 @@ update_status ModuleEditor::MenuBar()
 
 void ModuleEditor::Editor()
 {
-	if (IsOpenEditor)
-	{
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 530));
 		ImGui::SetNextWindowSize(ImVec2(330, screenH - 530));
 
-		ImGui::Begin("Editor", &IsOpenEditor, ImVec2(500, 300), 0.8f);
+		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f);
 
 		if (ImGui::CollapsingHeader("Application"))
 		{
@@ -449,17 +443,14 @@ void ModuleEditor::Editor()
 			}
 		}
 		ImGui::End();
-	}
 }
 
 void ModuleEditor::Console()
 {
-	if (IsOpenConsole)
-	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
 		ImGui::SetNextWindowSize(ImVec2(screenW - 330.0f, 200.0f));
 
-		ImGui::Begin("Console", &IsOpenConsole, ImVec2(500, 300), 0.8f);
+		ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f);
 
 		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
 		ImGui::PushStyleColor(0, col);
@@ -473,17 +464,14 @@ void ModuleEditor::Console()
 		scrollToBottom = false;
 
 		ImGui::End();
-	}
 }
 
 void ModuleEditor::Outliner()
 {
-	if (IsOpenOutliner)
-	{
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
 		ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 220.0f));
 
-		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 0.8f);
+		ImGui::Begin("Outliner", 0, ImVec2(500, 300), 0.8f);
 
 		std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
 		while (node != App->GO->GetRoot()->childs.end())
@@ -493,17 +481,14 @@ void ModuleEditor::Outliner()
 		}
 
 		ImGui::End();
-	}
 }
 
 
 void ModuleEditor::AttributeWindow()
 {
-	if (IsOpenAttributes)
-	{
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
 		ImGui::SetNextWindowSize(ImVec2(330, 510));
-		ImGui::Begin("Attribute Editor", &IsOpenAttributes, 0.8f);
+		ImGui::Begin("Attribute Editor", 0, 0.8f);
 		if (selectedGameObject)
 		{
 			selectedGameObject->DrawOnEditor();
@@ -525,7 +510,6 @@ void ModuleEditor::AttributeWindow()
 			}
 		}
 		ImGui::End();
-	}
 }
 
 void ModuleEditor::SwitchViewPorts()
