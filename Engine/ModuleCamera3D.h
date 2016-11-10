@@ -35,6 +35,8 @@ public:
 	void SetCameraToFront();
 	void SetCameraToCamera(GameObject* setTo);
 
+	Camera* GetMovingCamera();
+	void SetMovingCamera(Camera* cam = nullptr);
 	Camera* GetActiveCamera();
 	float3 GetCamPos();
 private:
@@ -45,6 +47,7 @@ public:
 	float camSprintMultiplier = 2.0f;
 
 private:
+	Camera* movingCamera = nullptr;
 	GameObject* defaultCameraGO = nullptr;
 	Camera* defaultCamera = nullptr;
 	Camera* activeCamera = nullptr;

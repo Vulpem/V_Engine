@@ -192,6 +192,21 @@ void ModuleCamera3D::SetCameraToCamera(GameObject * setTo)
 }
 
 
+Camera * ModuleCamera3D::GetMovingCamera()
+{
+	Camera* cam = movingCamera;
+	if (cam == nullptr)
+	{
+		cam = GetActiveCamera();
+	}
+	return cam;
+}
+
+void ModuleCamera3D::SetMovingCamera(Camera * cam)
+{
+	movingCamera = cam;
+}
+
 Camera * ModuleCamera3D::GetActiveCamera()
 {
 	if (activeCamera != nullptr)
@@ -208,14 +223,15 @@ float3 ModuleCamera3D::GetCamPos()
 
 void ModuleCamera3D::MoveWithKeys()
 {
+	Camera* cam = GetMovingCamera();
+
 	float speed = camSpeed;
-	float3 lastCamPos = GetActiveCamera()->object->GetTransform()->GetGlobalPos();
+	float3 lastCamPos = cam->object->GetTransform()->GetGlobalPos();
 	float3 camPos = lastCamPos;
 	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 	{
 		speed *= camSprintMultiplier;
 	}
-	Camera* cam = GetActiveCamera();
 
 	int mouseWheel = App->input->GetMouseZ();
 	if (mouseWheel != 0)

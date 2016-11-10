@@ -49,6 +49,10 @@ Camera::~Camera()
 	{
 		App->camera->SetCameraToDefault();
 	}
+	if (App->camera->GetMovingCamera() == this)
+	{
+		App->camera->SetMovingCamera();
+	}
 }
 
 void Camera::Draw()
