@@ -45,6 +45,9 @@ private:
 	void Outliner();
 	void AttributeWindow();
 	void SwitchViewPorts();
+	void ViewPortUI(const viewPort& port);
+
+	void SelectByViewPort();
 
 public:
 	bool orthogonalViews = false;
@@ -57,6 +60,8 @@ public:
 
 	//TMP
 	LineSegment selectRay;
+	float3 out_normal;
+	float3 out_pos;
 
 private:
 	int screenW = 0;

@@ -42,6 +42,7 @@ public:
 
 	template <typename C>
 	std::vector<GameObject*> FilterCollisions(C col);
+	bool RayCast(const LineSegment& ray, GameObject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL);
 
 	const GameObject* GetRoot() { return root; }
 
@@ -79,7 +80,7 @@ inline std::vector<GameObject*> ModuleGoManager::FilterCollisions(C col)
 
 	for (std::vector<GameObject*>::iterator it = dynamicGO.begin(); it != dynamicGO.end(); it++)
 	{
-		if ((*it)->aabb.Intersects(col) == true)
+		if ((*it)->aabb.IsFinite() && (*it)->aabb.Intersects(col) == true)
 		{
 			ret.push_back(*it);
 		}

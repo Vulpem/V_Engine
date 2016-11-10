@@ -33,6 +33,15 @@ public:
 
 	Mesh_RenderInfo GetMeshInfo();
 
+	//WARNING, the returned value is created via the NEW operator. Remember to destroy it after use
+	float3* GetVertices();
+
+	//WARNING, the returned value is created via the NEW operator. Remember to destroy it after use
+	uint* GetIndices();
+
+	//WARNING, the returned value is created via the NEW operator. Remember to destroy it after use
+	float3* GetNormals();
+
 	void EditorContent();
 
 	static Type GetType() { return Type::C_mesh; }

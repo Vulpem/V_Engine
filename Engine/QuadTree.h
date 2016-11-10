@@ -70,7 +70,7 @@ inline std::vector<GameObject*> QuadNode::FilterCollisions(C col)
 		{
 			for (std::vector<GameObject*>::iterator it = GOs.begin(); it != GOs.end(); it++)
 			{
-				if (col.Intersects((*it)->aabb) == true)
+				if ((*it)->aabb.IsFinite() && col.Intersects((*it)->aabb) == true)
 				{
 					ret.push_back(*it);
 				}

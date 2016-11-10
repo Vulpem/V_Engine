@@ -74,7 +74,7 @@ update_status ModuleEditor::Update(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN)
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN || App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
 		viewPort* port = App->renderer3D->HoveringViewPort();
 		if (port != nullptr)
@@ -83,18 +83,7 @@ update_status ModuleEditor::Update(float dt)
 		}
 	}
 
-
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
-	{
-		viewPort* port = nullptr;
-		float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
-		if (port != nullptr)
-		{			
-			portPos.x = portPos.x/(port->size.x/2) - 1;
-			portPos.y = portPos.y/(port->size.y/2) - 1;
-			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
-		}
-	}
+	SelectByViewPort();
 
 
 	if (IsOpenTestWindow)
@@ -129,52 +118,13 @@ bool ModuleEditor::CleanUp()
 void ModuleEditor::Render(const viewPort & port)
 {
 	//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
-	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
-
-	ImGui::SetNextWindowPos(ImVec2(port.pos.x, port.pos.y));
-	ImGui::SetNextWindowSize(ImVec2(port.size.x, 30));
-
-	char tmp[256];
-	sprintf(tmp, "ViewPortMenu##%i", port.ID);
-
-	ImGui::Begin(tmp, 0, flags);
-	if (ImGui::BeginMenuBar())
-	{
-		sprintf(tmp, "Camera:##ViewPort%i", port.ID);
-		if (ImGui::BeginMenu(tmp))
-		{
-			if (ImGui::BeginMenu("Current Camera"))
-			{
-				ImGui::Text("Name:");
-				ImGui::Text(port.camera->object->name);
-				ImGui::Separator();
-				ImGui::NewLine();
-				if (ImGui::MenuItem("Switch view type"))
-				{
-					App->renderer3D->FindViewPort(port.ID)->camera->SwitchViewType();
-				}
-				ImGui::EndMenu();
-			}
-			std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
-			for (; comp != App->GO->components.end() && comp->first == Component::Type::C_camera; comp++)
-			{
-				Camera* cam = (Camera*)&*comp->second;
-				if (ImGui::MenuItem(cam->object->name))
-				{
-					App->renderer3D->FindViewPort(port.ID)->camera = cam;
-					int a = 0;
-				}
-			}
-			ImGui::EndMenu();
-		}
-		sprintf(tmp, "Switch View Type:##%i", port.ID);
-
-		ImGui::EndMenuBar();
-	}
-	ImGui::End();
-
+	ViewPortUI(port);
 
 	App->renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	App->renderer3D->DrawLocator(out_pos, float4(1,1,1,1));
+	App->renderer3D->DrawLine(out_pos, out_pos + out_normal * 10, float4(1, 1, 1, 1));
+
 	if (showPlane)
 	{
 		P_Plane p(0, 0, 0, 1);
@@ -518,5 +468,78 @@ void ModuleEditor::SwitchViewPorts()
 	for (int n = 0; n < 4; n++)
 	{
 		App->renderer3D->FindViewPort(multipleViewPorts[n])->active = orthogonalViews;
+	}
+}
+
+void ModuleEditor::ViewPortUI(const viewPort& port)
+{
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
+
+	ImGui::SetNextWindowPos(ImVec2(port.pos.x, port.pos.y));
+	ImGui::SetNextWindowSize(ImVec2(port.size.x, 0));
+
+	char tmp[256];
+	sprintf(tmp, "ViewPortMenu##%i", port.ID);
+
+	ImGui::Begin(tmp, 0, flags);
+	if (ImGui::BeginMenuBar())
+	{
+		sprintf(tmp, "Camera:##ViewPort%i", port.ID);
+		if (ImGui::BeginMenu(tmp))
+		{
+			if (ImGui::BeginMenu("Current Camera"))
+			{
+				ImGui::Text("Name:");
+				ImGui::Text(port.camera->object->name);
+				ImGui::Separator();
+				ImGui::NewLine();
+				if (ImGui::MenuItem("Switch view type"))
+				{
+					App->renderer3D->FindViewPort(port.ID)->camera->SwitchViewType();
+				}
+				ImGui::EndMenu();
+			}
+			std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
+			for (; comp != App->GO->components.end() && comp->first == Component::Type::C_camera; comp++)
+			{
+				Camera* cam = (Camera*)&*comp->second;
+				if (ImGui::MenuItem(cam->object->name))
+				{
+					App->renderer3D->FindViewPort(port.ID)->camera = cam;
+					int a = 0;
+				}
+			}
+			ImGui::EndMenu();
+		}
+		sprintf(tmp, "Switch View Type:##%i", port.ID);
+
+		ImGui::EndMenuBar();
+	}
+	ImGui::End();
+}
+
+void ModuleEditor::SelectByViewPort()
+{
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	{
+		viewPort* port = nullptr;
+		float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
+		//Checking the click was made on a port
+		if (port != nullptr)
+		{
+			//Normalizing the mouse position in port to [-1,1]
+			portPos.x = portPos.x / (port->size.x / 2) - 1;
+			portPos.y = portPos.y / (port->size.y / 2) - 1;
+			//Generating the LineSegment we'll check for collisions
+			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
+
+			GameObject* out_go = NULL;
+
+			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal))
+			{
+				SelectGameObject(out_go);
+			}
+
+		}
 	}
 }

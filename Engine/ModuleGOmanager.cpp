@@ -256,6 +256,67 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 	}
 }
 
+bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal)
+{
+	bool collided = false;
+	GameObject* out_go = NULL;
+	float3 out_pos = float3::zero;
+	float3 out_normal = float3::zero;
+
+	//Obtaining all the AABB collisions, and sorting them by distance to the center of the GO box
+	std::vector<GameObject*> colls = App->GO->FilterCollisions(ray);
+	std::map<float, GameObject*> candidates;
+	for (std::vector<GameObject*>::iterator GO = colls.begin(); GO != colls.end(); GO++)
+	{
+		candidates.insert(std::pair<float, GameObject*>(ray.a.Distance((*GO)->aabb.CenterPoint()), (*GO)));
+	}
+
+	//Checking all the possible collisions in order
+	for (std::map<float, GameObject*>::iterator check = candidates.begin(); check != candidates.end() && collided == false; check++)
+	{
+		float collisionDistance = floatMax;
+		//One object may have more than a single mesh, so we'll check them one by one
+		std::vector<mesh*> meshes = check->second->GetComponent<mesh>();
+		for (std::vector<mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
+		{
+			LineSegment transformedRay = ray;
+			transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().Inverted());
+			//Generating the triangles the mes has, and checking them one by one
+			float3* vertices = (*m)->GetVertices();
+			for (int n = 0; n < (*m)->num_vertices; n+=3)
+			{
+				Triangle tri(vertices[n], vertices[n + 1], vertices[n + 2]);
+				float3 intersectionPoint;
+				float distance;
+				//If the triangle we collided with is further away than a previous collision, we'll ignore it
+				if (tri.Intersects(transformedRay, &distance, &intersectionPoint) == true)
+				{
+					if (distance < collisionDistance)
+					{
+						collided = true;
+						collisionDistance = distance;
+						out_go = check->second;
+						out_pos = intersectionPoint += check->second->GetTransform()->GetGlobalPos();
+						out_normal = tri.NormalCW();
+					}
+				}
+			}
+			RELEASE_ARRAY(vertices);
+		}
+	}
+	*OUT_gameobject = out_go;
+	if (OUT_normal != NULL)
+	{
+		*OUT_normal = out_normal;
+	}
+	if (OUT_position != NULL)
+	{
+		*OUT_position = out_pos;
+	}
+
+	return collided;
+}
+
 
 Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 {

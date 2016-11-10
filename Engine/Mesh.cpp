@@ -79,6 +79,33 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 	return ret;
 }
 
+float3 * mesh::GetVertices()
+{
+	//Obtaining the vertices data from the buffer
+	float* ret = new float[num_vertices * 3];
+	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * num_vertices * 3, ret);
+	return (float3*)ret;
+}
+
+uint * mesh::GetIndices()
+{
+	//Obtaining the vertices data from the buffer
+	uint* ret = new uint[num_indices];
+	glBindBuffer(GL_ARRAY_BUFFER, id_indices);
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(uint) * num_indices, ret);
+	return ret;
+}
+
+float3 * mesh::GetNormals()
+{
+	//Obtaining the vertices data from the buffer
+	float* ret = new float[num_normals * 3];
+	glBindBuffer(GL_ARRAY_BUFFER, id_normals);
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * num_normals * 3, ret);
+	return (float3*)ret;
+}
+
 void mesh::EditorContent()
 {
 	char tmp[48];
