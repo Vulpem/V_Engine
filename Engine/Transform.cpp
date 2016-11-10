@@ -211,7 +211,7 @@ math::float3 Transform::GetGlobalPos()
 
 void Transform::SetLocalRot(float x, float y, float z)
 {
-	if (object->IsStatic() == false)
+	if (object->IsStatic() == false && allowRotation)
 	{
 		while (x < 0) { x += 360; }
 		while (y < 0) { y += 360; }
@@ -234,7 +234,7 @@ void Transform::SetLocalRot(float3 rot)
 
 void Transform::SetLocalRot(float x, float y, float z, float w)
 {
-	if (object->IsStatic() == false)
+	if (object->IsStatic() == false && allowRotation)
 	{
 		localRotation.Set(x, y, z, w);
 
@@ -258,7 +258,7 @@ math::float3 Transform::GetLocalRot()
 
 void Transform::SetGlobalRot(float x, float y, float z)
 {
-	if (object->IsStatic() == false)
+	if (object->IsStatic() == false && allowRotation)
 	{
 		if (object->parent != nullptr && object->parent->HasComponent(Component::Type::C_transform) == true)
 		{

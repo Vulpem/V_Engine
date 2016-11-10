@@ -28,18 +28,21 @@ bool ModuleCamera3D::Start()
 	topView = App->GO->CreateCamera("TopView");
 	topView->GetTransform()->SetLocalPos(0, 100, 0);
 	topView->GetTransform()->SetLocalRot(90, 0, 0);
+	topView->GetTransform()->allowRotation = false;
 	topView->GetComponent<Camera>().front()->SwitchViewType();
 	topView->HideFromOutliner();
 
 	frontView = App->GO->CreateCamera("FrontView");
 	frontView->GetTransform()->SetLocalPos(0, 0, -100);
 	frontView->GetTransform()->SetLocalRot(0, 0, 0);
+	frontView->GetTransform()->allowRotation = false;
 	frontView->GetComponent<Camera>().front()->SwitchViewType();
 	frontView->HideFromOutliner();
 
 	rightView = App->GO->CreateCamera("RightView");
 	rightView->GetTransform()->SetLocalPos(-100, 0, 0);
 	rightView->GetTransform()->SetLocalRot(0, 90, 0);
+	rightView->GetTransform()->allowRotation = false;
 	rightView->GetComponent<Camera>().front()->SwitchViewType();
 	rightView->HideFromOutliner();
 

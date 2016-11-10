@@ -13,7 +13,7 @@ public:
 	Transform(GameObject* linkedTo, int id);
 	~Transform();
 
-	void Draw();
+	bool allowRotation = true;
 private:
 	math::Quat localRotation = math::Quat::identity;
 	math::float3 localPosition = math::float3::zero;
@@ -73,6 +73,8 @@ public:
 	static float3 WorldRight();
 	static float3 WorldForward();
 	static float3 WorldBackward();
+
+	void Draw();
 
 	static Type GetType() { return Type::C_transform; }
 
