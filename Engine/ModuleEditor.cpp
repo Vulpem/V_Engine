@@ -117,10 +117,25 @@ void ModuleEditor::Render(const viewPort & port)
 	ImGuiWindowFlags flags = ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;	
 	ImGui::SetNextWindowPos(ImVec2(port.pos.x, port.pos.y));
 	ImGui::SetNextWindowSize(ImVec2(port.size.x, 30));
-	char title[256];
-	sprintf(title, "ViewPortMenu##%i", port.ID);
-	ImGui::Begin(title, 0, flags);
-	ImGui::Text("hi!");
+	char tmp[256];
+	sprintf(tmp, "ViewPortMenu##%i", port.ID);
+	ImGui::Begin(tmp, 0, flags);
+
+	sprintf(tmp, "Select Camera:##%i", port.ID);
+	//TODO
+	if (ImGui::BeginMenu(tmp))
+	{		
+		std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
+		for (; comp != App->GO->components.end() && comp->first != Component::Type::C_camera; comp++)
+		{
+			Camera* cam = (Camera*)comp._Ptr;
+			if (ImGui::MenuItem(cam->object->name))
+			{
+				App->renderer3D->FindViewPort(port.ID)->camera = cam;
+			}
+		}
+		ImGui::EndMenu();
+	}
 	ImGui::End();
 
 	if (showPlane)
@@ -273,11 +288,11 @@ update_status ModuleEditor::MenuBar()
 
 		if (ImGui::BeginMenu("Create"))
 		{
-			if (ImGui::Button("Empty"))
+			if (ImGui::MenuItem("Empty##CreateEmpty"));
 			{
 				App->GO->CreateEmpty();
 			}
-			if (ImGui::Button("Camera"))
+			if (ImGui::MenuItem("Camera##CreateEmptyCam"))
 			{
 				App->GO->CreateCamera();
 			}
@@ -336,7 +351,7 @@ void ModuleEditor::Editor()
 			ImGui::LabelText("label", "MouseY: %i", App->input->GetMouseY());
 		}
 
-		if (ImGui::CollapsingHeader("Camera"))
+		if (ImGui::CollapsingHeader("Camera##CameraModule"))
 		{
 			ImGui::Text("Position");
 			if (ImGui::Button("Select active camera"))
