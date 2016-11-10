@@ -354,7 +354,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
 	glPopMatrix();
 }
 
-const viewPort* ModuleRenderer3D::HoveringViewPort()
+viewPort* ModuleRenderer3D::HoveringViewPort()
 {
 	for (std::vector<viewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
 	{
@@ -370,22 +370,22 @@ const viewPort* ModuleRenderer3D::HoveringViewPort()
 	return nullptr;
 }
 
-float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, const viewPort* OUT_port)
+float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, viewPort** OUT_port)
 {
-	OUT_port = HoveringViewPort();
-	if (OUT_port != nullptr)
+	*OUT_port = HoveringViewPort();
+	if (*OUT_port != nullptr)
 	{
-		return float2(OUT_port->pos + pos_in_ViewPort);
+		return float2((*OUT_port)->pos + pos_in_ViewPort);
 	}
 	return float2(-1,-1);
 }
 
-float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, const viewPort * OUT_port)
+float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, viewPort** OUT_port)
 {
-	OUT_port = HoveringViewPort();
-	if (OUT_port != nullptr)
+	*OUT_port = HoveringViewPort();
+	if (*OUT_port != nullptr)
 	{
-		return float2(pos_in_screen - OUT_port->pos);
+		return float2(pos_in_screen - (*OUT_port)->pos);
 	}
 	return float2(-1,-1);
 }

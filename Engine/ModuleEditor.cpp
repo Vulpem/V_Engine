@@ -76,12 +76,26 @@ update_status ModuleEditor::Update(float dt)
 
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN)
 	{
-		const viewPort* port = App->renderer3D->HoveringViewPort();
+		viewPort* port = App->renderer3D->HoveringViewPort();
 		if (port != nullptr)
 		{
 			App->camera->SetMovingCamera(port->camera);
 		}
 	}
+
+
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+	{
+		viewPort* port = nullptr;
+		float2 portPos = App->renderer3D->ScreenToViewPort(float2(App->input->GetMouseX(), App->input->GetMouseY()), &port);
+		if (port != nullptr)
+		{			
+			portPos.x = portPos.x/(port->size.x/2) - 1;
+			portPos.y = portPos.y/(port->size.y/2) - 1;
+			selectRay = port->camera->GetFrustum()->UnProjectLineSegment(portPos.x, -portPos.y);
+		}
+	}
+
 
 	if (IsOpenTestWindow)
 	{
@@ -157,9 +171,10 @@ void ModuleEditor::Render(const viewPort & port)
 
 		ImGui::EndMenuBar();
 	}
-
 	ImGui::End();
 
+
+	App->renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
 	if (showPlane)
 	{
 		P_Plane p(0, 0, 0, 1);

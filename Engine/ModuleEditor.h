@@ -73,6 +73,9 @@ public:
 	bool showAxis = true;
 	bool renderNormals = false;
 
+	//TMP
+	LineSegment selectRay;
+
 private:
 	int screenW = 0;
 	int screenH = 0;
