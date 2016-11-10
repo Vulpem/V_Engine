@@ -359,10 +359,13 @@ const viewPort* ModuleRenderer3D::HoveringViewPort()
 {
 	for (std::vector<viewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
 	{
-		if (App->input->GetMouseX() > it->pos.x && App->input->GetMouseX() < it->pos.x + it->size.x &&
-			App->input->GetMouseY() > it->pos.y && App->input->GetMouseY() < it->pos.y + it->size.y)
+		if (it->active)
 		{
-			return &*it;
+			if (App->input->GetMouseX() > it->pos.x && App->input->GetMouseX() < it->pos.x + it->size.x &&
+				App->input->GetMouseY() > it->pos.y && App->input->GetMouseY() < it->pos.y + it->size.y)
+			{
+				return &*it;
+			}
 		}
 	}
 	return nullptr;

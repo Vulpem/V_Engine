@@ -114,6 +114,15 @@ bool ModuleEditor::CleanUp()
 
 void ModuleEditor::Render(const viewPort & port)
 {
+	ImGuiWindowFlags flags = ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;	
+	ImGui::SetNextWindowPos(ImVec2(port.pos.x, port.pos.y));
+	ImGui::SetNextWindowSize(ImVec2(port.size.x, 30));
+	char title[256];
+	sprintf(title, "ViewPortMenu##%i", port.ID);
+	ImGui::Begin(title, 0, flags);
+	ImGui::Text("hi!");
+	ImGui::End();
+
 	if (showPlane)
 	{
 		P_Plane p(0, 0, 0, 1);
