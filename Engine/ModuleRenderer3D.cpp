@@ -141,7 +141,6 @@ bool ModuleRenderer3D::Start()
 	//Initialize Projection Matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glLoadMatrixf(App->camera->GetProjectionMatrix());
 
 	//Initialize Modelview Matrix
 	glMatrixMode(GL_MODELVIEW);

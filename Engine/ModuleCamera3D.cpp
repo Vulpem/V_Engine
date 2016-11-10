@@ -98,7 +98,7 @@ void ModuleCamera3D::LookAt( const float3 &Spot)
 // -----------------------------------------------------------------
 void ModuleCamera3D::Move(const float3 &Movement)
 {
-	GetMovingCamera()->object->GetTransform()->SetGlobalPos(GetActiveCamera()->object->GetTransform()->GetGlobalPos() + Movement);
+	GetMovingCamera()->object->GetTransform()->SetGlobalPos(GetMovingCamera()->object->GetTransform()->GetGlobalPos() + Movement);
 }
 
 void ModuleCamera3D::SetPos(const float3 &Pos)
@@ -107,15 +107,6 @@ void ModuleCamera3D::SetPos(const float3 &Pos)
 }
 
 // -----------------------------------------------------------------
-float* ModuleCamera3D::GetViewMatrix()
-{
-	return GetActiveCamera()->GetViewMatrix().ptr();
-}
-
-float* ModuleCamera3D::GetProjectionMatrix()
-{
-	return GetActiveCamera()->GetProjectionMatrix().ptr();
-}
 
 Camera * ModuleCamera3D::GetTopCam()
 {

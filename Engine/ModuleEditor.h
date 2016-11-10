@@ -55,12 +55,12 @@ private:
 	void Editor();
 	void Console();
 	void Outliner();
-	void CameraSelector();
 	void AttributeWindow();
 	void SwitchViewPorts();
 
 public:
 	bool orthogonalViews = false;
+	uint PortToChangeCam = 0;
 
 	bool IsOpenConsole = true;
 	bool IsOpenEditor = true;

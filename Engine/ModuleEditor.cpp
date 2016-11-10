@@ -30,17 +30,17 @@ ModuleEditor::~ModuleEditor()
 bool ModuleEditor::Init()
 {
 	bool ret = true;
-	LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
-	//Linking ImGUI and the window
-	ImGui_ImplSdlGL3_Init(App->window->GetWindow());
-		
-	return ret;
+LOG("Init editor gui with imgui lib version %s", ImGui::GetVersion());
+//Linking ImGUI and the window
+ImGui_ImplSdlGL3_Init(App->window->GetWindow());
+
+return ret;
 }
 
 bool ModuleEditor::Start()
 {
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
-	
+
 	//Initializing the strings used to test the editor
 	strcpy(testConsoleInput, "InputTextHere");
 	strcpy(toImport, "");
@@ -74,12 +74,13 @@ update_status ModuleEditor::Update(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
-	App->renderer3D->FindViewPort(singleViewPort)->camera = App->camera->GetActiveCamera();
-	App->renderer3D->FindViewPort(multipleViewPorts[0])->camera = App->camera->GetActiveCamera();
-
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN)
 	{
-		App->camera->SetMovingCamera(App->renderer3D->HoveringViewPort()->camera);
+		const viewPort* port = App->renderer3D->HoveringViewPort();
+		if (port != nullptr)
+		{
+			App->camera->SetMovingCamera(port->camera);
+		}
 	}
 
 	if (IsOpenTestWindow)
@@ -91,7 +92,6 @@ update_status ModuleEditor::Update(float dt)
 	Editor();
 	Console();
 	Outliner();
-	CameraSelector();
 	AttributeWindow();
 
 	return ret;
@@ -114,28 +114,50 @@ bool ModuleEditor::CleanUp()
 
 void ModuleEditor::Render(const viewPort & port)
 {
-	ImGuiWindowFlags flags = ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;	
+	//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
+
 	ImGui::SetNextWindowPos(ImVec2(port.pos.x, port.pos.y));
 	ImGui::SetNextWindowSize(ImVec2(port.size.x, 30));
+
 	char tmp[256];
 	sprintf(tmp, "ViewPortMenu##%i", port.ID);
-	ImGui::Begin(tmp, 0, flags);
 
-	sprintf(tmp, "Select Camera:##%i", port.ID);
-	//TODO
-	if (ImGui::BeginMenu(tmp))
-	{		
-		std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
-		for (; comp != App->GO->components.end() && comp->first != Component::Type::C_camera; comp++)
+	ImGui::Begin(tmp, 0, flags);
+	if (ImGui::BeginMenuBar())
+	{
+		sprintf(tmp, "Camera:##ViewPort%i", port.ID);
+		if (ImGui::BeginMenu(tmp))
 		{
-			Camera* cam = (Camera*)comp._Ptr;
-			if (ImGui::MenuItem(cam->object->name))
+			if (ImGui::BeginMenu("Current Camera"))
 			{
-				App->renderer3D->FindViewPort(port.ID)->camera = cam;
+				ImGui::Text("Name:");
+				ImGui::Text(port.camera->object->name);
+				ImGui::Separator();
+				ImGui::NewLine();
+				if (ImGui::MenuItem("Switch view type"))
+				{
+					App->renderer3D->FindViewPort(port.ID)->camera->SwitchViewType();
+				}
+				ImGui::EndMenu();
 			}
+			std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
+			for (; comp != App->GO->components.end() && comp->first == Component::Type::C_camera; comp++)
+			{
+				Camera* cam = (Camera*)&*comp->second;
+				if (ImGui::MenuItem(cam->object->name))
+				{
+					App->renderer3D->FindViewPort(port.ID)->camera = cam;
+					int a = 0;
+				}
+			}
+			ImGui::EndMenu();
 		}
-		ImGui::EndMenu();
+		sprintf(tmp, "Switch View Type:##%i", port.ID);
+
+		ImGui::EndMenuBar();
 	}
+
 	ImGui::End();
 
 	if (showPlane)
@@ -288,11 +310,11 @@ update_status ModuleEditor::MenuBar()
 
 		if (ImGui::BeginMenu("Create"))
 		{
-			if (ImGui::MenuItem("Empty##CreateEmpty"));
+			if (ImGui::MenuItem("Empty##CreateEmpty") == true)
 			{
 				App->GO->CreateEmpty();
 			}
-			if (ImGui::MenuItem("Camera##CreateEmptyCam"))
+			if (ImGui::MenuItem("Camera##CreateEmptyCam") == true)
 			{
 				App->GO->CreateCamera();
 			}
@@ -447,25 +469,6 @@ void ModuleEditor::Outliner()
 		ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 220.0f));
 
 		ImGui::Begin("Outliner", &IsOpenOutliner, ImVec2(500, 300), 0.8f);
-		if (ImGui::CollapsingHeader("Load Geometry"))
-		{
-			ImGui::InputText("Load:", toImport, 256);
-			if (ImGui::Button("Import"))
-			{
-				std::vector<GameObject*> import = App->GO->LoadGO(toImport);
-				if (import.empty() == false)
-				{
-					importResult = "Import successful!";
-				}
-				else
-				{
-					importResult = "Error importing.";
-				}
-
-
-			}
-			ImGui::Text(importResult.GetString());
-		}
 
 		std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
 		while (node != App->GO->GetRoot()->childs.end())
@@ -478,43 +481,6 @@ void ModuleEditor::Outliner()
 	}
 }
 
-void ModuleEditor::CameraSelector()
-{
-	if (IsOpenCameraSelector)
-	{
-		ImGui::SetNextWindowPos(ImVec2(screenW - 530, 20));
-		ImGui::SetNextWindowSize(ImVec2(200, 175));
-
-		ImGui::Begin("Camera Selector", &IsOpenCameraSelector, ImVec2(500, 300), 0.8f);
-		ImGui::Text("Active Camera:\n%s", App->camera->GetActiveCamera()->object->GetName());
-		ImGui::NewLine();
-		ImGui::Separator();
-		if (ImGui::Button("Switch View Type##CamSwitch"))
-		{
-			App->camera->GetActiveCamera()->SwitchViewType();
-		}
-		ImGui::Separator();
-		if (ImGui::Button("Default##SetDefaultCam"))
-		{
-			App->camera->SetCameraToDefault();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Top##SetTopCam"))
-		{
-			App->camera->SetCameraToTop();
-		}
-		if (ImGui::Button("Front##SetFrontCam"))
-		{
-			App->camera->SetCameraToFront();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Right##SetRightCam"))
-		{
-			App->camera->SetCameraToRight();
-		}
-		ImGui::End();
-	}
-}
 
 void ModuleEditor::AttributeWindow()
 {

@@ -20,8 +20,6 @@ public:
 	void LookAt(const float3 &Spot);
 	void Move(const float3 &Movement);
 	void SetPos(const float3 &Pos);
-	float* GetViewMatrix();
-	float* GetProjectionMatrix();
 
 	Camera* GetTopCam();
 	Camera* GetRightCam();
