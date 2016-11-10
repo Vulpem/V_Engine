@@ -9,6 +9,8 @@ struct viewPort
 {
 	viewPort(float2 pos, float2 size, Camera* cam) :pos(pos), size(size), camera(cam){};
 
+	bool active = true;
+
 	Camera* camera = nullptr;
 	float2 pos = float2::zero;
 	float2 size = float2(100,100);

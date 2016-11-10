@@ -20,7 +20,7 @@
 
 //------------------------- MODULE --------------------------------------------------------------------------------
 
-ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(-300,-10,-300), float3(300, 10, 300))
+ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
 	name.create("ModuleGeometry");
 }
@@ -108,11 +108,6 @@ update_status ModuleGoManager::Update(float dt)
 			setting = nullptr;
 		}
 		ImGui::End();
-	}
-
-	if (drawQuadTree)
-	{
-		quadTree.Draw();
 	}
 
 	return UPDATE_CONTINUE;
@@ -272,6 +267,11 @@ void ModuleGoManager::RenderGOs(viewPort & port)
 {
 	App->renderer3D->SetViewPort(port);
 
+	if (drawQuadTree)
+	{
+		quadTree.Draw();
+	}
+
 	//Call the Draw function of all the components, so they do what they need to
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
@@ -292,6 +292,7 @@ void ModuleGoManager::RenderGOs(viewPort & port)
 		{
 			aCamHadCulling = true;
 			std::vector<GameObject*> GOs;
+			//If a camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
 			if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 			{
 				GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());

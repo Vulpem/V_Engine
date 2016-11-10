@@ -61,4 +61,9 @@ enum update_status
 #define TITLE "V_Engine"
 #define ORGANISATION "UPC"
 
+//USED WHEN GENERATING THE QUAD TREE SIZE
+#define WORLD_WIDTH 1400
+#define WORLD_DEPTH 1400
+#define WORLD_HEIGHT 30
+
 #endif
