@@ -3,6 +3,7 @@
 #include "ModuleRenderer3D.h"
 #include "ModuleWindow.h"
 #include "ModuleCamera3D.h"
+#include "ModuleInput.h"
 
 #include "Camera.h"
 #include "imGUI\imgui.h"
@@ -352,6 +353,39 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glPopMatrix();
+}
+
+const viewPort* ModuleRenderer3D::HoveringViewPort()
+{
+	for (std::vector<viewPort>::reverse_iterator it = viewPorts.rbegin(); it != viewPorts.rend(); it++)
+	{
+		if (App->input->GetMouseX() > it->pos.x && App->input->GetMouseX() < it->pos.x + it->size.x &&
+			App->input->GetMouseY() > it->pos.y && App->input->GetMouseY() < it->pos.y + it->size.y)
+		{
+			return &*it;
+		}
+	}
+	return nullptr;
+}
+
+float2 ModuleRenderer3D::ViewPortToScreen(const float2 & pos_in_ViewPort, const viewPort* OUT_port)
+{
+	OUT_port = HoveringViewPort();
+	if (OUT_port != nullptr)
+	{
+		return float2(OUT_port->pos + pos_in_ViewPort);
+	}
+	return float2(-1,-1);
+}
+
+float2 ModuleRenderer3D::ScreenToViewPort(const float2 & pos_in_screen, const viewPort * OUT_port)
+{
+	OUT_port = HoveringViewPort();
+	if (OUT_port != nullptr)
+	{
+		return float2(pos_in_screen - OUT_port->pos);
+	}
+	return float2(-1,-1);
 }
 
 uint ModuleRenderer3D::AddViewPort(float2 pos, float2 size, Camera * cam)

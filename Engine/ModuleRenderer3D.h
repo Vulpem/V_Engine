@@ -32,6 +32,10 @@ public:
 	void DrawLocator(float4x4 transform = float4x4::identity, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawMesh(Mesh_RenderInfo meshInfo);
 
+	const viewPort* HoveringViewPort();
+	float2 ViewPortToScreen(const float2& pos_in_ViewPort, const viewPort* OUT_port);
+	float2 ScreenToViewPort(const float2& pos_in_screen, const viewPort* OUT_port);
+
 	uint AddViewPort(float2 pos, float2 size, Camera* cam);
 	viewPort* FindViewPort(uint ID);
 	bool DeleteViewPort(uint ID);
