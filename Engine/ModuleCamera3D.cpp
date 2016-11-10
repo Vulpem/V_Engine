@@ -71,15 +71,14 @@ update_status ModuleCamera3D::Update(float dt)
 		{
 			float Sensitivity = 0.05f;
 
-			Transform* activeCam = GetActiveCamera()->object->GetTransform();
-
+			Transform* cam = GetMovingCamera()->object->GetTransform();
 			
-			float3 toLook = activeCam->GetGlobalPos();
-			toLook += activeCam->Forward() * 10;
+			float3 toLook = cam->GetGlobalPos();
+			toLook += cam->Forward() * 10;
 
-			toLook += dy * Sensitivity * activeCam->Up();
+			toLook += dy * Sensitivity * cam->Up();
 
-			toLook += dx * Sensitivity * activeCam->Left();
+			toLook += dx * Sensitivity * cam->Left();
 
 			LookAt(toLook);
 		}
@@ -92,19 +91,19 @@ update_status ModuleCamera3D::Update(float dt)
 // -----------------------------------------------------------------
 void ModuleCamera3D::LookAt( const float3 &Spot)
 {
-	GetActiveCamera()->object->GetTransform()->LookAt(Spot);
+	GetMovingCamera()->object->GetTransform()->LookAt(Spot);
 }
 
 
 // -----------------------------------------------------------------
 void ModuleCamera3D::Move(const float3 &Movement)
 {
-	GetActiveCamera()->object->GetTransform()->SetGlobalPos(GetActiveCamera()->object->GetTransform()->GetGlobalPos() + Movement);
+	GetMovingCamera()->object->GetTransform()->SetGlobalPos(GetActiveCamera()->object->GetTransform()->GetGlobalPos() + Movement);
 }
 
 void ModuleCamera3D::SetPos(const float3 &Pos)
 {
-	GetActiveCamera()->object->GetTransform()->SetGlobalPos(Pos);
+	GetMovingCamera()->object->GetTransform()->SetGlobalPos(Pos);
 }
 
 // -----------------------------------------------------------------

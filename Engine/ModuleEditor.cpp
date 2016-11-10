@@ -77,6 +77,11 @@ update_status ModuleEditor::Update(float dt)
 	App->renderer3D->FindViewPort(singleViewPort)->camera = App->camera->GetActiveCamera();
 	App->renderer3D->FindViewPort(multipleViewPorts[0])->camera = App->camera->GetActiveCamera();
 
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_DOWN)
+	{
+		App->camera->SetMovingCamera(App->renderer3D->HoveringViewPort()->camera);
+	}
+
 	if (IsOpenTestWindow)
 	{
 		ImGui::ShowTestWindow(&IsOpenTestWindow);
