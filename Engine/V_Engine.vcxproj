@@ -181,6 +181,7 @@
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="PhysBody3D.h" />
     <ClInclude Include="Primitive.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="ViewPort.h" />
@@ -256,6 +257,12 @@
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl" />
     <None Include="MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_SSE.inl" />
     <None Include="MathGeoLib\include\Math\Matrix.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="V_Engine_Project.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="MAINICON.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
