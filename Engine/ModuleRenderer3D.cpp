@@ -317,6 +317,22 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
 	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.vertexBuffer);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
+	//Setting index
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
+
+	if (meshInfo.normalsBuffer > 0)
+	{
+		glEnableClientState(GL_NORMAL_ARRAY);
+		//Setting Normals
+		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.normalsBuffer);
+		glNormalPointer(GL_FLOAT, 0, NULL);
+	}
+
+	if (meshInfo.wired)
+	{
+		RenderMeshWired(meshInfo);
+	}
+
 	if (meshInfo.textureCoordsBuffer > 0)
 	{
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -326,35 +342,21 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)
 
 		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
 	}
-	if (meshInfo.normalsBuffer > 0)
-	{
-		glEnableClientState(GL_NORMAL_ARRAY);
-		//Setting Normals
-		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.normalsBuffer);
-		glNormalPointer(GL_FLOAT, 0, NULL);
-	}
 
-	//Setting index
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
-	if (meshInfo.wired)
-	{
-		RenderMeshWired(meshInfo);
-	}
 	if (meshInfo.filled)
 	{
 		RenderMeshFilled(meshInfo);
 	}
 
-	glDrawElements(GL_TRIANGLES, meshInfo.num_indices, GL_UNSIGNED_INT, NULL);
-
 	//Cleaning
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 
 	glPopMatrix();
 }
@@ -438,19 +440,18 @@ void ModuleRenderer3D::SetViewPort(viewPort& port)
 
 void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 {
+	if (data.doubleSidedFaces)
+	{
+		glDisable(GL_CULL_FACE);
+	}
+
 		glDisable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glLineWidth(1.0f);
 		glColor4fv(data.wiresColor.ptr());
-		if (data.doubleSidedFaces)
-		{
-			glDisable(GL_CULL_FACE);
-		}
 
 		glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
 
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
