@@ -499,6 +499,7 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 				}
 				ImGui::EndMenu();
 			}
+			ImGui::Separator();
 			std::multimap<Component::Type, Component*>::iterator comp = App->GO->components.find(Component::Type::C_camera);
 			for (; comp != App->GO->components.end() && comp->first == Component::Type::C_camera; comp++)
 			{
