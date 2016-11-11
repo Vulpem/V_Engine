@@ -122,8 +122,8 @@ void ModuleEditor::Render(const viewPort & port)
 
 	App->renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	App->renderer3D->DrawLocator(out_pos, float4(1,1,1,1));
-	App->renderer3D->DrawLine(out_pos, out_pos + out_normal * 10, float4(1, 1, 1, 1));
+	App->renderer3D->DrawLocator(out_pos, float4(0.75f, 0.75f, 0.75f,1));
+	App->renderer3D->DrawLine(out_pos, out_pos + out_normal * 2, float4(1, 1, 0, 1));
 
 	if (showPlane)
 	{
@@ -538,6 +538,10 @@ void ModuleEditor::SelectByViewPort()
 			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal))
 			{
 				SelectGameObject(out_go);
+			}
+			else
+			{
+				SelectGameObject(nullptr);
 			}
 
 		}

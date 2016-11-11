@@ -266,13 +266,13 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	//Obtaining all the AABB collisions, and sorting them by distance to the center of the GO box
 	std::vector<GameObject*> colls = App->GO->FilterCollisions(ray);
 	std::map<float, GameObject*> candidates;
-	for (std::vector<GameObject*>::iterator GO = colls.begin(); GO != colls.end(); GO++)
+	for (std::vector<GameObject*>::iterator GO = colls.begin(); GO != colls.end() && colls.empty() == false; GO++)
 	{
 		candidates.insert(std::pair<float, GameObject*>(ray.a.Distance((*GO)->aabb.CenterPoint()), (*GO)));
 	}
 
 	//Checking all the possible collisions in order
-	for (std::map<float, GameObject*>::iterator check = candidates.begin(); check != candidates.end() && collided == false; check++)
+	for (std::map<float, GameObject*>::iterator check = candidates.begin(); check != candidates.end() && collided == false && candidates.empty() == false; check++)
 	{
 		float collisionDistance = floatMax;
 		//One object may have more than a single mesh, so we'll check them one by one
@@ -280,12 +280,13 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		for (std::vector<mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 		{
 			LineSegment transformedRay = ray;
-			transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().Inverted());
+			transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().InverseTransposed());
 			//Generating the triangles the mes has, and checking them one by one
 			float3* vertices = (*m)->GetVertices();
-			for (int n = 0; n < (*m)->num_vertices; n+=3)
+			uint* index = (*m)->GetIndices();
+			for (int n = 0; n < (*m)->num_indices; n+=3)
 			{
-				Triangle tri(vertices[n], vertices[n + 1], vertices[n + 2]);
+				Triangle tri(vertices[index[n]], vertices[index[n + 1]], vertices[index[n + 2]]);
 				float3 intersectionPoint;
 				float distance;
 				//If the triangle we collided with is further away than a previous collision, we'll ignore it
@@ -296,18 +297,23 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 						collided = true;
 						collisionDistance = distance;
 						out_go = check->second;
-						out_pos = intersectionPoint += check->second->GetTransform()->GetGlobalPos();
-						out_normal = tri.NormalCW();
+						out_pos = intersectionPoint;
+						out_normal = tri.NormalCCW();
+						LineSegment tmp(out_pos, out_pos + out_normal);
+						tmp.Transform(check->second->GetTransform()->GetGlobalTransform().Transposed());
+						out_pos = tmp.a;
+						out_normal = tmp.b - tmp.a;
 					}
 				}
 			}
 			RELEASE_ARRAY(vertices);
+			RELEASE_ARRAY(index);
 		}
 	}
 	*OUT_gameobject = out_go;
 	if (OUT_normal != NULL)
 	{
-		*OUT_normal = out_normal;
+		*OUT_normal = out_normal.Normalized();
 	}
 	if (OUT_position != NULL)
 	{

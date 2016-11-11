@@ -298,7 +298,7 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 
 void ModuleRenderer3D::DrawLocator(float3 position, float4 color)
 {
-	App->renderer3D->DrawLocator(float4x4::FromTRS(position, float4x4::identity, float3(1, 1, 1)), color);
+	App->renderer3D->DrawLocator((float4x4::FromTRS(position, float4x4::identity, float3(1, 1, 1))).Transposed(), color);
 }
 
 void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo meshInfo)

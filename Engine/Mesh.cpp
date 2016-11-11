@@ -82,28 +82,31 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 float3 * mesh::GetVertices()
 {
 	//Obtaining the vertices data from the buffer
-	float* ret = new float[num_vertices * 3];
+	float3* ret = new float3[num_vertices];
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
-	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * num_vertices * 3, ret);
-	return (float3*)ret;
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * num_vertices, ret);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return ret;
 }
 
-uint * mesh::GetIndices()
+uint* mesh::GetIndices()
 {
-	//Obtaining the vertices data from the buffer
+	//Obtaining the index data from the buffer
 	uint* ret = new uint[num_indices];
-	glBindBuffer(GL_ARRAY_BUFFER, id_indices);
-	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(uint) * num_indices, ret);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_indices);
+	glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint) * num_indices, ret);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	return ret;
 }
 
 float3 * mesh::GetNormals()
 {
-	//Obtaining the vertices data from the buffer
-	float* ret = new float[num_normals * 3];
+	//Obtaining the normals data from the buffer
+	float3* ret = new float3[num_normals];
 	glBindBuffer(GL_ARRAY_BUFFER, id_normals);
-	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * num_normals * 3, ret);
-	return (float3*)ret;
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * num_normals, ret);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return ret;
 }
 
 void mesh::EditorContent()
