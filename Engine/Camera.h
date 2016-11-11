@@ -38,6 +38,8 @@ public:
 	void DrawFrustum();
 
 	void SetHorizontalFOV(float horizontalFOV);
+	void SetFarPlane(float farPlaneDistance);
+	void SetNearPlane(float nearPlaneDistance);
 
 	float4x4 GetViewMatrix();
 	float4x4 GetProjectionMatrix();

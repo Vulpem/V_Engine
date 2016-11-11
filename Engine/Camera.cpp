@@ -220,6 +220,22 @@ void Camera::SetHorizontalFOV(float horizontalFOV)
 	frustumChanged = true;
 }
 
+void Camera::SetFarPlane(float farPlaneDistance)
+{
+	if (farPlaneDistance > frustum.nearPlaneDistance)
+	{
+		frustum.farPlaneDistance = farPlaneDistance;
+	}
+}
+
+void Camera::SetNearPlane(float nearPlaneDistance)
+{
+	if (nearPlaneDistance < frustum.farPlaneDistance)
+	{
+		frustum.nearPlaneDistance = nearPlaneDistance;
+	}
+}
+
 float4x4 Camera::GetViewMatrix()
 {
 	return float4x4(frustum.ViewMatrix()).Transposed();
