@@ -49,8 +49,8 @@ bool ModuleEditor::Start()
 
 	App->renderer3D->FindViewPort(0)->active = false;
 
-	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetActiveCamera());
-	multipleViewPorts[0] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetActiveCamera());
+	singleViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
+	multipleViewPorts[0] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetDefaultCam());
 	multipleViewPorts[1] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetTopCam());
 	multipleViewPorts[2] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetRightCam());
 	multipleViewPorts[3] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetFrontCam());
@@ -335,10 +335,6 @@ void ModuleEditor::Editor()
 		if (ImGui::CollapsingHeader("Camera##CameraModule"))
 		{
 			ImGui::Text("Position");
-			if (ImGui::Button("Select active camera"))
-			{
-				SelectGameObject(App->camera->GetActiveCamera()->object);
-			}
 			ImGui::Text("Camera speed");
 			ImGui::DragFloat("##camSpeed", &App->camera->camSpeed, 0.1f);
 			ImGui::Text("Sprint speed multiplier");

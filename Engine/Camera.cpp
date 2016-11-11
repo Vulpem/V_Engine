@@ -45,10 +45,6 @@ Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id)
 
 Camera::~Camera()
 {
-	if (App->camera->GetActiveCamera() == this)
-	{
-		App->camera->SetCameraToDefault();
-	}
 	if (App->camera->GetMovingCamera() == this)
 	{
 		App->camera->SetMovingCamera();
@@ -143,10 +139,6 @@ math::FrustumType Camera::SwitchViewType()
 
 void Camera::EditorContent()
 {
-	if (ImGui::Button("Set As Active Camera"))
-	{
-		App->camera->SetActiveCamera(this);
-	}
 	ImGui::Checkbox("Culling", &hasCulling);
 	bool persp = true;
 	bool ortho = false;
@@ -205,7 +197,7 @@ void Camera::EditorContent()
 
 void Camera::DrawFrustum()
 {
-	if (App->camera->GetActiveCamera() != this && object->selected)
+	if (object->selected)
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);

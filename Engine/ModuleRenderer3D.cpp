@@ -128,7 +128,7 @@ bool ModuleRenderer3D::Init()
 
 		glShadeModel(GL_SMOOTH);		 // Enables Smooth Shading
 
-		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->camera->GetActiveCamera(), viewPorts.size()));
+		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->camera->GetDefaultCam(), viewPorts.size()));
 
 	}
 
@@ -163,10 +163,6 @@ update_status ModuleRenderer3D::PreUpdate(float dt)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	// light 0 on cam pos
-	float3 camPos = App->camera->GetCamPos();
-	lights[0].SetPos(camPos.x, camPos.y, camPos.z);
-
 	return UPDATE_CONTINUE;
 }
 
@@ -178,7 +174,7 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 		lights[i].Render();
 	}
 
-	viewPorts.front().camera = App->camera->GetActiveCamera();
+	viewPorts.front().camera = App->camera->GetDefaultCam();
 
 	if (viewPorts.empty() == false)
 	{

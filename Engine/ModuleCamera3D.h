@@ -21,22 +21,19 @@ public:
 	void Move(const float3 &Movement);
 	void SetPos(const float3 &Pos);
 
+	Camera* GetDefaultCam();
 	Camera* GetTopCam();
 	Camera* GetRightCam();
 	Camera* GetFrontCam();
 
-	void SetActiveCamera(Camera* activeCamera);
-	void SetActiveCamera(GameObject* activeCamera);
-	void SetCameraToDefault();
-	void SetCameraToTop();
-	void SetCameraToRight();
-	void SetCameraToFront();
-	void SetCameraToCamera(GameObject* setTo);
+	void SetCameraToDefault(Camera* toSet);
+	void SetCameraToTop(Camera* toSet);
+	void SetCameraToRight(Camera* toSet);
+	void SetCameraToFront(Camera* toSet);
+	void SetCameraToCamera(GameObject* setTo, Camera* toSet);
 
 	Camera* GetMovingCamera();
 	void SetMovingCamera(Camera* cam = nullptr);
-	Camera* GetActiveCamera();
-	float3 GetCamPos();
 private:
 	void MoveWithKeys();
 
@@ -48,7 +45,6 @@ private:
 	Camera* movingCamera = nullptr;
 	GameObject* defaultCameraGO = nullptr;
 	Camera* defaultCamera = nullptr;
-	Camera* activeCamera = nullptr;
 
 	GameObject* topView = nullptr;
 	GameObject* rightView = nullptr;

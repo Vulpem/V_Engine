@@ -111,6 +111,11 @@ void ModuleCamera3D::SetPos(const float3 &Pos)
 
 // -----------------------------------------------------------------
 
+Camera * ModuleCamera3D::GetDefaultCam()
+{
+	return defaultCamera;
+}
+
 Camera * ModuleCamera3D::GetTopCam()
 {
 	return topView->GetComponent<Camera>().front();
@@ -126,60 +131,35 @@ Camera * ModuleCamera3D::GetFrontCam()
 	return frontView->GetComponent<Camera>().front();
 }
 
-void ModuleCamera3D::SetActiveCamera(Camera * activeCamera)
+void ModuleCamera3D::SetCameraToDefault(Camera* toSet)
 {
-	this->activeCamera = activeCamera;
-	if (this->activeCamera)
-	{
-		this->activeCamera->frustumChanged = true;
-	}
-	else
-	{
-		defaultCamera->frustumChanged = true;
-	}
+	SetCameraToCamera(defaultCameraGO, toSet);
 }
 
-void ModuleCamera3D::SetActiveCamera(GameObject * activeCamera)
+void ModuleCamera3D::SetCameraToTop(Camera* toSet)
 {
-	std::vector<Camera*> cam = activeCamera->GetComponent<Camera>();
-	if (cam.empty() == false)
-	{
-		SetActiveCamera(cam.front());
-	}
+	SetCameraToCamera(topView, toSet);
 }
 
-void ModuleCamera3D::SetCameraToDefault()
+void ModuleCamera3D::SetCameraToRight(Camera* toSet)
 {
-	SetActiveCamera((Camera*)nullptr);
+	SetCameraToCamera(rightView, toSet);
 }
 
-void ModuleCamera3D::SetCameraToTop()
+void ModuleCamera3D::SetCameraToFront(Camera* toSet)
 {
-	SetCameraToDefault();
-	SetCameraToCamera(topView);
+	SetCameraToCamera(frontView, toSet);
 }
 
-void ModuleCamera3D::SetCameraToRight()
-{
-	SetCameraToDefault();
-	SetCameraToCamera(rightView);
-}
-
-void ModuleCamera3D::SetCameraToFront()
-{
-	SetCameraToDefault();
-	SetCameraToCamera(frontView);
-}
-
-void ModuleCamera3D::SetCameraToCamera(GameObject * setTo)
+void ModuleCamera3D::SetCameraToCamera(GameObject * setTo, Camera* toSet)
 {
 	if (setTo->GetComponent<Camera>().empty() == false && setTo->GetTransform() != nullptr)
 	{
-		GetActiveCamera()->object->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
-		GetActiveCamera()->object->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());
-		if (GetActiveCamera()->GetFrustum()->type != setTo->GetComponent<Camera>().front()->GetFrustum()->type)
+		toSet->object->GetTransform()->SetLocalPos(setTo->GetTransform()->GetLocalPos());
+		toSet->object->GetTransform()->SetLocalRot(setTo->GetTransform()->GetLocalRot());
+		if (toSet->GetFrustum()->type != setTo->GetComponent<Camera>().front()->GetFrustum()->type)
 		{
-			GetActiveCamera()->SwitchViewType();
+			toSet->SwitchViewType();
 		}
 	}
 }
@@ -190,7 +170,7 @@ Camera * ModuleCamera3D::GetMovingCamera()
 	Camera* cam = movingCamera;
 	if (cam == nullptr)
 	{
-		cam = GetActiveCamera();
+		cam = GetDefaultCam();
 	}
 	return cam;
 }
@@ -198,20 +178,6 @@ Camera * ModuleCamera3D::GetMovingCamera()
 void ModuleCamera3D::SetMovingCamera(Camera * cam)
 {
 	movingCamera = cam;
-}
-
-Camera * ModuleCamera3D::GetActiveCamera()
-{
-	if (activeCamera != nullptr)
-	{
-		return activeCamera;
-	}
-	return defaultCamera;
-}
-
-float3 ModuleCamera3D::GetCamPos()
-{
-	return GetActiveCamera()->object->GetTransform()->GetGlobalPos();
 }
 
 void ModuleCamera3D::MoveWithKeys()
