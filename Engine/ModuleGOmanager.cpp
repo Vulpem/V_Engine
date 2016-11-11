@@ -263,12 +263,18 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	float3 out_pos = float3::zero;
 	float3 out_normal = float3::zero;
 
-	//Obtaining all the AABB collisions, and sorting them by distance to the center of the GO box
+	//Obtaining all the AABB collisions, and sorting them by distance of the AABB
 	std::vector<GameObject*> colls = App->GO->FilterCollisions(ray);
 	std::map<float, GameObject*> candidates;
 	for (std::vector<GameObject*>::iterator GO = colls.begin(); GO != colls.end() && colls.empty() == false; GO++)
 	{
-		candidates.insert(std::pair<float, GameObject*>(ray.a.Distance((*GO)->aabb.CenterPoint()), (*GO)));
+		float distanceNear;
+		float distanceFar;
+		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
+		if ((*GO)->aabb.Intersects(ray, distanceNear, distanceFar) == true)
+		{
+			candidates.insert(std::pair<float, GameObject*>(distanceNear, (*GO)));
+		}
 	}
 
 	//Checking all the possible collisions in order
