@@ -57,7 +57,7 @@ update_status ModuleInput::PreUpdate(float dt)
 	
 	for(int i = 0; i < MAX_KEYS; ++i)
 	{
-		if(keys[i] == 1)
+		if(keys[i] == 1 && ignoreKeyboard == false)
 		{
 			if(keyboard[i] == KEY_IDLE)
 				keyboard[i] = KEY_DOWN;
@@ -79,7 +79,7 @@ update_status ModuleInput::PreUpdate(float dt)
 
 	for(int i = 0; i < 5; ++i)
 	{
-		if(buttons & SDL_BUTTON(i))
+		if(buttons & SDL_BUTTON(i) && ignoreMouse == false)
 		{
 			if(mouse_buttons[i] == KEY_IDLE)
 				mouse_buttons[i] = KEY_DOWN;
@@ -102,59 +102,58 @@ update_status ModuleInput::PreUpdate(float dt)
 	SDL_Event e;
 	while(SDL_PollEvent(&e))
 	{
-		switch(e.type)
+		if (ignoreMouse == false)
 		{
-			case SDL_MOUSEWHEEL:
+			switch (e.type)
 			{
-				mouse_z = e.wheel.y;
-				break;
-			}
-			case SDL_MOUSEMOTION:
-			{
-				if (captureMouse)
+				case SDL_MOUSEWHEEL:
 				{
-					if (CaptureMouse(e))
-					{
-						ImGui::GetIO().MousePos = ImVec2(-1, -1);
-						ImGui::GetIO().MousePosPrev = ImVec2(-1, -1);
-					}
+					mouse_z = e.wheel.y;
+					break;
 				}
-				mouse_x = e.motion.x;
-				mouse_y = e.motion.y;
-
-				mouse_x_motion = e.motion.xrel;
-				mouse_y_motion = e.motion.yrel;
-				break;
-			}
-
-			case SDL_DROPFILE:
-			{
-				strcpy_s(dropped_file, e.drop.file);
-				SDL_free(e.drop.file);
-				file_was_dropped = true;
-				LOG("Dropped %s", dropped_file);
-				LOG("File was detected as a %s", DroppedFileFormat().GetString());
-				break;
-			}
-			case SDL_QUIT:
-			{
-				quit = true;
-				break;
-			}
-			case SDL_WINDOWEVENT:
-			{
-				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+				case SDL_MOUSEMOTION:
 				{
-					App->OnScreenResize(e.window.data1, e.window.data2);
+					if (captureMouse)
+					{
+						if (CaptureMouse(e))
+						{
+							ImGui::GetIO().MousePos = ImVec2(-1, -1);
+							ImGui::GetIO().MousePosPrev = ImVec2(-1, -1);
+						}
+					}
+					mouse_x = e.motion.x;
+					mouse_y = e.motion.y;
+
+					mouse_x_motion = e.motion.xrel;
+					mouse_y_motion = e.motion.yrel;
+					break;
+				}
+
+				case SDL_DROPFILE:
+				{
+					strcpy_s(dropped_file, e.drop.file);
+					SDL_free(e.drop.file);
+					file_was_dropped = true;
+					LOG("Dropped %s", dropped_file);
+					LOG("File was detected as a %s", DroppedFileFormat().GetString());
+					break;
+				}
+				case SDL_QUIT:
+				{
+					quit = true;
+					break;
+				}
+				case SDL_WINDOWEVENT:
+				{
+					if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+					{
+						App->OnScreenResize(e.window.data1, e.window.data2);
+					}
 				}
 			}
 		}
-
 		ImGui_ImplSdlGL3_ProcessEvent(&e);
 	}
-
-	if(quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
-		return UPDATE_STOP;
 
 	if (GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
 	{
@@ -164,6 +163,9 @@ update_status ModuleInput::PreUpdate(float dt)
 	{
 		captureMouse = false;
 	}
+
+	if (quit == true || keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
+		return UPDATE_STOP;
 
 	return UPDATE_CONTINUE;
 }

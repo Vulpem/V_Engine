@@ -42,6 +42,11 @@ public:
 
 	template <typename C>
 	std::vector<GameObject*> FilterCollisions(C col);
+	/*Check if the ray collides with any GameObject
+	-return bool: wether if the ray collided with something or not
+	-OUT_Gameobject: gameobject the ray collided with. If there's none, nullptr is returned
+	-OUT_position: the position where the ray collided. If it didn't, it will return (-1,-1).
+	-OUT_normal: the direction of the normal of the surface where the ray collided. If it didn't, it will return (-1,-1).*/
 	bool RayCast(const LineSegment& ray, GameObject** OUT_gameobject = NULL, float3* OUT_position = NULL, float3* OUT_normal = NULL);
 
 	const GameObject* GetRoot() { return root; }

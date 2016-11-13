@@ -50,7 +50,7 @@ private:
 	void SelectByViewPort();
 
 public:
-	bool orthogonalViews = false;
+	bool multipleViews = true;
 
 	bool IsOpenTestWindow = false;
 

@@ -67,6 +67,18 @@ update_status ModuleEditor::PreUpdate(float dt)
 	update_status ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
+	ImGuiIO IO = ImGui::GetIO();
+	App->input->ignoreMouse = IO.WantCaptureMouse;
+
+	if (IO.WantCaptureKeyboard || IO.WantTextInput)
+	{
+		App->input->ignoreKeyboard = true;
+	}
+	else
+	{
+		App->input->ignoreKeyboard = false;
+	}
+
 	return ret;
 }
 
@@ -84,6 +96,12 @@ update_status ModuleEditor::Update(float dt)
 	}
 
 	SelectByViewPort();
+
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
+	{
+		multipleViews = !multipleViews;
+		SwitchViewPorts();
+	}
 
 
 	if (IsOpenTestWindow)
@@ -253,7 +271,7 @@ update_status ModuleEditor::MenuBar()
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			if (ImGui::Checkbox("Orthogonal Views", &orthogonalViews))
+			if (ImGui::Checkbox("Multiple Views", &multipleViews))
 			{
 				SwitchViewPorts();
 			}
@@ -460,10 +478,10 @@ void ModuleEditor::AttributeWindow()
 
 void ModuleEditor::SwitchViewPorts()
 {
-	App->renderer3D->FindViewPort(singleViewPort)->active = !orthogonalViews;
+	App->renderer3D->FindViewPort(singleViewPort)->active = !multipleViews;
 	for (int n = 0; n < 4; n++)
 	{
-		App->renderer3D->FindViewPort(multipleViewPorts[n])->active = orthogonalViews;
+		App->renderer3D->FindViewPort(multipleViewPorts[n])->active = multipleViews;
 	}
 }
 

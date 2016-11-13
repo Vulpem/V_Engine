@@ -42,6 +42,11 @@ bool ModuleWindow::Init()
 			flags |= SDL_WINDOW_FULLSCREEN;
 		}
 
+		if (WIN_MAXIMIZED)
+		{
+			flags |= SDL_WINDOW_MAXIMIZED;
+		}
+
 		if(WIN_RESIZABLE == true)
 		{
 			flags |= SDL_WINDOW_RESIZABLE;

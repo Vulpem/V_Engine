@@ -73,7 +73,12 @@ private:
 	int mouse_x_motion;
 	int mouse_y_motion;
 public:
+	//Defines if we allow the mouse to exit the window
 	bool captureMouse = false;
+	//Defines if mouse input is processed (this doesn't affect IMGUI)
+	bool ignoreMouse = false;
+	//Defines if keyboard input is processed (this doesn't affect IMGUI)
+	bool ignoreKeyboard = false;
 	char dropped_file[1024];
 	mutable bool file_was_dropped;
 };
