@@ -72,25 +72,6 @@ bool ModuleImporter::Start()
 	return true;
 }
 
-// Called every draw update
-update_status ModuleImporter::PreUpdate(float dt)
-{
-	update_status ret = UPDATE_CONTINUE;
-
-	return ret;
-}
-
-update_status ModuleImporter::Update(float dt)
-{
-
-	return UPDATE_CONTINUE;
-}
-
-update_status ModuleImporter::PostUpdate(float dt)
-{
-	
-	return UPDATE_CONTINUE;
-}
 
 void ModuleImporter::ImportFromFolder(const char * path)
 {
