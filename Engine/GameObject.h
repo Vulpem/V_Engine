@@ -18,7 +18,7 @@ class GameObject
 public:
 	char name[NAME_MAX_LEN];
 	AABB aabb;
-
+	OBB obb;
 private:
 	bool active = true;
 	bool publicActive = true;
@@ -44,6 +44,7 @@ public:
 
 	void DrawLocator();
 	void DrawAABB();
+	void DrawOBB();
 
 	//Be wary, deactivate this only for objects that the editor will take care of by itself. You won't be able to access them during runtime
 	void HideFromOutliner() { hiddenOnOutliner = true; }

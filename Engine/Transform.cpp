@@ -36,6 +36,7 @@ void Transform::Draw()
 	if (object->selected)
 	{
 		object->DrawAABB();
+		object->DrawOBB();
 	}
 }
 

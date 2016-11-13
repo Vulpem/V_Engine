@@ -176,6 +176,16 @@ void GameObject::DrawAABB()
 	}
 }
 
+void GameObject::DrawOBB()
+{
+	if (obb.IsFinite())
+	{
+		math::float3 corners[8];
+		obb.GetCornerPoints(corners);
+		App->renderer3D->DrawBox(corners, float4(0.2f, 0.45f, 0.27f, 1.0f));
+	}
+}
+
 void GameObject::Select(bool _renderNormals)
 {
 	selected = true;
@@ -213,9 +223,10 @@ void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
 void GameObject::UpdateAABB()
 {
 	aabb.SetNegativeInfinity();
+	obb.SetNegativeInfinity();
 	if (originalAABB.IsFinite())
 	{
-		OBB obb = originalAABB;
+		obb = originalAABB;
 		obb.Transform(GetTransform()->GetGlobalTransform().Transposed());
 		aabb.Enclose(obb);
 	}

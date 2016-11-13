@@ -282,7 +282,10 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
 		if ((*GO)->aabb.Intersects(ray, distanceNear, distanceFar) == true)
 		{
-			candidates.insert(std::pair<float, GameObject*>(distanceNear, (*GO)));
+			if ((*GO)->obb.Intersects(ray, distanceNear, distanceFar) == true)
+			{
+				candidates.insert(std::pair<float, GameObject*>(distanceNear, (*GO)));
+			}
 		}
 	}
 

@@ -201,7 +201,7 @@ void Camera::DrawFrustum()
 	{
 		float3 corners[8];
 		frustum.GetCornerPoints(corners);
-		App->renderer3D->DrawBox(corners);
+		App->renderer3D->DrawBox(corners, float4(0.49f, 0.85f, 1.0f, 1.0f));
 	}
 }
 
