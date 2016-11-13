@@ -83,31 +83,40 @@ update_status ModuleGoManager::Update(float dt)
 
 	if (setting != nullptr)
 	{
-		ImGui::SetNextWindowSize(ImVec2(250, 75));
-
-		ImGui::Begin("##SetStaticChilds");
-		if (settingStatic)
+		if (ImGui::BeginPopupModal("##SetStaticChilds", &StaticChildsPopUpIsOpen))
 		{
-			ImGui::Text("Set childs to Static too?");
+			if (settingStatic)
+			{
+				ImGui::Text("Set childs to Static too?");
+			}
+			else
+			{
+				ImGui::Text("Set childs to non Static too?");
+			}
+			ImGui::NewLine();
+			ImGui::SameLine(30);
+			if (ImGui::Button("Yes##yesSetStatic"))
+			{
+				SetChildsStatic(settingStatic, setting);
+				setting = nullptr;
+			}
+			ImGui::SameLine(150);
+			if (ImGui::Button("No##NoSetStatic"))
+			{
+				SetStatic(settingStatic, setting);
+				setting = nullptr;
+			}
+			ImGui::EndPopup();
 		}
-		else
+		if (StaticChildsPopUpIsOpen == false)
 		{
-			ImGui::Text("Set childs to non Static too?");
+			ImGui::OpenPopup("##SetStaticChilds");
+			StaticChildsPopUpIsOpen = true;
 		}
-		ImGui::NewLine();
-		ImGui::SameLine(30);
-		if (ImGui::Button("Yes##yesSetStatic"))
-		{
-			SetChildsStatic(settingStatic, setting);
-			setting = nullptr;
-		}
-		ImGui::SameLine(150);
-		if (ImGui::Button("No##NoSetStatic"))
-		{
-			SetStatic(settingStatic, setting);
-			setting = nullptr;
-		}
-		ImGui::End();
+	}
+	else
+	{
+		StaticChildsPopUpIsOpen = false;
 	}
 
 	return UPDATE_CONTINUE;

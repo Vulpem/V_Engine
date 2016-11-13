@@ -74,6 +74,8 @@ public:
 	//UI TMP STUFF
 	GameObject* setting = nullptr;
 	bool settingStatic = true;
+private:
+	bool StaticChildsPopUpIsOpen = false;
 };
 
 
