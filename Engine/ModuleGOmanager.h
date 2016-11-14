@@ -51,9 +51,9 @@ public:
 
 	const GameObject* GetRoot() { return root; }
 
+	void RenderGOs(const viewPort& viewPort, const std::vector<GameObject*>& exclusiveGOs = std::vector<GameObject*>());
 private:
 	Mesh_RenderInfo GetMeshData(mesh* getFrom);
-	void RenderGOs(const viewPort& viewPort);
 
 	void AddGOtoRoot(GameObject* GO);
 	void CreateRootGameObject();

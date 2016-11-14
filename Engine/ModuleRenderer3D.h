@@ -40,8 +40,8 @@ public:
 	viewPort* FindViewPort(uint ID);
 	bool DeleteViewPort(uint ID);
 
-private:
 	void SetViewPort(viewPort& port);
+private:
 	void RenderMeshWired(const Mesh_RenderInfo& data);
 	void RenderMeshFilled(const Mesh_RenderInfo& data);
 	void RenderNormals(const Mesh_RenderInfo& data);

@@ -284,7 +284,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		{
 			if ((*GO)->obb.Intersects(ray, distanceNear, distanceFar) == true)
 			{
-				candidates.insert(std::pair<float, GameObject*>(distanceNear, (*GO)));
+				candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), (*GO)));
 			}
 		}
 	}
@@ -357,36 +357,59 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 	return ret;
 }
 
-void ModuleGoManager::RenderGOs(const viewPort & port)
+void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObject*>& exclusiveGOs)
 {
-	//Call the Draw function of all the components, so they do what they need to
-	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
-	for (; comp != components.end(); comp++)
-	{
-		if (comp->second->object->IsActive())
-		{
-			comp->second->Draw();
-		}
-	}
-
 	std::unordered_set<GameObject*> toRender;
-	bool aCamHadCulling = false;
-	//Finding all the cameras that have culling on, and collecting all the GOs we need to render
-	std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
-	for (; it != components.end() && it->first == Component::Type::C_camera; it++)
+
+	//This vector will generally be empty. It is only used when we send certain GOs we want to render exclusively
+	if (exclusiveGOs.empty() == true)
 	{
-		if (((Camera*)(it->second))->HasCulling())
+		//Call the Draw function of all the components, so they do what they need to
+		std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+		for (; comp != components.end(); comp++)
 		{
-			aCamHadCulling = true;
-			std::vector<GameObject*> GOs;
-			//If a camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
-			if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+			if (comp->second->object->IsActive())
 			{
-				GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
+				comp->second->Draw();
+			}
+		}
+
+		bool aCamHadCulling = false;
+		//Finding all the cameras that have culling on, and collecting all the GOs we need to render
+		std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
+		for (; it != components.end() && it->first == Component::Type::C_camera; it++)
+		{
+			if (((Camera*)(it->second))->HasCulling())
+			{
+				aCamHadCulling = true;
+				std::vector<GameObject*> GOs;
+				//If a camera has ortographiv view, we'll need to test culling against an AABB instead of against it frustum
+				if (((Camera*)(it->second))->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+				{
+					GOs = FilterCollisions(*((Camera*)(it->second))->GetFrustum());
+				}
+				else
+				{
+					GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+				}
+				for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
+				{
+					toRender.insert(*toInsert);
+				}
+			}
+		}
+
+		//If no cameras had culling active, we'll cull from the Current Active camera
+		if (aCamHadCulling == false)
+		{
+			std::vector<GameObject*> GOs;
+			if (port.camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
+			{
+				GOs = FilterCollisions(*port.camera->GetFrustum());
 			}
 			else
 			{
-				GOs = FilterCollisions(((Camera*)(it->second))->GetFrustum()->MinimalEnclosingAABB());
+				GOs = FilterCollisions(port.camera->GetFrustum()->MinimalEnclosingAABB());
 			}
 			for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
 			{
@@ -394,20 +417,10 @@ void ModuleGoManager::RenderGOs(const viewPort & port)
 			}
 		}
 	}
-
-	//If no cameras had culling active, we'll cull from the Current Active camera
-	if (aCamHadCulling == false)
+	else
 	{
-		std::vector<GameObject*> GOs;
-		if (port.camera->GetFrustum()->type == FrustumType::PerspectiveFrustum)
-		{
-			GOs = FilterCollisions(*port.camera->GetFrustum());
-		}
-		else
-		{
-			GOs = FilterCollisions(port.camera->GetFrustum()->MinimalEnclosingAABB());
-		}
-		for (std::vector<GameObject*>::iterator toInsert = GOs.begin(); toInsert != GOs.end(); toInsert++)
+		App->renderer3D->SetViewPort(*App->renderer3D->FindViewPort(port.ID));
+		for (std::vector<GameObject*>::const_iterator toInsert = exclusiveGOs.begin(); toInsert != exclusiveGOs.end(); toInsert++)
 		{
 			toRender.insert(*toInsert);
 		}
@@ -421,7 +434,13 @@ void ModuleGoManager::RenderGOs(const viewPort & port)
 		{
 			for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 			{
-				App->renderer3D->DrawMesh(GetMeshData(*mesh));
+				Mesh_RenderInfo info = GetMeshData(*mesh);
+				if (port.useOnlyWires)
+				{
+					info.filled = false;
+					info.wired = true;
+				}
+				App->renderer3D->DrawMesh(info);
 			}
 		}
 	}

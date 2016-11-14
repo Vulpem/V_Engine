@@ -10,6 +10,13 @@ struct viewPort
 	viewPort(float2 pos, float2 size, Camera* cam, uint ID) :pos(pos), size(size), camera(cam), ID(ID) {};
 
 	bool active = true;
+	bool withUI = true;
+	bool autoRender = true;
+
+	bool useLighting = true;
+	bool useMaterials = true;
+	bool useSingleSidedFaces = true;
+	bool useOnlyWires = false;
 
 	Camera* camera = nullptr;
 	float2 pos = float2::zero;

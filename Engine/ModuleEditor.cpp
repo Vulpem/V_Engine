@@ -55,6 +55,11 @@ bool ModuleEditor::Start()
 	multipleViewPorts[2] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetRightCam());
 	multipleViewPorts[3] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetFrontCam());
 
+	GameObject* prev = App->GO->CreateCamera("PreviewCamera");
+	previewViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), prev->GetComponent<Camera>().front());
+	App->renderer3D->FindViewPort(previewViewPort)->withUI = false;
+	App->renderer3D->FindViewPort(previewViewPort)->autoRender = false;
+
 	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 	SwitchViewPorts();
 
@@ -115,6 +120,13 @@ update_status ModuleEditor::Update(float dt)
 	Outliner();
 	AttributeWindow();
 
+	if (selectedGameObject != nullptr)
+	{
+		std::vector<GameObject*> toRender;
+		toRender.push_back(selectedGameObject);
+		App->GO->RenderGOs(*App->renderer3D->FindViewPort(previewViewPort), toRender);
+	}
+
 	return ret;
 }
 
@@ -135,19 +147,22 @@ bool ModuleEditor::CleanUp()
 
 void ModuleEditor::Render(const viewPort & port)
 {
-	//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
-	ViewPortUI(port);
-
-	App->renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	App->renderer3D->DrawLocator(out_pos, float4(0.75f, 0.75f, 0.75f,1));
-	App->renderer3D->DrawLine(out_pos, out_pos + out_normal * 2, float4(1, 1, 0, 1));
-
-	if (showPlane)
+	if (port.withUI)
 	{
-		P_Plane p(0, 0, 0, 1);
-		p.axis = true;
-		p.Render();
+		//Here we put the UI we'll draw for each viewport, since Render is called one time for each port that's active
+		ViewPortUI(port);
+
+		App->renderer3D->DrawLine(selectRay.a, selectRay.b, float4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		App->renderer3D->DrawLocator(out_pos, float4(0.75f, 0.75f, 0.75f, 1));
+		App->renderer3D->DrawLine(out_pos, out_pos + out_normal * 2, float4(1, 1, 0, 1));
+
+		if (showPlane)
+		{
+			P_Plane p(0, 0, 0, 1);
+			p.axis = true;
+			p.Render();
+		}
 	}
 }
 
@@ -188,6 +203,10 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	port->pos.y += size.y;
 	port->size = size;
 
+	port = App->renderer3D->FindViewPort(previewViewPort);
+	port->pos.x = viewPortMax.x;
+	port->pos.y = screenH - 330;
+	port->size = float2(330, 330);
 }
 
 void ModuleEditor::HandleInput(SDL_Event* event)
@@ -328,7 +347,7 @@ update_status ModuleEditor::MenuBar()
 void ModuleEditor::Editor()
 {
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 530));
-		ImGui::SetNextWindowSize(ImVec2(330, screenH - 530));
+		ImGui::SetNextWindowSize(ImVec2(330, screenH - 530 -330));
 
 		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f);
 
@@ -498,7 +517,17 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 	ImGui::Begin(tmp, 0, flags);
 	if (ImGui::BeginMenuBar())
 	{
-		sprintf(tmp, "Camera:##ViewPort%i", port.ID);
+		sprintf(tmp, "Display##ViewPort%i", port.ID);
+		if (ImGui::BeginMenu(tmp))
+		{
+			viewPort* editPort = App->renderer3D->FindViewPort(port.ID);
+			ImGui::Checkbox("Wired", &editPort->useOnlyWires);
+			ImGui::Checkbox("Lightning", &editPort->useLighting);
+			ImGui::Checkbox("Textured", &editPort->useMaterials);
+			ImGui::Checkbox("Single sided faces", &editPort->useSingleSidedFaces);
+			ImGui::EndMenu();
+		}
+		sprintf(tmp, "Camera##ViewPort%i", port.ID);
 		if (ImGui::BeginMenu(tmp))
 		{
 			if (ImGui::BeginMenu("Current Camera"))
