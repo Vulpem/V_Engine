@@ -419,12 +419,12 @@ void ModuleEditor::Editor()
 
 		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
 		{
-			std::vector<std::pair<float, std::string>> timers = App->timers->ReadMSAll();
+			std::vector<std::pair<std::string, float>> timers = App->timers->GetLastReads();
 			if (timers.empty() == false)
 			{
-				for (std::vector<std::pair<float, std::string>>::iterator it = timers.begin(); it != timers.end(); it++)
+				for (std::vector<std::pair<std::string, float>>::iterator it = timers.begin(); it != timers.end(); it++)
 				{
-					ImGui::Text("%s: %fms", it->second, it->first);
+					ImGui::Text("%s: %f ms", it->first.data(), it->second);
 				}
 			}
 			else

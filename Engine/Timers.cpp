@@ -20,6 +20,9 @@ void TimerManager::CreatePerfTimer(std::string key)
 	perfTimers.insert(timer);
 	std::map<uint, PerfTimer>::iterator it = perfTimers.find(id);
 	it->second.Start();
+
+	//map with ID and a pair(key, lastReadTime)
+	lastReads.insert(std::pair<uint, std::pair<std::string, float>>(id, std::pair<std::string, float>(key, 0.0f)));
 }
 
 void TimerManager::CreateTimer(std::string key)
@@ -31,6 +34,9 @@ void TimerManager::CreateTimer(std::string key)
 	stdTimers.insert(timer);
 	std::map<uint, Timer>::iterator it = stdTimers.find(id);
 	it->second.Start();
+
+	//map with ID and a pair(key, lastReadTime)
+	lastReads.insert(std::pair<uint, std::pair<std::string, float>>(id, std::pair<std::string, float>(key, 0.0f)));
 }
 
 void TimerManager::StartTimer(std::string key)
@@ -58,7 +64,7 @@ void TimerManager::StartTimer(std::string key)
 	}
 	else
 	{
-		CreateTimer(key);
+		CreatePerfTimer(key);
 	}
 }
 
@@ -70,14 +76,18 @@ float TimerManager::ReadMs(std::string key)
 		std::map<uint, PerfTimer>::iterator it = perfTimers.find(IDit->second);
 		if (it != perfTimers.end())
 		{
-			return it->second.ReadMs();
+			float ret = it->second.ReadMs();
+			lastReads.find(it->first)->second.second = ret;
+			return ret;
 		}
 		else
 		{
 			std::map<uint, Timer>::iterator stdIt = stdTimers.find(IDit->second);
 			if (stdIt != stdTimers.end())
 			{
-				return stdIt->second.Read();
+				float ret = stdIt->second.Read();
+				lastReads.find(it->first)->second.second = ret;
+				return ret;
 			}
 			else
 			{
@@ -109,18 +119,16 @@ std::string TimerManager::GetKeyFromID(uint id)
 	return std::string();
 }
 
-std::vector<std::pair<float, std::string>> TimerManager::ReadMSAll()
+std::vector<std::pair<std::string, float>> TimerManager::GetLastReads()
 {
-	std::vector<std::pair<float, std::string>> ret;
-	for (std::map<uint, PerfTimer>::iterator it = perfTimers.begin(); it != perfTimers.end(); it++)
+	std::vector<std::pair<std::string, float>> ret;
+	if (lastReads.empty() == false)
 	{
-		ret.push_back(std::pair<float, std::string>(it->second.ReadMs(), GetKeyFromID(it->first)));
+		std::map<uint, std::pair<std::string, float>>::iterator it = lastReads.begin();
+		for (; it != lastReads.end(); it++)
+		{
+			ret.push_back(it->second);
+		}
 	}
-
-	for (std::map<uint, Timer>::iterator it = stdTimers.begin(); it != stdTimers.end(); it++)
-	{
-		ret.push_back(std::pair<float, std::string>(it->second.Read(), GetKeyFromID(it->first)));
-	}
-
 	return ret;
 }

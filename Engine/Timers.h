@@ -20,13 +20,14 @@ public:
 	float ReadMs(std::string key);
 	uint ReadSec(std::string key);
 	std::string GetKeyFromID(uint id);
-	std::vector<std::pair<float, std::string>> ReadMSAll();
+	std::vector<std::pair<std::string, float>> GetLastReads();
 
 private:
 	std::map<uint, PerfTimer> perfTimers;
 	std::map<uint, Timer> stdTimers;
 
 	std::map<std::string, uint> timerIDs;
+	std::map<uint, std::pair<std::string, float>> lastReads;
 };
 
 #endif // !__TIMERMANAGER__
