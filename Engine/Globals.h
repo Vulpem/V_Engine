@@ -12,20 +12,41 @@ void log(const char file[], int line, const char* format, ...);
 
 // ------------ TIMER FUNCTIONS -------------------------
 
-#define CREATE_PERF_TIMER(key) CreatePerfTimer(key);
+//Each time a timer is "read" it will store it's last returned value
+
+//Create a slower but more accurate timer associated with the key sent
+#define TIMER_CREATE_PERF(key) CreatePerfTimer(key)
 void CreatePerfTimer(std::string key);
 
-#define CREATE_TIMER(key) CreateTimer(key);
+//Create a timer associated with the key sent
+#define TIMER_CREATE(key) CreateTimer(key)
 void CreateTimer(std::string key);
 
-#define READ_MS(key) ReadMs(key);
+
+//Sets the timer to 0
+#define TIMER_START(key) StartTimer(key)
+void StartTimer(std::string key);
+
+//Sets the timer stored value to 0.0f
+#define TIMER_RESET_STORED(key) ResetTimerStoredVal(key)
+void ResetTimerStoredVal(std::string key);
+
+
+//Returns the timer value in MS, and stores the result
+#define TIMER_READ_MS(key) ReadMs(key)
 float ReadMs(std::string key);
 
-#define READ_SECONDS(key) ReadSec(key);
+//Returns the timer value in seconds, and stores the result
+#define TIMER_READ_SECONDS(key) ReadSec(key)
 unsigned int ReadSec(std::string key);
 
-#define START_TIMER(key) StartTimer(key);
-void StartTimer(std::string key);
+//Returns the higher value between the last read the timer had and the current read and stores it
+#define TIMER_READ_MS_MAX(key) ReadMs_Max(key)
+float ReadMs_Max(std::string key);
+
+//Returns the timer stored value (last read)
+#define TIMER_READ_STORED(key) ReadMsStoredVal(key)
+float ReadMsStoredVal(std::string key);
 
 // ------------ TIMER FUNCTIONS -------------------------
 

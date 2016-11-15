@@ -61,8 +61,20 @@ bool ModuleRenderer3D::Init()
 		LOG("OpenGL version supported %s", glGetString(GL_VERSION));
 		LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-		if (VSYNC && SDL_GL_SetSwapInterval(1) < 0)
-			LOG("Warning: Unable to set VSync! SDL Error: %s", SDL_GetError());
+		if (VSYNC)
+		{
+			if (SDL_GL_SetSwapInterval(1) < 0)
+			{
+				LOG("Warning: Unable to set VSync! SDL Error: %s", SDL_GetError());
+			}
+		}
+		else
+		{
+			if (SDL_GL_SetSwapInterval(0) < 0)
+			{
+				LOG("Warning: Unable to set VSync! SDL Error: %s", SDL_GetError());
+			}
+		}
 
 		//Check for error
 		GLenum error = glGetError();
@@ -175,23 +187,26 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 	}
 
 	viewPorts.front().camera = App->camera->GetDefaultCam();
-
+	TIMER_START("ViewPorts render");
 	if (viewPorts.empty() == false)
 	{
+		TIMER_RESET_STORED("ViewPort_The slowest");
 		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
 		{
+			TIMER_START("ViewPort_The slowest");
 			if (port->active && port->autoRender)
 			{
 				SetViewPort(*port);
 				App->Render(*port);
 			}
+			TIMER_READ_MS_MAX("ViewPort_The slowest");
 		}
 	}
 	else
 	{
 		LOG("Warning, there are no viewPorts!");
 	}
-
+	TIMER_READ_MS("ViewPorts render");
 	ImGui::Render();
 
 	SDL_GL_SwapWindow(App->window->GetWindow());

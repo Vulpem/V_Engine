@@ -68,6 +68,24 @@ void TimerManager::StartTimer(std::string key)
 	}
 }
 
+void TimerManager::ResetTimerStoredVal(std::string key)
+{
+	std::map<std::string, uint>::iterator IDit = timerIDs.find(key);
+	if (IDit != timerIDs.end())
+	{
+		lastReads.find(IDit->second)->second.second = 0.0f;
+	}
+}
+
+float TimerManager::ReadMsStoredVal(std::string key)
+{
+	std::map<std::string, uint>::iterator IDit = timerIDs.find(key);
+	if (IDit != timerIDs.end())
+	{
+		return lastReads.find(IDit->second)->second.second;
+	}
+}
+
 float TimerManager::ReadMs(std::string key)
 {
 	std::map<std::string, uint>::iterator IDit = timerIDs.find(key);
@@ -87,6 +105,48 @@ float TimerManager::ReadMs(std::string key)
 			{
 				float ret = stdIt->second.Read();
 				lastReads.find(it->first)->second.second = ret;
+				return ret;
+			}
+			else
+			{
+				LOG("Something went horribly wrong with timers. ID %u with key %s has no timer associated", IDit->second, key.data());
+			}
+		}
+	}
+	else
+	{
+		LOG("Tried to read the timer %s, which is unexistant", key.data());
+	}
+	return 0.0f;
+}
+
+float TimerManager::ReadMS_Max(std::string key)
+{
+	std::map<std::string, uint>::iterator IDit = timerIDs.find(key);
+	if (IDit != timerIDs.end())
+	{
+		std::map<uint, PerfTimer>::iterator it = perfTimers.find(IDit->second);
+		if (it != perfTimers.end())
+		{
+			float ret = it->second.ReadMs();
+			std::map<uint, std::pair<std::string, float>>::iterator tim = lastReads.find(it->first);
+
+			ret = MAX(ret, tim->second.second);
+			lastReads.find(it->first)->second.second = ret;
+			tim->second.second = ret;
+			return ret;
+		}
+		else
+		{
+			std::map<uint, Timer>::iterator stdIt = stdTimers.find(IDit->second);
+			if (stdIt != stdTimers.end())
+			{
+				float ret = stdIt->second.Read();
+				std::map<uint, std::pair<std::string, float>>::iterator tim = lastReads.find(it->first);
+
+				ret = MAX(ret, tim->second.second);
+				lastReads.find(it->first)->second.second = ret;
+				tim->second.second = ret;
 				return ret;
 			}
 			else
@@ -124,11 +184,21 @@ std::vector<std::pair<std::string, float>> TimerManager::GetLastReads()
 	std::vector<std::pair<std::string, float>> ret;
 	if (lastReads.empty() == false)
 	{
-		std::map<uint, std::pair<std::string, float>>::iterator it = lastReads.begin();
+		std::map<std::string, uint>::iterator it = timerIDs.begin();
+		for (; it != timerIDs.end(); it++)
+		{
+			ret.push_back(lastReads.find(it->second)->second);
+		}
+
+
+		//THIS WAY IS A LITTLE BIT FASTER; BUT RETURNS THE TIMERS IN THE ORDER THEY WERE CREATED
+		//THE WAY CURRENTLY IMPLEMENTED RETURNS THE TIMERS IN ALPHABETICAL ORDER
+
+		/*std::map<uint, std::pair<std::string, float>>::iterator it = lastReads.begin();
 		for (; it != lastReads.end(); it++)
 		{
 			ret.push_back(it->second);
-		}
+		}*/
 	}
 	return ret;
 }

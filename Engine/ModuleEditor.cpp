@@ -424,7 +424,7 @@ void ModuleEditor::Editor()
 			{
 				for (std::vector<std::pair<std::string, float>>::iterator it = timers.begin(); it != timers.end(); it++)
 				{
-					ImGui::Text("%s: %f ms", it->first.data(), it->second);
+					ImGui::Text("%*s: %*0.3f ms", 25, it->first.data(), 5,it->second);
 				}
 			}
 			else

@@ -26,3 +26,18 @@ void StartTimer(std::string key)
 {
 	App->timers->StartTimer(key);
 }
+
+float ReadMs_Max(std::string key)
+{
+	return App->timers->ReadMS_Max(key);
+}
+
+void ResetTimerStoredVal(std::string key)
+{
+	App->timers->ResetTimerStoredVal(key);
+}
+
+float ReadMsStoredVal(std::string key)
+{
+	return App->timers->ReadMsStoredVal(key);
+}
