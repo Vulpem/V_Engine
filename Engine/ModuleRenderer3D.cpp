@@ -239,7 +239,10 @@ void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 
 void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 {
-	glDisable(GL_LIGHTING);
+	if (usingLights)
+	{
+		glDisable(GL_LIGHTING);
+	}
 	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
 
@@ -259,7 +262,10 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 
 void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 {
-	glDisable(GL_LIGHTING);
+	if (usingLights)
+	{
+		glDisable(GL_LIGHTING);
+	}
 	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
 
@@ -471,8 +477,14 @@ void ModuleRenderer3D::SetViewPort(viewPort& port)
 
 void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 {
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_LIGHTING);
+	if (usingSingleSidedFaces)
+	{
+		glDisable(GL_CULL_FACE);
+	}
+	if (usingLights)
+	{
+		glDisable(GL_LIGHTING);
+	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(1.0f);
