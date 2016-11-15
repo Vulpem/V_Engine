@@ -9,6 +9,7 @@
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
 #include "ModuleGOmanager.h"
+#include "Timers.h"
 
 #include "AllComponents.h"
 
@@ -346,8 +347,8 @@ update_status ModuleEditor::MenuBar()
 
 void ModuleEditor::Editor()
 {
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 530));
-		ImGui::SetNextWindowSize(ImVec2(330, screenH - 530 -330));
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20 + (screenH - 20 - 330) / 2));
+		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20 - 330) / 2 + 20));
 
 		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f);
 
@@ -416,6 +417,23 @@ void ModuleEditor::Editor()
 			}
 		}
 
+		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))
+		{
+			std::vector<std::pair<float, std::string>> timers = App->timers->ReadMSAll();
+			if (timers.empty() == false)
+			{
+				for (std::vector<std::pair<float, std::string>>::iterator it = timers.begin(); it != timers.end(); it++)
+				{
+					ImGui::Text("%s: %fms", it->second, it->first);
+				}
+			}
+			else
+			{
+				ImGui::Text("No timers initialized");
+			}
+		}
+
+
 		if (ImGui::CollapsingHeader("Tests"))
 		{
 			ImGui::InputText("##consoleTest", testConsoleInput, 60);
@@ -470,7 +488,7 @@ void ModuleEditor::Outliner()
 void ModuleEditor::AttributeWindow()
 {
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(330, 510));
+		ImGui::SetNextWindowSize(ImVec2(330, (screenH-20-330)/2));
 		ImGui::Begin("Attribute Editor", 0, 0.8f);
 		if (selectedGameObject)
 		{
