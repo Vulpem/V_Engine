@@ -104,7 +104,7 @@ float TimerManager::ReadMs(std::string key)
 			if (stdIt != stdTimers.end())
 			{
 				float ret = stdIt->second.Read();
-				lastReads.find(it->first)->second.second = ret;
+				lastReads.find(stdIt->first)->second.second = ret;
 				return ret;
 			}
 			else
@@ -142,10 +142,10 @@ float TimerManager::ReadMS_Max(std::string key)
 			if (stdIt != stdTimers.end())
 			{
 				float ret = stdIt->second.Read();
-				std::map<uint, std::pair<std::string, float>>::iterator tim = lastReads.find(it->first);
+				std::map<uint, std::pair<std::string, float>>::iterator tim = lastReads.find(stdIt->first);
 
 				ret = MAX(ret, tim->second.second);
-				lastReads.find(it->first)->second.second = ret;
+				lastReads.find(stdIt->first)->second.second = ret;
 				tim->second.second = ret;
 				return ret;
 			}

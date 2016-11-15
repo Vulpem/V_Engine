@@ -48,8 +48,16 @@ private:
 public:
 	std::vector<viewPort> viewPorts;
 	Light lights[MAX_LIGHTS];
+
 private:
 	SDL_GLContext context;
+
+	//Only for read access
+	bool usingLights = true;
+	//Only for read access
+	bool usingSingleSidedFaces = true;
+	//Only for read access
+	bool usingTextures = true;
 };
 
 #endif

@@ -190,16 +190,16 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 	TIMER_START("ViewPorts render");
 	if (viewPorts.empty() == false)
 	{
-		TIMER_RESET_STORED("ViewPort_The slowest");
+		TIMER_RESET_STORED("ViewPorts The slowest");
 		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
 		{
-			TIMER_START("ViewPort_The slowest");
+			TIMER_START("ViewPorts The slowest");
 			if (port->active && port->autoRender)
 			{
 				SetViewPort(*port);
 				App->Render(*port);
 			}
-			TIMER_READ_MS_MAX("ViewPort_The slowest");
+			TIMER_READ_MS_MAX("ViewPorts The slowest");
 		}
 	}
 	else
@@ -239,9 +239,6 @@ void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 
 void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 {
-	bool lightWasEnabled = true;
-	if (glIsEnabled(GL_LIGHTING) == GL_FALSE) { lightWasEnabled = false; }
-
 	glDisable(GL_LIGHTING);
 	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
@@ -254,7 +251,7 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 
 	glLineWidth(1.0f);
 
-	if (lightWasEnabled)
+	if (usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
@@ -262,9 +259,6 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 
 void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 {
-	bool lightWasEnabled = true;
-	if (glIsEnabled(GL_LIGHTING) == GL_FALSE) { lightWasEnabled = false; }
-
 	glDisable(GL_LIGHTING);
 	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
@@ -288,7 +282,7 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 
 	glLineWidth(1.0f);
 
-	if (lightWasEnabled)
+	if (usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
@@ -298,10 +292,6 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 {
 	glPushMatrix();
 	glMultMatrixf(transform.ptr());
-
-	bool lightWasEnabled = true;
-	if (glIsEnabled(GL_LIGHTING) == GL_FALSE) { lightWasEnabled = false; }
-	glDisable(GL_LIGHTING);
 
 	// Draw Axis Grid
 	glLineWidth(2.0f);
@@ -321,7 +311,7 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 
 	glLineWidth(1.0f);
 
-	if (lightWasEnabled)
+	if (usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
@@ -469,24 +459,18 @@ void ModuleRenderer3D::SetViewPort(viewPort& port)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(port.camera->GetViewMatrix().ptr());
 
-	if (port.useSingleSidedFaces){ glEnable(GL_CULL_FACE); }
-	else { glDisable(GL_CULL_FACE); }
+	if (port.useSingleSidedFaces) { glEnable(GL_CULL_FACE); usingSingleSidedFaces = true; }
+	else { glDisable(GL_CULL_FACE); usingSingleSidedFaces = false; }
 
-	if (port.useLighting) { glEnable(GL_LIGHTING); }
-	else { glDisable(GL_LIGHTING); }
+	if (port.useLighting) { glEnable(GL_LIGHTING); usingLights = true; }
+	else { glDisable(GL_LIGHTING); usingLights = false;}
 
-	if (port.useMaterials) { glEnable(GL_TEXTURE_2D); }
-	else { glDisable(GL_TEXTURE_2D); }
+	if (port.useMaterials) { glEnable(GL_TEXTURE_2D); usingTextures = true; }
+	else { glDisable(GL_TEXTURE_2D); usingTextures = false;}
 }
 
 void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 {
-	bool hadCullEnabled = true;
-	if (glIsEnabled(GL_CULL_FACE) == GL_FALSE) { hadCullEnabled = false; }
-
-	bool lightWasEnabled = true;
-	if (glIsEnabled(GL_LIGHTING) == GL_FALSE) { lightWasEnabled = false; }
-
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_LIGHTING);
 
@@ -498,16 +482,14 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-
-	if (hadCullEnabled)
+	if (usingSingleSidedFaces)
 	{
 		glEnable(GL_CULL_FACE);
 	}
-	if (lightWasEnabled)
+	if (usingLights)
 	{
 		glEnable(GL_LIGHTING);
 	}
-
 
 }
 

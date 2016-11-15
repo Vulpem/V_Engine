@@ -112,7 +112,7 @@ bool Application::Init()
 // ---------------------------------------------
 void Application::PrepareUpdate()
 {
-	TIMER_START("0_PreUpdate timer");
+	TIMER_START("App PreUpdate");
 	frameCount++;
 	dt = (float)ms_timer.Read() / 1000.0f;
 	ms_timer.Start();
@@ -171,8 +171,8 @@ update_status Application::Update()
 		}
 		item++;
 	}
-	TIMER_READ_MS("0_PreUpdate timer");
-	TIMER_START("0_Update timer");
+	TIMER_READ_MS("App PreUpdate");
+	TIMER_START("App Update");
 	item = list_modules.begin();
 
 	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
@@ -183,9 +183,9 @@ update_status Application::Update()
 		}
 		item++;
 	}
-	TIMER_READ_MS("0_Update timer");
+	TIMER_READ_MS("App Update");
 	item = list_modules.begin();
-	TIMER_START("0_PostUpdate timer");
+	TIMER_START("App PostUpdate");
 	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
 	{
 		if ((*item)->IsEnabled())
@@ -194,7 +194,7 @@ update_status Application::Update()
 		}
 		item++;
 	}
-	TIMER_READ_MS("0_PostUpdate timer");
+	TIMER_READ_MS("App PostUpdate");
 	FinishUpdate();
 
 	if (FrameTime > 0.0001f)

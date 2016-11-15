@@ -109,18 +109,6 @@ update_status ModuleEditor::Update(float dt)
 		SwitchViewPorts();
 	}
 
-
-	if (IsOpenTestWindow)
-	{
-		ImGui::ShowTestWindow(&IsOpenTestWindow);
-	}
-
-	ret = MenuBar();
-	Editor();
-	Console();
-	Outliner();
-	AttributeWindow();
-
 	if (selectedGameObject != nullptr)
 	{
 		std::vector<GameObject*> toRender;
@@ -133,7 +121,20 @@ update_status ModuleEditor::Update(float dt)
 
 update_status ModuleEditor::PostUpdate(float dt)
 {
-	return UPDATE_CONTINUE;
+	update_status ret = UPDATE_CONTINUE;
+
+	if (IsOpenTestWindow)
+	{
+		ImGui::ShowTestWindow(&IsOpenTestWindow);
+	}
+
+	ret = MenuBar();
+	Editor();
+	Console();
+	Outliner();
+	AttributeWindow();
+
+	return ret;
 }
 
 // Called before quitting
@@ -422,8 +423,14 @@ void ModuleEditor::Editor()
 			std::vector<std::pair<std::string, float>> timers = App->timers->GetLastReads();
 			if (timers.empty() == false)
 			{
+				char lastLetter = '0';
 				for (std::vector<std::pair<std::string, float>>::iterator it = timers.begin(); it != timers.end(); it++)
 				{
+					if (it->first.data()[0] != lastLetter)
+					{
+						lastLetter = it->first.data()[0];
+						ImGui::Separator();
+					}
 					ImGui::Text("%*s: %*0.3f ms", 25, it->first.data(), 5,it->second);
 				}
 			}

@@ -50,6 +50,7 @@ update_status ModuleGoManager::PreUpdate(float dt)
 {
 	update_status ret = UPDATE_CONTINUE;
 
+	TIMER_START("Components PreUpdate");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
@@ -58,7 +59,7 @@ update_status ModuleGoManager::PreUpdate(float dt)
 			comp->second->PreUpdate();
 		}
 	}
-
+	TIMER_READ_MS("Components PreUpdate");
 	return ret;
 }
 
@@ -72,6 +73,7 @@ update_status ModuleGoManager::Update(float dt)
 		LoadGO(onlyName.data());
 	}
 
+	TIMER_START("Components Update");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
@@ -80,7 +82,7 @@ update_status ModuleGoManager::Update(float dt)
 			comp->second->Update();
 		}
 	}
-
+	TIMER_READ_MS("Components Update");
 	if (setting != nullptr)
 	{
 		if (ImGui::BeginPopupModal("##SetStaticChilds", &StaticChildsPopUpIsOpen))
@@ -124,6 +126,7 @@ update_status ModuleGoManager::Update(float dt)
 
 update_status ModuleGoManager::PostUpdate(float dt)
 {
+	TIMER_START("Components PostUpdate");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
@@ -132,8 +135,13 @@ update_status ModuleGoManager::PostUpdate(float dt)
 			comp->second->PostUpdate();
 		}
 	}
-
+	TIMER_READ_MS("Components PostUpdate");
 	DeleteGOs();
+
+	TIMER_RESET_STORED("Cam culling longest");
+	TIMER_RESET_STORED("GO render longest");
+
+
 	return UPDATE_CONTINUE;
 }
 
@@ -142,7 +150,9 @@ void ModuleGoManager::Render(const viewPort& port)
 	App->GO->RenderGOs(port);
 	if (drawQuadTree)
 	{
+		TIMER_START("QuadTree drawTime");
 		quadTree.Draw();
+		TIMER_READ_MS("QuadTree drawTime");
 	}
 }
 
@@ -267,6 +277,8 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 
 bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal)
 {
+	TIMER_RESET_STORED("Raycast");
+	TIMER_START("Raycast");
 	bool collided = false;
 	GameObject* out_go = NULL;
 	float3 out_pos = float3::zero;
@@ -337,7 +349,7 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	{
 		*OUT_position = out_pos;
 	}
-
+	TIMER_READ_MS("Raycast");
 	return collided;
 }
 
@@ -373,7 +385,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 				comp->second->Draw();
 			}
 		}
-
+		TIMER_START("Cam culling longest");
 		bool aCamHadCulling = false;
 		//Finding all the cameras that have culling on, and collecting all the GOs we need to render
 		std::multimap<Component::Type, Component*>::iterator it = components.find(Component::Type::C_camera);
@@ -416,6 +428,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 				toRender.insert(*toInsert);
 			}
 		}
+		TIMER_READ_MS_MAX("Cam culling longest");
 	}
 	else
 	{
@@ -426,6 +439,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 		}
 	}
 
+	TIMER_START("GO render longest");
 	//And now, we render them
 	for (std::unordered_set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
 	{
@@ -444,6 +458,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			}
 		}
 	}
+	TIMER_READ_MS_MAX("GO render longest");
 }
 
 void ModuleGoManager::AddGOtoRoot(GameObject * GO)
