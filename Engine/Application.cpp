@@ -13,6 +13,8 @@
 #include "ModuleFileSystem.h"
 #include "ModuleImporter.h"
 
+#include "Timers.h"
+
 Application::Application()
 {
 	gameRunning = false;
@@ -31,6 +33,8 @@ Application::Application()
 	Editor = new ModuleEditor(this);
 	GO = new ModuleGoManager(this);
 	importer = new ModuleImporter(this);
+
+	timers = new TimerManager();
 
 	// The order of calls is very important!
 	// Modules will Init() Start() and Update in this order
@@ -197,7 +201,6 @@ update_status Application::Update()
 		{
 		}
 	}
-
 	return ret;
 }
 

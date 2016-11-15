@@ -94,6 +94,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Mesh_RenderInfo.h" />
+    <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="imGUI\imconfig.h" />
     <ClInclude Include="imGUI\imgui.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Timers.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="ViewPort.h" />
   </ItemGroup>
@@ -242,10 +244,13 @@
     <ClCompile Include="ModuleGOmanager.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
+    <ClCompile Include="PerfTimer.cpp" />
     <ClCompile Include="PhysBody3D.cpp" />
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="timerFunctions.cpp" />
+    <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>

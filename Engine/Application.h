@@ -19,6 +19,7 @@ class ModuleGoManager;
 class ModulePhysics3D;
 class ModuleFileSystem;
 class ModuleImporter;
+class TimerManager;
 
 struct viewPort;
 
@@ -43,6 +44,8 @@ public:
 	float ms_frame[EDITOR_FRAME_SAMPLES];
 	float framerate[EDITOR_FRAME_SAMPLES];
 	int maxFPS = 0;
+
+	TimerManager* timers;
 
 private:
 

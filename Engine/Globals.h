@@ -3,10 +3,32 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <string>
 
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
 
 void log(const char file[], int line, const char* format, ...);
+
+
+// ------------ TIMER FUNCTIONS -------------------------
+
+#define CREATE_PERF_TIMER(key) CreatePerfTimer(key);
+void CreatePerfTimer(std::string key);
+
+#define CREATE_TIMER(key) CreateTimer(key);
+void CreateTimer(std::string key);
+
+#define READ_MS(key) ReadMs(key);
+float ReadMs(std::string key);
+
+#define READ_SECONDS(key) ReadSec(key);
+unsigned int ReadSec(std::string key);
+
+#define START_TIMER(key) StartTimer(key);
+void StartTimer(std::string key);
+
+// ------------ TIMER FUNCTIONS -------------------------
+
 
 #define CAP(n) ((n <= 0.0f) ? n=0.0f : (n >= 1.0f) ? n=1.0f : n=n)
 
@@ -20,6 +42,9 @@ void log(const char file[], int line, const char* format, ...);
 #define MIN(a,b) ((a)<(b)) ? (a) : (b)
 #define MAX(a,b) ((a)>(b)) ? (a) : (b)
 
+typedef unsigned __int32 uint32;
+typedef unsigned __int64 uint64;
+typedef unsigned int uint;
 
 #define RELEASE( x )\
     {\
@@ -38,8 +63,6 @@ void log(const char file[], int line, const char* format, ...);
 	       x = nullptr;\
 		 }\
 	 }
-
-typedef unsigned int uint;
 
 enum update_status
 {
