@@ -190,16 +190,16 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 	TIMER_START("ViewPorts render");
 	if (viewPorts.empty() == false)
 	{
-		TIMER_RESET_STORED("ViewPorts The slowest");
+		TIMER_RESET_STORED("ViewPorts slowest");
 		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
 		{
-			TIMER_START("ViewPorts The slowest");
+			TIMER_START("ViewPorts slowest");
 			if (port->active && port->autoRender)
 			{
 				SetViewPort(*port);
 				App->Render(*port);
 			}
-			TIMER_READ_MS_MAX("ViewPorts The slowest");
+			TIMER_READ_MS_MAX("ViewPorts slowest");
 		}
 	}
 	else
