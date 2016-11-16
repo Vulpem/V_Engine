@@ -56,11 +56,6 @@ bool ModuleEditor::Start()
 	multipleViewPorts[2] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetRightCam());
 	multipleViewPorts[3] = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), App->camera->GetFrontCam());
 
-	GameObject* prev = App->GO->CreateCamera("PreviewCamera");
-	previewViewPort = App->renderer3D->AddViewPort(float2(0, 0), float2(100, 100), prev->GetComponent<Camera>().front());
-	App->renderer3D->FindViewPort(previewViewPort)->withUI = false;
-	App->renderer3D->FindViewPort(previewViewPort)->autoRender = false;
-
 	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 	SwitchViewPorts();
 
@@ -107,13 +102,6 @@ update_status ModuleEditor::Update(float dt)
 	{
 		multipleViews = !multipleViews;
 		SwitchViewPorts();
-	}
-
-	if (selectedGameObject != nullptr)
-	{
-		std::vector<GameObject*> toRender;
-		toRender.push_back(selectedGameObject);
-		App->GO->RenderGOs(*App->renderer3D->FindViewPort(previewViewPort), toRender);
 	}
 
 	return ret;
@@ -204,11 +192,6 @@ void ModuleEditor::OnScreenResize(int width, int heigth)
 	port->pos.x += size.x;
 	port->pos.y += size.y;
 	port->size = size;
-
-	port = App->renderer3D->FindViewPort(previewViewPort);
-	port->pos.x = viewPortMax.x;
-	port->pos.y = screenH - 330;
-	port->size = float2(330, 330);
 }
 
 void ModuleEditor::HandleInput(SDL_Event* event)
@@ -348,8 +331,8 @@ update_status ModuleEditor::MenuBar()
 
 void ModuleEditor::Editor()
 {
-		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20 + (screenH - 20 - 330) / 2));
-		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20 - 330) / 2 + 20));
+		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20 + (screenH - 20) / 2));
+		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 2));
 
 		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f);
 
@@ -495,7 +478,7 @@ void ModuleEditor::Outliner()
 void ModuleEditor::AttributeWindow()
 {
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(330, (screenH-20-330)/2));
+		ImGui::SetNextWindowSize(ImVec2(330, (screenH-20)/2));
 		ImGui::Begin("Attribute Editor", 0, 0.8f);
 		if (selectedGameObject)
 		{

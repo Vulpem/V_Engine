@@ -441,6 +441,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 
 	TIMER_START("GO render longest");
 	//And now, we render them
+	TIMER_RESET_STORED("Mesh slowest");
 	for (std::unordered_set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
 	{
 		std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
@@ -448,6 +449,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 		{
 			for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 			{
+				TIMER_START("Mesh slowest");
 				Mesh_RenderInfo info = GetMeshData(*mesh);
 				if (port.useOnlyWires)
 				{
@@ -455,6 +457,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 					info.wired = true;
 				}
 				App->renderer3D->DrawMesh(info);
+				TIMER_READ_MS_MAX("Mesh slowest");
 			}
 		}
 	}
