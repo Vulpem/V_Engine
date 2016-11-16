@@ -17,6 +17,8 @@ public:
 	Camera(GameObject* linkedTo, int id);
 	~Camera();
 
+	void PreUpdate();
+
 	void EditorContent();
 
 	void UpdateCamMatrix();

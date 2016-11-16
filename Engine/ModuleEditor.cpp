@@ -587,7 +587,7 @@ void ModuleEditor::SelectByViewPort()
 
 			GameObject* out_go = NULL;
 
-			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal))
+			if (App->GO->RayCast(selectRay, &out_go, &out_pos, &out_normal, false))
 			{
 				SelectGameObject(out_go);
 			}

@@ -51,6 +51,11 @@ Camera::~Camera()
 	}
 }
 
+void Camera::PreUpdate()
+{
+	frustum.Update();
+}
+
 void Camera::Draw()
 {
 	if (object->HiddenFromOutliner() == false)

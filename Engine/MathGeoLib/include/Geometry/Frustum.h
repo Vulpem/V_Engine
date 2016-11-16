@@ -21,6 +21,7 @@
 #include "../Math/float2.h"
 #include "../Math/float3.h"
 #include "Ray.h"
+#include "Plane.h"
 
 #ifdef MATH_TINYXML_INTEROP
 #include "Config/tinyxml/tinyxml.h"
@@ -39,6 +40,13 @@ enum FrustumType
 class Frustum
 {
 public:
+	// WARNING
+	// David was here
+
+	void Update();
+
+	Plane planes[6];
+
 	/// Specifies whether this frustum is a perspective or an orthographic frustum.
 	/** [noscript] @todo Remove the noscript attribute. */
 	FrustumType type;
@@ -403,7 +411,6 @@ public:
 	bool Intersects(const LineSegment &lineSegment) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const OBB &obb) const;
-	bool Intersects(const OBB &obb, float& in, float& out) const;
 	bool Intersects(const Plane &plane) const;
 	bool Intersects(const Triangle &triangle) const;
 	bool Intersects(const Polygon &polygon) const;

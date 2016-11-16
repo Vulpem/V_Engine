@@ -296,15 +296,17 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 
 void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 {
+	if (usingLights)
+	{
+		glDisable(GL_LIGHTING);
+	}
 	glPushMatrix();
 	glMultMatrixf(transform.ptr());
 
-	// Draw Axis Grid
 	glLineWidth(2.0f);
+	glColor4f(color.x, color.y, color.z, color.w);
 
 	glBegin(GL_LINES);
-
-	glColor4f(color.x, color.y, color.z, color.w);
 
 	glVertex3f(1.0f, 0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, 0.0f);
 	glVertex3f(0.0f, 1.0f, 0.0f); glVertex3f(0.0f, -1.0f, 0.0f);

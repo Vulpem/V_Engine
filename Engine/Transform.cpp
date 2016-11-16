@@ -28,16 +28,17 @@ Transform::~Transform()
 
 void Transform::Draw()
 {
-	if (object->HasComponent(Component::Type::C_mesh) == false)
+	if (!object->HasComponent(Component::Type::C_mesh))
 	{
 		object->DrawLocator();
 	}
 	//Drawing AABB independantly of object transform
-	if (object->selected)
+	//REMOVED
+	/*if (object->selected)
 	{
 		object->DrawAABB();
 		object->DrawOBB();
-	}
+	}*/
 }
 
 void Transform::EditorContent()

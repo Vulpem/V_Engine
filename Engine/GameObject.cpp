@@ -148,8 +148,7 @@ void GameObject::DrawLocator()
 		{
 			color = float4(0, 0.5f, 0.5f, 1);
 		}
-		else
-		{
+		else {
 			color = float4(0, 0.8f, 0.8f, 1);
 		}
 	}
@@ -221,6 +220,12 @@ void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
 {
 	originalAABB.minPoint = minPoint;
 	originalAABB.maxPoint = maxPoint;
+	if (originalAABB.IsFinite() == false)
+	{
+		originalAABB.minPoint = float3{ -0.25f,-0.25f,-0.25f };
+		originalAABB.maxPoint = float3{ 0.25f,0.25f,0.25f };
+	}
+
 	UpdateAABB();
 }
 

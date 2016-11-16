@@ -45,7 +45,15 @@
 
 MATH_BEGIN_NAMESPACE
 
-float Frustum::AspectRatio() const
+void Frustum::Update()
+{
+	for (int n = 0; n < 6; n++)
+	{
+		planes[n] = GetPlane(n);
+	}
+}
+
+   float Frustum::AspectRatio() const
 {
 	return horizontalFov / verticalFov;
 }
@@ -460,7 +468,7 @@ void Frustum::GetPlanes(Plane *outArray) const
 		return;
 #endif
 	for(int i = 0; i < 6; ++i)
-		outArray[i] = GetPlane(i);
+		outArray[i] = planes[i];
 }
 
 float3 Frustum::CenterPoint() const
@@ -681,42 +689,6 @@ bool Frustum::Intersects(const OBB &obb) const
 		return false;
 #endif
 
-	return true;
-}
-
-bool Frustum::Intersects(const OBB & obb, float & in, float & out) const
-{
-	float3 points[8];
-	obb.GetCornerPoints(points);
-
-	Plane planes[6];
-	GetPlanes(planes);
-
-	// Discard boxes with all points outside
-	int discard;
-	for (int i = 0; i < 6; ++i)
-	{
-		discard = 0;
-		for (int k = 0; k < 8; ++k)
-			discard += planes[i].IsOnPositiveSide(points[k]);
-
-		if (discard == 8)
-			return false;
-	}
-
-	// Calculate approx distances
-	in = obb.ClosestPoint(pos).DistanceSq(pos);
-
-	/*
-	float3 closest = obb.ClosestPoint(pos);
-	float squared = pos.DistanceSq(closest);
-
-	in = pos.DistanceSq(obb.pos);
-	
-	in = squared / (farPlaneDistance * farPlaneDistance);
-	float radius = obb.MinimalEnclosingSphere().r;
-	out = in + (radius / farPlaneDistance * farPlaneDistance);
-	*/
 	return true;
 }
 

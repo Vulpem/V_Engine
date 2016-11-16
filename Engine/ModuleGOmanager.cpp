@@ -275,7 +275,7 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 	}
 }
 
-bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal)
+bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal, bool onlyMeshes)
 {
 	TIMER_RESET_STORED("Raycast");
 	TIMER_START("Raycast");
@@ -292,12 +292,9 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 		float distanceNear;
 		float distanceFar;
 		//The distance is normalized between [0,1] and is the relative position in the Segment the AABB collides
-		if ((*GO)->aabb.Intersects(ray, distanceNear, distanceFar) == true)
+		if ((*GO)->obb.Intersects(ray, distanceNear, distanceFar) == true)
 		{
-			if ((*GO)->obb.Intersects(ray, distanceNear, distanceFar) == true)
-			{
-				candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), (*GO)));
-			}
+			candidates.insert(std::pair<float, GameObject*>(MIN(distanceNear, distanceFar), (*GO)));
 		}
 	}
 
@@ -341,6 +338,13 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 				RELEASE_ARRAY(vertices);
 				RELEASE_ARRAY(index);
 			}
+		}
+		else if(onlyMeshes == false)
+		{
+			collided = true;
+			out_go = check->second;
+			out_normal = float3(0, 1, 0);
+			out_pos = check->second->GetTransform()->GetGlobalPos();
 		}
 	}
 	*OUT_gameobject = out_go;
