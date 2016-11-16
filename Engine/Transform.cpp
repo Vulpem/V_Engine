@@ -151,9 +151,9 @@ void Transform::SetLocalPos(float x, float y, float z)
 
 		object->UpdateTransformMatrix();
 
-		std::vector<Camera*> cams = object->GetComponent<Camera>();
-		if (cams.empty() == false)
+		if (object->HasComponent(Component::Type::C_camera))
 		{
+			std::vector<Camera*> cams = object->GetComponent<Camera>();
 			std::vector<Camera*>::iterator it = cams.begin();
 			while (it != cams.end())
 			{

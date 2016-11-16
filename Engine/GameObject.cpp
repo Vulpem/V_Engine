@@ -246,9 +246,9 @@ void GameObject::UpdateTransformMatrix()
 	UpdateAABB();
 
 	//Updating cameras position
-	std::vector<Camera*> cams = GetComponent<Camera>();
-	if (cams.empty() == false)
+	if (HasComponent(Component::Type::C_camera))
 	{
+		std::vector<Camera*> cams = GetComponent<Camera>();
 		std::vector<Camera*>::iterator it = cams.begin();
 		while (it != cams.end())
 		{
@@ -365,7 +365,7 @@ Component* GameObject::AddComponent(Component::Type type)
 bool GameObject::HasComponent(Component::Type type)
 {
 	return HasComponents[type];
-	if (components.size() > 0)
+	/*if (components.size() > 0)
 	{
 		if (type == Component::Type::C_transform)
 		{
@@ -385,7 +385,7 @@ bool GameObject::HasComponent(Component::Type type)
 			it++;
 		}
 	}
-	return false;
+	return false;*/
 }
 
 Transform * GameObject::GetTransform()

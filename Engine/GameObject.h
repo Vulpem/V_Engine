@@ -80,15 +80,18 @@ public:
 	std::vector<typeComp*> GetComponent()
 	{  
 		std::vector<typeComp*> ret;
-		std::vector<Component*>::iterator it = components.begin();
-		while (it != components.end())
+		if (HasComponent(typeComp::GetType()))
 		{
-			//Remember to add a "static GetType()" function to all created components
-			if ((*it)->GetType() == typeComp::GetType())
+			std::vector<Component*>::iterator it = components.begin();
+			while (it != components.end())
 			{
-				ret.push_back((typeComp*)(*it));
+				//Remember to add a "static GetType()" function to all created components
+				if ((*it)->GetType() == typeComp::GetType())
+				{
+					ret.push_back((typeComp*)(*it));
+				}
+				it++;
 			}
-			it++;
 		}
 		return ret;
 	}

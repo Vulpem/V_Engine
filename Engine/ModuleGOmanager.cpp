@@ -306,38 +306,41 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 	{
 		float collisionDistance = floatMax;
 		//One object may have more than a single mesh, so we'll check them one by one
-		std::vector<mesh*> meshes = check->second->GetComponent<mesh>();
-		for (std::vector<mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
+		if (check->second->HasComponent(Component::Type::C_mesh))
 		{
-			LineSegment transformedRay = ray;
-			transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().InverseTransposed());
-			//Generating the triangles the mes has, and checking them one by one
-			float3* vertices = (*m)->GetVertices();
-			uint* index = (*m)->GetIndices();
-			for (int n = 0; n < (*m)->num_indices; n+=3)
+			std::vector<mesh*> meshes = check->second->GetComponent<mesh>();
+			for (std::vector<mesh*>::iterator m = meshes.begin(); m != meshes.end(); m++)
 			{
-				Triangle tri(vertices[index[n]], vertices[index[n + 1]], vertices[index[n + 2]]);
-				float3 intersectionPoint;
-				float distance;
-				//If the triangle we collided with is further away than a previous collision, we'll ignore it
-				if (tri.Intersects(transformedRay, &distance, &intersectionPoint) == true)
+				LineSegment transformedRay = ray;
+				transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().InverseTransposed());
+				//Generating the triangles the mes has, and checking them one by one
+				float3* vertices = (*m)->GetVertices();
+				uint* index = (*m)->GetIndices();
+				for (int n = 0; n < (*m)->num_indices; n += 3)
 				{
-					if (distance < collisionDistance)
+					Triangle tri(vertices[index[n]], vertices[index[n + 1]], vertices[index[n + 2]]);
+					float3 intersectionPoint;
+					float distance;
+					//If the triangle we collided with is further away than a previous collision, we'll ignore it
+					if (tri.Intersects(transformedRay, &distance, &intersectionPoint) == true)
 					{
-						collided = true;
-						collisionDistance = distance;
-						out_go = check->second;
-						out_pos = intersectionPoint;
-						out_normal = tri.NormalCCW();
-						LineSegment tmp(out_pos, out_pos + out_normal);
-						tmp.Transform(check->second->GetTransform()->GetGlobalTransform().Transposed());
-						out_pos = tmp.a;
-						out_normal = tmp.b - tmp.a;
+						if (distance < collisionDistance)
+						{
+							collided = true;
+							collisionDistance = distance;
+							out_go = check->second;
+							out_pos = intersectionPoint;
+							out_normal = tri.NormalCCW();
+							LineSegment tmp(out_pos, out_pos + out_normal);
+							tmp.Transform(check->second->GetTransform()->GetGlobalTransform().Transposed());
+							out_pos = tmp.a;
+							out_normal = tmp.b - tmp.a;
+						}
 					}
 				}
+				RELEASE_ARRAY(vertices);
+				RELEASE_ARRAY(index);
 			}
-			RELEASE_ARRAY(vertices);
-			RELEASE_ARRAY(index);
 		}
 	}
 	*OUT_gameobject = out_go;
@@ -360,10 +363,9 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 	ret.transform = getFrom->object->GetTransform()->GetGlobalTransform();
 
-	std::vector<Material*> mats = getFrom->object->GetComponent<Material>();
-	if (mats.empty() == false)
+	if (getFrom->object->HasComponent(Component::Type::C_material))
 	{
-		Material* mat = mats.front();
+		Material* mat = getFrom->object->GetComponent<Material>().front();
 		ret.meshColor = mat->GetColor();
 		ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
 	}
@@ -445,9 +447,9 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 	TIMER_RESET_STORED("Mesh slowest");
 	for (std::unordered_set<GameObject*>::iterator it = toRender.begin(); it != toRender.end(); it++)
 	{
-		std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
-		if (meshes.empty() == false)
+		if ((*it)->HasComponent(Component::Type::C_mesh))
 		{
+			std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
 			for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 			{
 				TIMER_START("Mesh slowest");
