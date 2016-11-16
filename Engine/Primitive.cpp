@@ -24,8 +24,6 @@ void Primitive::Render() const
 	{
 		glDisable(GL_DEPTH_TEST);
 		// Draw Axis Grid
-		glLineWidth(2.0f);
-
 		glBegin(GL_LINES);
 
 		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
@@ -50,7 +48,6 @@ void Primitive::Render() const
 
 		glEnd();
 
-		glLineWidth(1.0f);
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -262,16 +259,12 @@ P_Line::P_Line(float x, float y, float z) : Primitive(), origin(0, 0, 0), destin
 
 void P_Line::InnerRender() const
 {
-	glLineWidth(2.0f);
-
 	glBegin(GL_LINES);
 
 	glVertex3f(origin.x, origin.y, origin.z);
 	glVertex3f(destination.x, destination.y, destination.z);
 
 	glEnd();
-
-	glLineWidth(1.0f);
 }
 
 // PLANE ==================================================
@@ -287,8 +280,6 @@ P_Plane::P_Plane(float x, float y, float z, float d) : Primitive(), normal(x, y,
 
 void P_Plane::InnerRender() const
 {
-	glLineWidth(0.7f);
-
 	glBegin(GL_LINES);
 
 	float d = 20.0f;

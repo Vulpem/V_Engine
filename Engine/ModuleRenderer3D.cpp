@@ -140,6 +140,8 @@ bool ModuleRenderer3D::Init()
 
 		glShadeModel(GL_SMOOTH);		 // Enables Smooth Shading
 
+		glLineWidth(1.0f);
+
 		viewPorts.push_back(viewPort(float2(0, 0), float2(SCREEN_WIDTH, SCREEN_HEIGHT), App->camera->GetDefaultCam(), viewPorts.size()));
 
 	}
@@ -243,7 +245,6 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 	{
 		glDisable(GL_LIGHTING);
 	}
-	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
 
 	glBegin(GL_LINES);
@@ -251,8 +252,6 @@ void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
 	glVertex3fv(a.ptr()); glVertex3fv(b.ptr());
 
 	glEnd();
-
-	glLineWidth(1.0f);
 
 	if (usingLights)
 	{
@@ -266,7 +265,6 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 	{
 		glDisable(GL_LIGHTING);
 	}
-	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
 
 	glBegin(GL_LINES);
@@ -286,8 +284,6 @@ void ModuleRenderer3D::DrawBox(float3* corners, float4 color)
 
 	glEnd();
 
-	glLineWidth(1.0f);
-
 	if (usingLights)
 	{
 		glEnable(GL_LIGHTING);
@@ -303,7 +299,6 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 	glPushMatrix();
 	glMultMatrixf(transform.ptr());
 
-	glLineWidth(2.0f);
 	glColor4f(color.x, color.y, color.z, color.w);
 
 	glBegin(GL_LINES);
@@ -316,8 +311,6 @@ void ModuleRenderer3D::DrawLocator(float4x4 transform, float4 color)
 	glVertex3f(0.0f, 0.0f, 1.0f); glVertex3f(-0.1f, 0.0f, 0.9f);
 
 	glEnd();
-
-	glLineWidth(1.0f);
 
 	if (usingLights)
 	{
@@ -489,7 +482,6 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glLineWidth(1.0f);
 	glColor4fv(data.wiresColor.ptr());
 
 	glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
