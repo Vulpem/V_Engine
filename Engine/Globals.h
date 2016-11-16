@@ -23,9 +23,13 @@ void CreatePerfTimer(std::string key);
 void CreateTimer(std::string key);
 
 
-//Sets the timer to 0
+//Sets the timer to 0, faster for normal timers. If it doesn't exist, it will create a timer
 #define TIMER_START(key) StartTimer(key)
 void StartTimer(std::string key);
+
+//Sets the timer to 0, faster for perf timers. If it doesn't exist, it will create a Perf timer
+#define TIMER_START_PERF(key) StartTimerPerf(key)
+void StartTimerPerf(std::string key);
 
 //Sets the timer stored value to 0.0f
 #define TIMER_RESET_STORED(key) ResetTimerStoredVal(key)

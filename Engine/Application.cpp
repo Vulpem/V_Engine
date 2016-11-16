@@ -106,13 +106,29 @@ bool Application::Init()
 	ms_timer.Start();
 	FPS_Timer.Start();
 
+	//TMP
+	TIMER_CREATE("__Timer");
+	TIMER_CREATE_PERF("__PerfTimer");
+	TIMER_CREATE_PERF("Timer Test");
+	TIMER_CREATE_PERF("TimerPerf Test");
 	return ret;
 }
 
 // ---------------------------------------------
 void Application::PrepareUpdate()
 {
-	TIMER_START("App PreUpdate");
+	//TMP, TESTING TIMERS
+	TIMER_START_PERF("TimerPerf Test");
+	TIMER_START_PERF("__PerfTimer");
+	TIMER_READ_MS("__PerfTimer");
+	TIMER_READ_MS_MAX("TimerPerf Test");
+
+	TIMER_START_PERF("Timer Test");
+	TIMER_START("__Timer");
+	TIMER_READ_MS("__Timer");
+	TIMER_READ_MS_MAX("Timer Test");
+	//////////
+	TIMER_START_PERF("App PreUpdate");
 	frameCount++;
 	dt = (float)ms_timer.Read() / 1000.0f;
 	ms_timer.Start();
@@ -172,7 +188,7 @@ update_status Application::Update()
 		item++;
 	}
 	TIMER_READ_MS("App PreUpdate");
-	TIMER_START("App Update");
+	TIMER_START_PERF("App Update");
 	item = list_modules.begin();
 
 	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
@@ -185,7 +201,7 @@ update_status Application::Update()
 	}
 	TIMER_READ_MS("App Update");
 	item = list_modules.begin();
-	TIMER_START("App PostUpdate");
+	TIMER_START_PERF("App PostUpdate");
 	while(item != list_modules.end() && ret == UPDATE_CONTINUE)
 	{
 		if ((*item)->IsEnabled())

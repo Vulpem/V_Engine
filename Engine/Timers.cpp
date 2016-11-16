@@ -44,6 +44,35 @@ void TimerManager::StartTimer(std::string key)
 	std::map<std::string, uint>::iterator IDit = timerIDs.find(key);
 	if (IDit != timerIDs.end())
 	{
+		std::map<uint, Timer>::iterator it = stdTimers.find(IDit->second);
+		if (it != stdTimers.end())
+		{
+			it->second.Start();
+		}
+		else
+		{
+			std::map<uint, PerfTimer>::iterator stdIt = perfTimers.find(IDit->second);
+			if (stdIt != perfTimers.end())
+			{
+				stdIt->second.Start();
+			}
+			else
+			{
+				LOG("Something went horribly wrong with timers. ID %u with key %s has no timer associated", IDit->second, key.data());
+			}
+		}
+	}
+	else
+	{
+		CreateTimer(key);
+	}
+}
+
+void TimerManager::StartTimerPerf(std::string key)
+{
+	std::map<std::string, uint>::iterator IDit = timerIDs.find(key);
+	if (IDit != timerIDs.end())
+	{
 		std::map<uint, PerfTimer>::iterator it = perfTimers.find(IDit->second);
 		if (it != perfTimers.end())
 		{
@@ -67,6 +96,7 @@ void TimerManager::StartTimer(std::string key)
 		CreatePerfTimer(key);
 	}
 }
+
 
 void TimerManager::ResetTimerStoredVal(std::string key)
 {
@@ -132,7 +162,6 @@ float TimerManager::ReadMS_Max(std::string key)
 			std::map<uint, std::pair<std::string, float>>::iterator tim = lastReads.find(it->first);
 
 			ret = MAX(ret, tim->second.second);
-			lastReads.find(it->first)->second.second = ret;
 			tim->second.second = ret;
 			return ret;
 		}
@@ -145,7 +174,6 @@ float TimerManager::ReadMS_Max(std::string key)
 				std::map<uint, std::pair<std::string, float>>::iterator tim = lastReads.find(stdIt->first);
 
 				ret = MAX(ret, tim->second.second);
-				lastReads.find(stdIt->first)->second.second = ret;
 				tim->second.second = ret;
 				return ret;
 			}

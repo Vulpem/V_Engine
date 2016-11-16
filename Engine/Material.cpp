@@ -45,7 +45,7 @@ int Material::GetTexture(uint n)
 {
 	if (IsEnabled())
 	{
-		if (n >= 0 && n < textures.size() && IsEnabled())
+		if (n >= 0 && n < textures.size())
 		{
 			return textures.at(n);
 		}

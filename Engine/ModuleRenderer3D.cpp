@@ -193,7 +193,7 @@ update_status ModuleRenderer3D::PostUpdate(float dt)
 		TIMER_RESET_STORED("ViewPorts slowest");
 		for (std::vector<viewPort>::iterator port = viewPorts.begin(); port != viewPorts.end(); port++)
 		{
-			TIMER_START("ViewPorts slowest");
+			TIMER_START_PERF("ViewPorts slowest");
 			if (port->active && port->autoRender)
 			{
 				SetViewPort(*port);

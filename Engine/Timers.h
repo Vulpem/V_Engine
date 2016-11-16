@@ -17,6 +17,7 @@ public:
 	void CreatePerfTimer(std::string key);
 	void CreateTimer(std::string key);
 	void StartTimer(std::string key);
+	void StartTimerPerf(std::string key);
 	void ResetTimerStoredVal(std::string key);
 	float ReadMsStoredVal(std::string key);
 	float ReadMs(std::string key);

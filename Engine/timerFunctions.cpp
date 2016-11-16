@@ -27,6 +27,11 @@ void StartTimer(std::string key)
 	App->timers->StartTimer(key);
 }
 
+void StartTimerPerf(std::string key)
+{
+	App->timers->StartTimerPerf(key);
+}
+
 float ReadMs_Max(std::string key)
 {
 	return App->timers->ReadMS_Max(key);
