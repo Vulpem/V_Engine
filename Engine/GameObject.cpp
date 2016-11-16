@@ -15,6 +15,10 @@
 
 GameObject::GameObject()
 {
+	for (int n = 0; n < nComponentTypes; n++)
+	{
+		HasComponents[n] = false;
+	}
 	aabb.SetNegativeInfinity();
 	originalAABB.SetNegativeInfinity();
 	strcpy(name, "Unnamed");
@@ -350,6 +354,7 @@ Component* GameObject::AddComponent(Component::Type type)
 
 	if (toAdd != nullptr)
 	{
+		HasComponents[type] = true;
 		components.push_back(toAdd);
 	}
 	App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
@@ -359,6 +364,7 @@ Component* GameObject::AddComponent(Component::Type type)
 
 bool GameObject::HasComponent(Component::Type type)
 {
+	return HasComponents[type];
 	if (components.size() > 0)
 	{
 		if (type == Component::Type::C_transform)
@@ -369,15 +375,15 @@ bool GameObject::HasComponent(Component::Type type)
 			}
 			return true;
 		}
-			std::vector<Component*>::iterator it = components.begin();
-			while (it != components.end())
+		std::vector<Component*>::iterator it = components.begin();
+		while (it != components.end())
+		{
+			if ((*it)->GetType() == type)
 			{
-				if ((*it)->GetType() == type)
-				{
-					return true;
-				}
-				it++;
+				return true;
 			}
+			it++;
+		}
 	}
 	return false;
 }

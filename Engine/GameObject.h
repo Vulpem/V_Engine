@@ -25,6 +25,9 @@ private:
 	bool hiddenOnOutliner = false;
 	bool Static = false;
 
+	static const uint nComponentTypes = Component::Type::C_None;
+	bool HasComponents[Component::Type::C_None];
+
 	AABB originalAABB;
 
 	Transform* transform = nullptr;

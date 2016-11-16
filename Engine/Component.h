@@ -9,13 +9,15 @@ class GameObject;
 class Component
 {
 public:
-	enum Type
+	static const enum Type
 	{
-		C_None,
-		C_transform,
+		C_transform = 1,
 		C_material,
 		C_mesh,
-		C_camera
+		C_camera,
+
+		//Keep this "C_None" always last
+		C_None
 	};
 	
 

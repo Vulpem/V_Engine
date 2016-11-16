@@ -360,9 +360,10 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 
 	ret.transform = getFrom->object->GetTransform()->GetGlobalTransform();
 
-	if (getFrom->object->HasComponent(Component::Type::C_material))
+	std::vector<Material*> mats = getFrom->object->GetComponent<Material>();
+	if (mats.empty() == false)
 	{
-		Material* mat = getFrom->object->GetComponent<Material>().front();
+		Material* mat = mats.front();
 		ret.meshColor = mat->GetColor();
 		ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
 	}
