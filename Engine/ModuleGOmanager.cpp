@@ -7,6 +7,7 @@
 #include "ModuleImporter.h"
 #include "ModuleCamera3D.h"
 #include "ModuleRenderer3D.h"
+#include "ModuleFileSystem.h"
 #include "imGUI\imgui.h"
 
 #include "Mesh_RenderInfo.h"
@@ -141,6 +142,12 @@ update_status ModuleGoManager::PostUpdate()
 	TIMER_RESET_STORED("Cam culling longest");
 	TIMER_RESET_STORED("GO render longest");
 
+	if (wantToSaveScene)
+	{
+		TIMER_START_PERF("Saving Scene");
+		SaveSceneNow();
+		TIMER_READ_MS("Saving Scene");
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -222,6 +229,37 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	}
 	return false;
 	
+}
+
+void ModuleGoManager::SaveSceneNow()
+{
+	// xml object were we will store all data
+	pugi::xml_document data;
+	pugi::xml_node root_node;
+	pugi::xml_node Components_node;
+
+	root_node = data.append_child("Scene");
+
+	root_node.append_attribute("SceneName") = sceneName.data();
+
+	root->Save(root_node.append_child("GameObjects"));
+
+
+	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
+	for (; comp != components.end(); comp++)
+	{
+		comp->second->Save(Components_node.append_child("Component"));
+	}
+
+	std::stringstream stream;
+	data.save(stream);
+	// we are done, so write data to disk
+	App->fs->Save(sceneName.data(), stream.str().c_str(), stream.str().length());
+	LOG("Scene saved: %s", sceneName.data());
+
+	data.reset();
+
+	wantToSaveScene = false;
 }
 
 void ModuleGoManager::SetStatic(bool Static, GameObject * GO)

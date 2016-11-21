@@ -20,6 +20,8 @@ public:
 	AABB aabb;
 	OBB obb;
 private:
+	uint64_t uid;	
+
 	bool active = true;
 	bool publicActive = true;
 	bool hiddenOnOutliner = false;
@@ -36,6 +38,7 @@ public:
 	GameObject();
 	~GameObject();
 
+	const uint64_t GetUID() { return uid; }
 	std::vector<GameObject*> childs;
 	GameObject* parent = nullptr;
 
@@ -73,6 +76,8 @@ public:
 	Component* AddComponent(Component::Type type);
 	bool HasComponent(Component::Type type);
 	Transform* GetTransform();
+
+	void Save(pugi::xml_node node);
 
 #pragma region GetComponents
 	//GetComponent function

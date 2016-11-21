@@ -36,6 +36,21 @@ void Material::EditorContent()
 	}
 }
 
+void Material::SaveSpecifics(pugi::xml_node myNode)
+{
+	pugi::xml_node color_n = myNode.append_child("Color");
+	color_n.append_attribute("R") = color[0];
+	color_n.append_attribute("G") = color[1];
+	color_n.append_attribute("B") = color[2];
+	color_n.append_attribute("A") = color[3];
+	for (std::vector<std::string>::iterator it = texturePaths.begin(); it != texturePaths.end(); it++)
+	{
+		pugi::xml_node tex = myNode.append_child("Texture");
+		color_n.append_attribute("path") = it->data();
+	}
+
+}
+
 uint Material::NofTextures()
 {
 	return textures.size();

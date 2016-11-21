@@ -26,6 +26,26 @@ Transform::~Transform()
 {
 }
 
+void Transform::SaveSpecifics(pugi::xml_node myNode)
+{
+	myNode.append_attribute("AllowRotation") = allowRotation;
+	pugi::xml_node node = myNode.append_child("LocalRotation");
+	node.append_attribute("x") = localRotation.x;
+	node.append_attribute("y") = localRotation.y;
+	node.append_attribute("z") = localRotation.z;
+	node.append_attribute("w") = localRotation.w;
+
+	node = myNode.append_child("LocalPosition");
+	node.append_attribute("x") = localPosition.x;
+	node.append_attribute("y") = localPosition.y;
+	node.append_attribute("z") = localPosition.z;
+
+	node = myNode.append_child("LocalScale");
+	node.append_attribute("x") = localScale.x;
+	node.append_attribute("y") = localScale.y;
+	node.append_attribute("z") = localScale.z;
+}
+
 void Transform::Draw()
 {
 	if (!object->HasComponent(Component::Type::C_mesh))

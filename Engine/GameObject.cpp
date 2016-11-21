@@ -15,6 +15,7 @@
 
 GameObject::GameObject()
 {
+	uid = GenerateUUID();
 	for (int n = 0; n < nComponentTypes; n++)
 	{
 		HasComponents[n] = false;
@@ -396,4 +397,27 @@ bool GameObject::HasComponent(Component::Type type)
 Transform * GameObject::GetTransform()
 {
 	return transform;
+}
+
+void GameObject::Save(pugi::xml_node node)
+{
+	pugi::xml_node GO = node.append_child("GO");
+	GO.append_attribute("name") = name;
+	GO.append_attribute("UID") = uid;
+	GO.append_attribute("parent") = parent->GetUID();
+
+	pugi::xml_node aabb_node = GO.append_child("Original_AABB");
+
+	aabb_node.append_attribute("minX") = originalAABB.minPoint.x;
+	aabb_node.append_attribute("minY") = originalAABB.minPoint.y;
+	aabb_node.append_attribute("minZ") = originalAABB.minPoint.z;
+
+	aabb_node.append_attribute("maxX") = originalAABB.maxPoint.x;
+	aabb_node.append_attribute("maxY") = originalAABB.maxPoint.y;
+	aabb_node.append_attribute("maxZ") = originalAABB.maxPoint.z;
+
+	for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+	{
+		(*it)->Save(node);
+	}
 }

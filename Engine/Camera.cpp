@@ -1,4 +1,3 @@
-
 #include "Camera.h"
 
 #include "GameObject.h"
@@ -198,6 +197,24 @@ void Camera::EditorContent()
 	{
 		SetHorizontalFOV(frustum.horizontalFov);
 	}
+}
+
+void Camera::SaveSpecifics(pugi::xml_node myNode)
+{
+	pugi::xml_node frust = myNode.append_child("Frustum");
+	frust.append_attribute("FarPlaneDistance") = frustum.farPlaneDistance;
+	frust.append_attribute("NearPlaneDistance") = frustum.nearPlaneDistance;
+	frust.append_attribute("FrontX") = frustum.front.x;
+	frust.append_attribute("FrontY") = frustum.front.y;
+	frust.append_attribute("FrontZ") = frustum.front.z;
+	frustum.horizontalFov;
+	frustum.type;
+	frustum.up;
+
+	hasCulling;
+	aspectRatio;
+	otherFOV;
+
 }
 
 void Camera::DrawFrustum()

@@ -15,6 +15,8 @@ public:
 	mesh(GameObject* linkedTo, int id);
 	~mesh();
 
+	std::string meshPath;
+
 	uint id_vertices = 0;
 	uint num_vertices = 0;
 
@@ -43,6 +45,8 @@ public:
 	float3* GetNormals();
 
 	void EditorContent();
+
+	void SaveSpecifics(pugi::xml_node myNode);
 
 	static Type GetType() { return Type::C_mesh; }
 };

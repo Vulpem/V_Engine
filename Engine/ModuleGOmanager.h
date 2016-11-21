@@ -37,6 +37,14 @@ public:
 	std::vector<GameObject*> LoadGO(const char* file_noFormat);
 	bool DeleteGameObject(GameObject* toErase);
 
+	void SaveScene(char* name) { wantToSaveScene = true; sceneName = name; }
+private:
+	std::string sceneName;
+	bool wantToSaveScene = false;
+	void SaveSceneNow();
+public:
+
+
 	void SetStatic(bool Static, GameObject* GO);
 	void SetChildsStatic(bool Static, GameObject* GO);
 
