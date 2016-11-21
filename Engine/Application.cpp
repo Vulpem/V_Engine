@@ -130,14 +130,16 @@ void Application::PrepareUpdate()
 	//////////
 	TIMER_START_PERF("App PreUpdate");
 	frameCount++;
-	dt = (float)ms_timer.Read() / 1000.0f;
+	Time.gdt = Time.dt = ms_timer.ReadMs() / 1000.0f;
+	Time.runningTime = totalTimer.Read() / 1000.0f;
+
 	ms_timer.Start();
 
 	for (int n = 0; n < EDITOR_FRAME_SAMPLES - 1; n++)
 	{
 		ms_frame[n] = ms_frame[n + 1];
 	}
-	ms_frame[EDITOR_FRAME_SAMPLES - 1] = dt;
+	ms_frame[EDITOR_FRAME_SAMPLES - 1] = Time.dt;
 
 	float tmp = FPS_Timer.Read();
 	if (FPS_Timer.Read() > 1000.0f)
@@ -183,7 +185,7 @@ update_status Application::Update()
 	{
 		if ((*item)->IsEnabled())
 		{
-			ret = (*item)->PreUpdate(dt);
+			ret = (*item)->PreUpdate();
 		}
 		item++;
 	}
@@ -195,7 +197,7 @@ update_status Application::Update()
 	{
 		if ((*item)->IsEnabled())
 		{
-			ret = (*item)->Update(dt);
+			ret = (*item)->Update();
 		}
 		item++;
 	}
@@ -206,7 +208,7 @@ update_status Application::Update()
 	{
 		if ((*item)->IsEnabled())
 		{
-			ret = (*item)->PostUpdate(dt);
+			ret = (*item)->PostUpdate();
 		}
 		item++;
 	}
@@ -215,7 +217,7 @@ update_status Application::Update()
 
 	if (FrameTime > 0.0001f)
 	{
-		while (ms_timer.Read() < FrameTime)
+		while (ms_timer.ReadMs() < FrameTime)
 		{
 		}
 	}

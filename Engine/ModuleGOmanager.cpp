@@ -46,7 +46,7 @@ bool ModuleGoManager::Start()
 }
 
 // Called every draw update
-update_status ModuleGoManager::PreUpdate(float dt)
+update_status ModuleGoManager::PreUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
 
@@ -63,7 +63,7 @@ update_status ModuleGoManager::PreUpdate(float dt)
 	return ret;
 }
 
-update_status ModuleGoManager::Update(float dt)
+update_status ModuleGoManager::Update()
 {
 	if (App->input->file_was_dropped)
 	{
@@ -124,7 +124,7 @@ update_status ModuleGoManager::Update(float dt)
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleGoManager::PostUpdate(float dt)
+update_status ModuleGoManager::PostUpdate()
 {
 	TIMER_START("Components PostUpdate");
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();

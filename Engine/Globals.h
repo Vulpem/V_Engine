@@ -1,9 +1,11 @@
 #ifndef __GLOBALS__
-#define __GLOBALS__
+#define __GLOBALS__ 
 
 #include <windows.h>
 #include <stdio.h>
 #include <string>
+
+#include "GlobalTime.h"
 
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
 
@@ -96,6 +98,7 @@ enum update_status
 	UPDATE_ERROR
 };
 
+extern GlobalTime Time;
 
 // Configuration -----------
 #define SCREEN_WIDTH 1456

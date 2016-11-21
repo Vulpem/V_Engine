@@ -61,7 +61,7 @@ bool ModuleCamera3D::CleanUp()
 }
 
 // -----------------------------------------------------------------
-update_status ModuleCamera3D::Update(float dt)
+update_status ModuleCamera3D::Update()
 {
 
 	MoveWithKeys();
@@ -72,16 +72,15 @@ update_status ModuleCamera3D::Update(float dt)
 		int dy = -App->input->GetMouseYMotion();
 		if (dx != 0 || dy != 0)
 		{
-			float Sensitivity = 0.05f;
-
+			float Sensitivity = 0.04;
 			Transform* cam = GetMovingCamera()->object->GetTransform();
 			
 			float3 toLook = cam->GetGlobalPos();
 			toLook += cam->Forward() * 10;
 
-			toLook += dy * Sensitivity * cam->Up();
+			toLook += (float)dy * Sensitivity *cam->Up();
 
-			toLook += dx * Sensitivity * cam->Left();
+			toLook += (float)dx * Sensitivity * cam->Left();
 
 			LookAt(toLook);
 		}
@@ -197,11 +196,11 @@ void ModuleCamera3D::MoveWithKeys()
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Forward() * speed * mouseWheel * 10;
+			lastCamPos += cam->object->GetTransform()->Forward() * speed * mouseWheel * 10 * Time.dt;
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * mouseWheel * 10);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * mouseWheel * 10 * Time.dt);
 		}
 	}
 
@@ -211,43 +210,43 @@ void ModuleCamera3D::MoveWithKeys()
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Forward() * speed;
+			lastCamPos += cam->object->GetTransform()->Forward() * speed* Time.dt;
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov - speed * Time.dt);
 		}
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 	{
 		if (cam->GetFrustum()->type == FrustumType::PerspectiveFrustum)
 		{
-			lastCamPos += cam->object->GetTransform()->Backward() * speed;
+			lastCamPos += cam->object->GetTransform()->Backward() * speed* Time.dt;
 		}
 		else
 		{
-			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed);
+			cam->SetHorizontalFOV(cam->GetFrustum()->horizontalFov + speed* Time.dt);
 		}
 	}
 
 	//Right Left
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Left() * speed;
+		lastCamPos += cam->object->GetTransform()->Left() * speed* Time.dt;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Right() * speed;
+		lastCamPos += cam->object->GetTransform()->Right() * speed* Time.dt;
 	}
 
 	//Up Down
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Down() * speed;
+		lastCamPos += cam->object->GetTransform()->Down() * speed* Time.dt;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 	{
-		lastCamPos += cam->object->GetTransform()->Up() * speed;
+		lastCamPos += cam->object->GetTransform()->Up() * speed* Time.dt;
 	}
 
 	if (lastCamPos.x != camPos.x || lastCamPos.y != camPos.y || lastCamPos.z != camPos.z)

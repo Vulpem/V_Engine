@@ -13,7 +13,7 @@ public:
 	~ModuleCamera3D();
 
 	bool Start();
-	update_status Update(float dt);
+	update_status Update();
 	bool CleanUp();
 
 	void LookAt(const float3 &Spot);
@@ -37,8 +37,8 @@ private:
 	void MoveWithKeys();
 
 public:
-	float camSpeed = 0.4f;
-	float camSprintMultiplier = 2.0f;
+	float camSpeed = 30.0f;
+	float camSprintMultiplier = 3.0f;
 
 private:
 	Camera* movingCamera = nullptr;

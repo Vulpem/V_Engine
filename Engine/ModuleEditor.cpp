@@ -63,7 +63,7 @@ bool ModuleEditor::Start()
 }
 
 // Called every draw update
-update_status ModuleEditor::PreUpdate(float dt)
+update_status ModuleEditor::PreUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
@@ -83,7 +83,7 @@ update_status ModuleEditor::PreUpdate(float dt)
 	return ret;
 }
 
-update_status ModuleEditor::Update(float dt)
+update_status ModuleEditor::Update()
 {
 	update_status ret = UPDATE_CONTINUE;
 
@@ -107,7 +107,7 @@ update_status ModuleEditor::Update(float dt)
 	return ret;
 }
 
-update_status ModuleEditor::PostUpdate(float dt)
+update_status ModuleEditor::PostUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
 
@@ -338,6 +338,8 @@ void ModuleEditor::Editor()
 
 		if (ImGui::CollapsingHeader("Application"))
 		{
+			ImGui::Text("Time since startup: %f", Time.runningTime);
+
 			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
 			char tmp[256];
 			sprintf(tmp, "Framerate: %i", int(App->framerate[EDITOR_FRAME_SAMPLES - 1]));

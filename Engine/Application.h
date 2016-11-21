@@ -3,6 +3,7 @@
 
 #include "Globals.h"
 #include "Timer.h"
+#include "PerfTimer.h"
 #include "C_String.h"
 
 #include <vector>
@@ -49,8 +50,7 @@ public:
 
 private:
 
-	Timer	ms_timer;
-	float	dt;
+	PerfTimer	ms_timer;
 	std::vector<Module*> list_modules;
 	int frameCount = 0;
 	Timer	FPS_Timer;
