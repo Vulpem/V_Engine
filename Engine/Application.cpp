@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include <time.h>
+
 
 #include "Module.h"
 #include "ModuleWindow.h"
@@ -60,6 +62,8 @@ Application::Application()
 		framerate[n] = 0;
 	}
 	FrameTime = -1.0f;
+
+	srand(time(NULL));
 }
 
 Application::~Application()
@@ -111,6 +115,7 @@ bool Application::Init()
 	TIMER_CREATE_PERF("__PerfTimer");
 	TIMER_CREATE_PERF("Timer Test");
 	TIMER_CREATE_PERF("TimerPerf Test");
+
 	return ret;
 }
 
@@ -165,7 +170,6 @@ void Application::PrepareUpdate()
 		}
 		previous_maxFPS = maxFPS;
 	}
-
 }
 
 // ---------------------------------------------

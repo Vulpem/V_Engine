@@ -92,8 +92,8 @@
     <ClInclude Include="Devil\include\ilu_region.h" />
     <ClInclude Include="Devil\include\il_wrap.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GlobalFunctions.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="GlobalTime.h" />
     <ClInclude Include="Mesh_RenderInfo.h" />
     <ClInclude Include="PerfTimer.h" />
     <ClInclude Include="QuadTree.h" />
@@ -194,7 +194,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GlobalTime.cpp" />
+    <ClCompile Include="GlobalFunctions.cpp" />
     <ClCompile Include="imGUI\imgui.cpp" />
     <ClCompile Include="imGUI\imgui_demo.cpp" />
     <ClCompile Include="imGUI\imgui_draw.cpp" />

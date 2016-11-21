@@ -376,7 +376,7 @@
     <ClInclude Include="Timers.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalTime.h">
+    <ClInclude Include="GlobalFunctions.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
   </ItemGroup>
@@ -573,7 +573,7 @@
     <ClCompile Include="timerFunctions.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalTime.cpp">
+    <ClCompile Include="GlobalFunctions.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
   </ItemGroup>
