@@ -134,7 +134,7 @@ void mesh::EditorContent()
 	ImGui::Text("Texture index material: %i", texMaterialIndex);
 }
 
-void mesh::SaveSpecifics(pugi::xml_node myNode)
+void mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
 	myNode.append_attribute("MeshPath") = meshPath.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;

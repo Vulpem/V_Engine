@@ -36,7 +36,7 @@ void Material::EditorContent()
 	}
 }
 
-void Material::SaveSpecifics(pugi::xml_node myNode)
+void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
 	pugi::xml_node color_n = myNode.append_child("Color");
 	color_n.append_attribute("R") = color[0];

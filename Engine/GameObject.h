@@ -36,6 +36,9 @@ private:
 public:
 
 	GameObject();
+	//Force the gameobject to have a certain UID. For loading purposes
+	GameObject(uint64_t Uid);
+
 	~GameObject();
 
 	const uint64_t GetUID() { return uid; }
@@ -77,7 +80,7 @@ public:
 	bool HasComponent(Component::Type type);
 	Transform* GetTransform();
 
-	void Save(pugi::xml_node node);
+	void Save(pugi::xml_node& node);
 
 #pragma region GetComponents
 	//GetComponent function

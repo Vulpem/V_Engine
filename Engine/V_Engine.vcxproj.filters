@@ -49,6 +49,9 @@
     <Filter Include="Sources\Libraries\Math\MathGeoLib\Algorithm\Random">
       <UniqueIdentifier>{abfa937e-f724-4ec5-9f40-c941dd8dd3b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Libraries\pugiXML">
+      <UniqueIdentifier>{fb8e26ed-592a-4d43-9971-4e7accb06d33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -379,6 +382,12 @@
     <ClInclude Include="GlobalFunctions.h">
       <Filter>Sources\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="PugiXml\src\pugiconfig.hpp">
+      <Filter>Sources\Libraries\pugiXML</Filter>
+    </ClInclude>
+    <ClInclude Include="PugiXml\src\pugixml.hpp">
+      <Filter>Sources\Libraries\pugiXML</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -576,6 +585,9 @@
     <ClCompile Include="GlobalFunctions.cpp">
       <Filter>Sources\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="PugiXml\src\pugixml.cpp">
+      <Filter>Sources\Libraries\pugiXML</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MathGeoLib\include\Math\Matrix.inl">
@@ -602,5 +614,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="MAINICON.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="PugiXml\readme.txt">
+      <Filter>Sources\Libraries\pugiXML</Filter>
+    </Text>
   </ItemGroup>
 </Project>

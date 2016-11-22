@@ -26,6 +26,19 @@ GameObject::GameObject()
 	App->GO->dynamicGO.push_back(this);
 }
 
+GameObject::GameObject(uint64_t Uid)
+{
+	uid = Uid;
+	for (int n = 0; n < nComponentTypes; n++)
+	{
+		HasComponents[n] = false;
+	}
+	aabb.SetNegativeInfinity();
+	originalAABB.SetNegativeInfinity();
+	strcpy(name, "Unnamed");
+	App->GO->dynamicGO.push_back(this);
+}
+
 GameObject::~GameObject()
 {
 	if (IsStatic() == false)
@@ -399,12 +412,19 @@ Transform * GameObject::GetTransform()
 	return transform;
 }
 
-void GameObject::Save(pugi::xml_node node)
+void GameObject::Save(pugi::xml_node& node)
 {
 	pugi::xml_node GO = node.append_child("GO");
 	GO.append_attribute("name") = name;
 	GO.append_attribute("UID") = uid;
-	GO.append_attribute("parent") = parent->GetUID();
+	if (parent != nullptr)
+	{
+		GO.append_attribute("parent") = parent->GetUID();
+	}
+	else
+	{
+		GO.append_attribute("parent") = "0000";
+	}
 
 	pugi::xml_node aabb_node = GO.append_child("Original_AABB");
 

@@ -63,7 +63,7 @@ void Component::DrawOnEditor()
 	}
 }
 
-void Component::Save(pugi::xml_node myNode)
+void Component::Save(pugi::xml_node& myNode)
 {
 	pugi::xml_node node = myNode.append_child("General");
 	node.append_attribute("name") = name.data();

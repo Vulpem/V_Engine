@@ -244,12 +244,15 @@ void ModuleGoManager::SaveSceneNow()
 
 	root->Save(root_node.append_child("GameObjects"));
 
+	Components_node = root_node.append_child("Components");
 
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
 		comp->second->Save(Components_node.append_child("Component"));
 	}
+
+	sceneName += ".xml";
 
 	std::stringstream stream;
 	data.save(stream);

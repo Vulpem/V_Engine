@@ -21,7 +21,6 @@ public:
 		//Keep this "C_None" always last
 		C_None
 	};
-	
 
 	Component(GameObject* linkedTo, int id);
 	virtual ~Component();
@@ -39,9 +38,9 @@ public:
 	Type GetType() { return type; }
 	bool IsEnabled() { return enabled; }
 
-	void Save(pugi::xml_node myNode);
+	void Save(pugi::xml_node& myNode);
 protected:
-	virtual void SaveSpecifics(pugi::xml_node myNode) {};
+	virtual void SaveSpecifics(pugi::xml_node& myNode) {};
 
 protected:
 	virtual void OnEnable() {}

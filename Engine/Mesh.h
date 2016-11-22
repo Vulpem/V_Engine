@@ -46,7 +46,7 @@ public:
 
 	void EditorContent();
 
-	void SaveSpecifics(pugi::xml_node myNode);
+	void SaveSpecifics(pugi::xml_node& myNode);
 
 	static Type GetType() { return Type::C_mesh; }
 };

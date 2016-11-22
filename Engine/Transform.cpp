@@ -26,7 +26,7 @@ Transform::~Transform()
 {
 }
 
-void Transform::SaveSpecifics(pugi::xml_node myNode)
+void Transform::SaveSpecifics(pugi::xml_node& myNode)
 {
 	myNode.append_attribute("AllowRotation") = allowRotation;
 	pugi::xml_node node = myNode.append_child("LocalRotation");

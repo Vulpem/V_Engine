@@ -263,6 +263,10 @@ update_status ModuleEditor::MenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("Save Scene"))
+			{
+				App->GO->SaveScene("TestScene");
+			}
 			if (ImGui::MenuItem("Quit"))
 			{
 				ret = UPDATE_STOP;
