@@ -17,9 +17,11 @@ public:
 
 	std::string meshPath;
 
+	float3* vertices;
 	uint id_vertices = 0;
 	uint num_vertices = 0;
 
+	uint* indices;
 	uint id_indices = 0;
 	uint num_indices = 0;
 
@@ -30,6 +32,8 @@ public:
 	uint num_textureCoords = 0;
 
 	int texMaterialIndex = -1;
+
+	AABB aabb;
 
 	bool wires = false;
 

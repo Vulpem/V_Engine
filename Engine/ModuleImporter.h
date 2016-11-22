@@ -8,6 +8,7 @@
 #include <vector>
 
 struct aiScene;
+struct aiMesh;
 struct aiNode;
 class GameObject;
 class Material;
@@ -29,6 +30,9 @@ public:
 	//Import a specific 3D model
 	bool Import3dScene(const char* filePath);
 	bool ImportImage(const char* filePath);
+
+	std::string ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir, uint& textureID);
+	std::string ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName);
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, GameObject* parent = nullptr, char* meshesFolder = nullptr);

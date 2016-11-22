@@ -14,6 +14,7 @@ mesh::mesh(GameObject* linkedTo, int id):Component(linkedTo, id)
 	sprintf(tmp, "Mesh##%i", id);
 	name = tmp;
 	type = C_mesh;
+	aabb.SetNegativeInfinity();
 }
 
 mesh::~mesh()
@@ -34,6 +35,9 @@ mesh::~mesh()
 	{
 		glDeleteBuffers(1, &id_vertices);
 	}
+
+	RELEASE_ARRAY(vertices);
+	RELEASE_ARRAY(indices);
 }
 
 Mesh_RenderInfo mesh::GetMeshInfo()

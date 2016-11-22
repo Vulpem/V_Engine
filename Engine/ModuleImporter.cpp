@@ -210,6 +210,218 @@ bool ModuleImporter::ImportImage(const char * filePath)
 	return true;
 }
 
+std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir ,uint& materialID)
+{
+	//Importing vertex
+	uint num_vertices = toLoad->mNumVertices;
+	float* vertices = new float[num_vertices * 3];
+	memcpy_s(vertices, sizeof(float) * num_vertices * 3, toLoad->mVertices, sizeof(float) * num_vertices * 3);
+
+	AABB aabb;
+	aabb.SetNegativeInfinity();
+
+	float* it = vertices;
+	for (uint n = 0; n < num_vertices * 3; n += 3)
+	{
+		float* x = it;
+		float* y = x;
+		y++;
+		float* z = y;
+		z++;
+		aabb.Enclose(float3(*x, *y, *z));
+		it += 3;
+	}
+
+	//Importing normals
+	float* normals = nullptr;
+	uint numNormals = 0;
+	if (toLoad->HasNormals())
+	{
+		numNormals = num_vertices;
+		normals = new float[num_vertices * 3];
+		memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
+	}
+
+	//Importing texture coords
+	float* textureCoords = nullptr;
+	uint numTextureCoords = 0;
+	if (toLoad->HasTextureCoords(0))
+	{
+		numTextureCoords = num_vertices;
+		textureCoords = new float[num_vertices * 2];
+
+		aiVector3D* tmpVect = toLoad->mTextureCoords[0];
+		for (uint n = 0; n < num_vertices * 2; n += 2)
+		{
+			textureCoords[n] = tmpVect->x;
+			textureCoords[n + 1] = tmpVect->y;
+			tmpVect++;
+		}
+	}
+
+	//Importing texture path for this mesh
+	materialID = toLoad->mMaterialIndex;
+
+	//Importing index (3 per face)
+	uint num_indices = 0;
+	uint* indices = nullptr;
+
+	aiFace* currentFace = toLoad->mFaces;
+
+	num_indices = toLoad->mNumFaces * 3;
+	indices = new uint[num_indices];
+	//If this boolean is still false at the end of the for bucle, not a single face had been loaded. This mesh is unexistant
+	bool meshExists = false;
+
+	for (uint i = 0; i < num_indices; i += 3)
+	{
+		if (currentFace->mNumIndices != 3)
+		{
+			LOG("------------------------------------------\nA loaded face had %i vertices, will be ignored!\n------------------------------------------", currentFace->mNumIndices);
+		}
+		else
+		{
+			meshExists = true;
+			indices[i] = currentFace->mIndices[0];
+			indices[i + 1] = currentFace->mIndices[1];
+			indices[i + 2] = currentFace->mIndices[2];
+		}
+		currentFace++;
+	}
+
+	uint meshSize =
+		//Mesh size		//Mesh exists?
+		sizeof(uint) + sizeof(bool) +
+
+		//num_vertices				   vertices				num_normals   normals
+		sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
+
+		//num_texture coords  texture Coords		             
+		+ sizeof(uint) + sizeof(float) * numTextureCoords * 2 +
+
+		//num indices								indices
+		+sizeof(uint) + sizeof(uint) * num_indices
+		//aabb
+		+ sizeof(float) * 6;
+
+	char* mesh = new char[meshSize];
+	char* meshIt = mesh;
+
+	//Does this mesh actually exist?
+	meshIt = CopyMem<bool>(meshIt, &meshExists);
+
+	//Num vertices
+	meshIt = CopyMem<uint>(meshIt, &num_vertices);
+
+	//Vertices
+	meshIt = CopyMem<float>(meshIt, vertices, num_vertices * 3);
+
+	//Num Normals
+	meshIt = CopyMem<uint>(meshIt, &numNormals);
+
+	if (numNormals > 0)
+	{
+		//Normals
+		meshIt = CopyMem<float>(meshIt, normals, numNormals * 3);
+	}
+
+	//Num texture coords
+	meshIt = CopyMem<uint>(meshIt, &numTextureCoords);
+
+	if (numTextureCoords > 0)
+	{
+		//texture coords
+		meshIt = CopyMem<float>(meshIt, textureCoords, numTextureCoords * 2);
+	}
+
+	//AABB
+	meshIt = CopyMem<float3>(meshIt, &aabb.maxPoint);
+	meshIt = CopyMem<float3>(meshIt, &aabb.minPoint);
+
+	//num_indices
+	meshIt = CopyMem<uint>(meshIt, &num_indices);
+
+	//indices
+	meshIt = CopyMem<uint>(meshIt, indices, num_indices);
+
+
+	RELEASE_ARRAY(vertices);
+	RELEASE_ARRAY(normals);
+	RELEASE_ARRAY(textureCoords);
+	RELEASE_ARRAY(indices);
+
+	std::string toCreate("Library/Meshes/");
+	toCreate += dir;
+	toCreate += "/";
+	toCreate += name;
+	toCreate += ".vmesh";
+	App->fs->Save(toCreate.data(), mesh, meshSize);
+
+	RELEASE_ARRAY(mesh);
+
+	return toLoad->mName.data;
+}
+
+std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName)
+{
+	if (matsIndex.empty() == false)
+	{
+		uint realSize = 0;
+
+		uint* materialsSize = new uint[matsIndex.size()];
+		char** materials = new char*[matsIndex.size()];
+		uint n = 0;
+		for (std::vector<uint>::iterator it = matsIndex.begin(); it != matsIndex.end(); it++)
+		{
+			aiString texturePath;
+			scene->mMaterials[(*it)]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &texturePath);
+			char tmp[1024];
+			strcpy(tmp, texturePath.data);			
+
+			std::string textureName = FileName(tmp);
+			uint textureNameLen = textureName.length() + 1;
+
+			//Importing color for this mesh
+			aiColor3D col;
+			scene->mMaterials[(*it)]->Get(AI_MATKEY_COLOR_DIFFUSE, col);
+			float color[3] = { col.r, col.g, col.b };
+
+			materialsSize[n] = sizeof(uint) + sizeof(char) * textureNameLen + sizeof(float) * 3;
+			realSize += materialsSize[n];
+			materials[n] = new char[materialsSize[n]];
+			char* materialIt = materials[n];
+
+			materialIt = CopyMem<uint>(materialIt, &textureNameLen, 1);
+			materialIt = CopyMem<char>(materialIt, textureName.data(), textureNameLen);
+			materialIt = CopyMem<float>(materialIt, color, 3);
+
+			n++;
+		}
+
+		char* realMat = new char[realSize];
+		char* realIt = realMat;
+		for (int n = 0; n < matsIndex.size(); n++)
+		{
+			realIt = CopyMem<char>(realIt, materials[n], materialsSize[n]);
+		}
+		
+		std::string toCreate("Library/Materials/");
+		toCreate += matName;
+		toCreate += ".vmat";
+		App->fs->Save(toCreate.data(), realMat, realSize);	
+
+		for (int n = 0; n < matsIndex.size(); n++)
+		{
+			RELEASE_ARRAY(materials[n]);
+		}
+		RELEASE_ARRAY(materialsSize);
+		RELEASE_ARRAY(materials);
+		RELEASE_ARRAY(realMat);
+		return matName;
+	}
+	return NULL;
+}
+
 GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
 {
 	std::string fileName = FileName(fileName_NoFileType);
@@ -561,10 +773,10 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 	LOG("Importing GameObject %s", name);
 
-		//					rot + scal + pos				nMeshes
-		uint file_0Size = sizeof(float) * (4 + 3 + 3) + sizeof(uint) * 1;
-		char* file_0 = new char[file_0Size];
-		char* file_0It = file_0;
+		//					rot + scal + pos				nMeshes			Material
+		uint transformSize = sizeof(float) * (4 + 3 + 3) + sizeof(uint)  +	sizeof (uint);
+		char* transform = new char[transformSize];
+		char* transformIt = transform;
 
 		aiQuaternion rot;
 		aiVector3D scal;
@@ -572,203 +784,51 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 		NodetoLoad->mTransformation.Decompose(scal, rot, pos);
 
-		float transform[10];
-		transform[0] = rot.x;
-		transform[1] = rot.y;
-		transform[2] = rot.z;
-		transform[3] = rot.w;
-		transform[4] = scal.x;
-		transform[5] = scal.y;
-		transform[6] = scal.z;
-		transform[7] = pos.x;
-		transform[8] = pos.y;
-		transform[9] = pos.z;
+		float t[10];
+		t[0] = rot.x;
+		t[1] = rot.y;
+		t[2] = rot.z;
+		t[3] = rot.w;
+		t[4] = scal.x;
+		t[5] = scal.y;
+		t[6] = scal.z;
+		t[7] = pos.x;
+		t[8] = pos.y;
+		t[9] = pos.z;
 
-		file_0It = CopyMem<float>(file_0It, transform, 10);
+		transformIt = CopyMem<float>(transformIt, t, 10);
 
-		const uint nMeshes = NodetoLoad->mNumMeshes;
+		transformIt = CopyMem<uint>(transformIt, &NodetoLoad->mNumMeshes);
 
-		file_0It = CopyMem<uint>(file_0It, &nMeshes);
-
-		//The AABB box that will englobe all the vertices of the meshes
-		AABB aabb;
-		aabb.SetNegativeInfinity();
-
-		char** meshes = new char*[nMeshes];
-		uint* meshSize = new uint[nMeshes];
-
-		for (uint n = 0; n < nMeshes; n++)
+		std::vector<uint> materials;
+		std::vector<std::string> meshes;
+		uint nMeshes = NodetoLoad->mNumMeshes;
+		for (uint n = 0; n <nMeshes; n++)
 		{
+			if (isChild == false)
+			{
+				RootName = name;
+			}
+
+			uint matIndex;
+
 			aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
 
-			//Importing vertex
-			uint num_vertices = toLoad->mNumVertices;
-			float* vertices = new float[num_vertices * 3];
-			memcpy_s(vertices, sizeof(float) * num_vertices * 3, toLoad->mVertices, sizeof(float) * num_vertices * 3);
-
-			float* it = vertices;
-			for (uint n = 0; n < num_vertices * 3; n += 3)
-			{
-				float* x = it;
-				float* y = x;
-				y++;
-				float* z = y;
-				z++;
-				aabb.Enclose(float3(*x,*y,*z));
-				it += 3;
-			}
-
-			//Importing normals
-			float* normals = nullptr;
-			uint numNormals = 0;
-			if (toLoad->HasNormals())
-			{
-				numNormals = num_vertices;
-				normals = new float[num_vertices * 3];
-				memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
-			}
-
-			//Importing texture coords
-			float* textureCoords = nullptr;
-			uint numTextureCoords = 0;
-			if (toLoad->HasTextureCoords(0))
-			{
-				numTextureCoords = num_vertices;
-				textureCoords = new float[num_vertices * 2];
-
-				aiVector3D* tmpVect = toLoad->mTextureCoords[0];
-				for (uint n = 0; n < num_vertices * 2; n += 2)
-				{
-					textureCoords[n] = tmpVect->x;
-					textureCoords[n + 1] = tmpVect->y;
-					tmpVect++;
-				}
-			}
-
-			//Importing texture path for this mesh
-			aiString texturePath;
-			scene->mMaterials[toLoad->mMaterialIndex]->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &texturePath);
-			char textureName[1024];
-			strcpy(textureName, texturePath.data);
-
-			std::string tmp(textureName);
-			uint textureNameLen = tmp.length() + 1;
-
-			//Importing color for this mesh
-			aiColor3D col;
-			scene->mMaterials[toLoad->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, col);
-			float color[3] = { col.r, col.g, col.b };
-
-			//Importing index (3 per face)
-			uint num_indices = 0;
-			uint* indices = nullptr;
-
-			aiFace* currentFace = toLoad->mFaces;
-
-			num_indices = toLoad->mNumFaces * 3;
-			indices = new uint[num_indices];
-			//If this boolean is still false at the end of the for bucle, not a single face had been loaded. This mesh is unexistant
-			bool meshExists = false;
-
-			for (uint i = 0; i < num_indices; i += 3)
-			{
-				if (currentFace->mNumIndices != 3)
-				{
-					LOG("------------------------------------------\nA loaded face had %i vertices, will be ignored!\nFrom %s\n%s\n------------------------------------------", currentFace->mNumIndices, name, path);
-				}
-				else
-				{
-					meshExists = true;
-					indices[i] = currentFace->mIndices[0];
-					indices[i + 1] = currentFace->mIndices[1];
-					indices[i + 2] = currentFace->mIndices[2];
-				}
-				currentFace++;
-			}
-
-			meshSize[n] =
-				//Mesh size		//Mesh exists?
-				sizeof(uint) + sizeof(bool) +
-
-				//num_vertices				   vertices				num_normals   normals
-				sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
-
-				//num_texture coords  texture Coords		        texture name length		      tetxture name
-				+ sizeof(uint) + sizeof(float) * numTextureCoords * 2 + sizeof(uint) + sizeof(char) * textureNameLen
-
-				//colors								num indices								indices
-				+ sizeof(float) * 3 + sizeof(uint) + sizeof(uint) * num_indices;
-
-
-
-			meshes[n] = new char[meshSize[n]];
-			char* meshIt = meshes[n];
-
-			//Mesh size
-			meshIt = CopyMem<uint>(meshIt, meshSize);
-
-			//Does this mesh actually exist?
-			meshIt = CopyMem<bool>(meshIt, &meshExists);
-
-			//Num vertices
-			meshIt = CopyMem<uint>(meshIt, &num_vertices);
-
-			//Vertices
-			meshIt = CopyMem<float>(meshIt, vertices, num_vertices * 3);
-
-			//Num Normals
-			meshIt = CopyMem<uint>(meshIt, &numNormals);
-
-			if (numNormals > 0)
-			{
-				//Normals
-				meshIt = CopyMem<float>(meshIt, normals, numNormals * 3);
-			}
-
-			//Num texture coords
-			meshIt = CopyMem<uint>(meshIt, &numTextureCoords);
-
-			if (numTextureCoords > 0)
-			{
-				//texture coords
-				meshIt = CopyMem<float>(meshIt, textureCoords, numTextureCoords * 2);
-			}
-
-			//Texture name len
-			meshIt = CopyMem<uint>(meshIt, &textureNameLen);
-
-			//Texture name
-			meshIt = CopyMem<char>(meshIt, textureName, textureNameLen);
-
-			//Color
-			meshIt = CopyMem<float>(meshIt, color, 3);
-
-			//num_indices
-			meshIt = CopyMem<uint>(meshIt, &num_indices);
-
-			//indices
-			meshIt = CopyMem<uint>(meshIt, indices, num_indices);
-
-			RELEASE_ARRAY(vertices);
-			RELEASE_ARRAY(normals);
-			RELEASE_ARRAY(textureCoords);
-			RELEASE_ARRAY(indices);
+			meshes.push_back(ImportMesh(toLoad, scene, name, RootName , matIndex));
+			materials.push_back(matIndex);
 		}
+		uint hasMaterial = 0;
+		if (materials.empty() == false)
+		{
+			ImportMaterial(scene, materials, name);
+			hasMaterial = 1;
+		}
+		transformIt = CopyMem<uint>(transformIt, &hasMaterial);
 
-		uint AABBFileSize = sizeof(float) * 6;
-
-		char* aabbFile = new char[AABBFileSize];
-		char* aabbFile_it = aabbFile;
-			//minPoint
-		aabbFile_it = CopyMem<float>(aabbFile_it, aabb.minPoint.ptr(), 3);
-
-			//maxPoint
-		aabbFile_it = CopyMem<float>(aabbFile_it, aabb.maxPoint.ptr(), 3);			
 
 		uint nChilds = NodetoLoad->mNumChildren;
 		uint* childsSize = new uint[nChilds];
 		std::vector<std::string> childs;
-
 
 		uint childFileSize =
 			//nChilds			each child size
@@ -801,12 +861,8 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 		//Getting the total size of the real file
 		uint realFileSize = 0;
-		realFileSize += file_0Size;
-		for (uint n = 0; n < nMeshes; n++)
-		{
-			realFileSize += meshSize[n];
-		}
-		realFileSize += AABBFileSize;
+		realFileSize += transformSize;
+		realFileSize += 256 * nMeshes + 256 * hasMaterial;
 		realFileSize += childFileSize;
 
 		//Copying all the buffers we created into a single bigger buffer
@@ -814,34 +870,27 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		char* realIt = realFile;
 
 		//file_0
-		realIt = CopyMem<char>(realIt, file_0, file_0Size);
+		realIt = CopyMem<char>(realIt, transform, transformSize);
 
-		for (uint n = 0; n < nMeshes; n++)
+		for (int n = 0; n < nMeshes; n++)
 		{
-			//each mesh
-			realIt = CopyMem<char>(realIt, meshes[n], meshSize[n]);
+			realIt = CopyMem<char>(realIt, meshes[n].data(), 256);
 		}
-
-		//AABB
-		realIt = CopyMem<char>(realIt, aabbFile, AABBFileSize);
+		if (hasMaterial)
+		{
+			realIt = CopyMem<char>(realIt, name, 256);
+		}
 
 		//childs
 		realIt = CopyMem<char>(realIt, file_childs, childFileSize);
 
-		RELEASE_ARRAY(file_0);
-		for (int n = nMeshes - 1; n >= 0; n--)
-		{
-			RELEASE_ARRAY(meshes[n]);
-		}
-		RELEASE_ARRAY(meshes);
-		RELEASE_ARRAY(meshSize);
-		RELEASE_ARRAY(aabbFile);
+		RELEASE_ARRAY(transform);
 		RELEASE_ARRAY(childsSize);
 		RELEASE_ARRAY(file_childs);
 
 		// ---------------- Creating the save file and writting it -----------------------------------------
 
-		std::string toCreate("Library/Meshes/");
+		std::string toCreate("Library/vGOs/");
 		if (isChild)
 		{
 			toCreate += RootName;
@@ -849,7 +898,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		}
 		else
 		{
-			std::string dir("Library/Meshes/");
+			std::string dir("Library/vGOs/");
 			dir += name;
 			App->fs->CreateDir(dir.data());
 		}
@@ -859,6 +908,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		App->fs->Save(toCreate.data(), realFile, realFileSize);
 
 		RELEASE_ARRAY(realFile);
+
 	//Importing also all the childs
 	for (uint n = 0; n < NodetoLoad->mNumChildren; n++)
 	{
