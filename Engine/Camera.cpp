@@ -204,16 +204,17 @@ void Camera::SaveSpecifics(pugi::xml_node& myNode)
 	pugi::xml_node frust = myNode.append_child("Frustum");
 	frust.append_attribute("FarPlaneDistance") = frustum.farPlaneDistance;
 	frust.append_attribute("NearPlaneDistance") = frustum.nearPlaneDistance;
+	frust.append_attribute("HorizontalFOV") = frustum.horizontalFov;
+	frust.append_attribute("AspectRatio") = aspectRatio;
+	frust.append_attribute("FrustumType") =	frustum.type;
 	frust.append_attribute("FrontX") = frustum.front.x;
 	frust.append_attribute("FrontY") = frustum.front.y;
 	frust.append_attribute("FrontZ") = frustum.front.z;
-	frustum.horizontalFov;
-	frustum.type;
-	frustum.up;
-
-	hasCulling;
-	aspectRatio;
-	otherFOV;
+	frust.append_attribute("UpX") = frustum.up.x;
+	frust.append_attribute("UpY") = frustum.up.y;
+	frust.append_attribute("UpZ") = frustum.up.z;
+	frust.append_attribute("HasCulling") = hasCulling;
+	frust.append_attribute("otherFOV") = otherFOV.x;
 
 }
 

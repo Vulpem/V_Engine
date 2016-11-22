@@ -29,6 +29,8 @@ enum update_status
 
 extern GlobalTime Time;
 
+#define USE_EDITOR true
+
 // Configuration -----------
 #define SCREEN_WIDTH 1456
 #define SCREEN_HEIGHT 1024

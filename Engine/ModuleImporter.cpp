@@ -295,7 +295,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				{
 					mesh* newMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
 
-					newMesh->meshPath = fileName;
+					newMesh->meshPath = path;
 
 					//Num vertices
 					bytes = sizeof(uint);

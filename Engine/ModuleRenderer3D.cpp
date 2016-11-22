@@ -209,7 +209,10 @@ update_status ModuleRenderer3D::PostUpdate()
 		LOG("Warning, there are no viewPorts!");
 	}
 	TIMER_READ_MS("ViewPorts render");
+
+#if USE_EDITOR
 	ImGui::Render();
+#endif
 
 	SDL_GL_SwapWindow(App->window->GetWindow());
 	return UPDATE_CONTINUE;

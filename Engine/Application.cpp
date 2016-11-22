@@ -32,7 +32,9 @@ Application::Application()
 	renderer3D = new ModuleRenderer3D(this);
 	camera = new ModuleCamera3D(this);
 	physics = new ModulePhysics3D(this);
-	Editor = new ModuleEditor(this);
+#if USE_EDITOR
+		Editor = new ModuleEditor(this);
+#endif
 	GO = new ModuleGoManager(this);
 	importer = new ModuleImporter(this);
 
@@ -46,7 +48,9 @@ Application::Application()
 	AddModule(window);
 	AddModule(input);
 	AddModule(camera);
-	AddModule(Editor);
+#if USE_EDITOR
+		AddModule(Editor);
+#endif
 	AddModule(fs);
 	AddModule(audio);
 	AddModule(physics);
