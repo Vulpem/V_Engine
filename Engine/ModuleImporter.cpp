@@ -352,6 +352,8 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 
 	std::string toCreate("Library/Meshes/");
 	toCreate += dir;
+	App->fs->CreateDir(toCreate.data());
+
 	toCreate += "/";
 	toCreate += name;
 	toCreate += ".vmesh";
