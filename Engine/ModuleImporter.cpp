@@ -890,31 +890,45 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 
 void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 {
-	//Texture name Len
-	uint textureNameLen = 0;
+	Material* mat = (Material*) toLink->AddComponent(Component::Type::C_material);
+
+	uint bytes = 0;
+	uint nTextures = 0;
+
+	//NumTextures
+	uint numTextures = 0;
 	bytes = sizeof(uint);
-	memcpy(&textureNameLen, It, bytes);
+	memcpy(&numTextures, It, bytes);
 	It += bytes;
 
-	//Texture name
-	char* textureName = new char[textureNameLen];
-	bytes = sizeof(char) * textureNameLen;
-	memcpy(textureName, It, bytes);
-	It += bytes;
-
-	if (textureNameLen > 1)
+	for (int n = 0; n < numTextures; n++)
 	{
-		newMesh->texMaterialIndex = LoadTexture(textureName, mat);
+		//Texture name Len
+		uint textureNameLen = 0;
+		bytes = sizeof(uint);
+		memcpy(&textureNameLen, It, bytes);
+		It += bytes;
+
+		//Texture name
+		char* textureName = new char[textureNameLen];
+		bytes = sizeof(char) * textureNameLen;
+		memcpy(textureName, It, bytes);
+		It += bytes;
+
+		if (textureNameLen > 1)
+		{
+			newMesh->texMaterialIndex = LoadTexture(textureName, mat);
+		}
+		delete[] textureName;
+
+
+		//Color
+		float color[3];
+		bytes = sizeof(float) * 3;
+		memcpy(color, It, bytes);
+		It += bytes;
+		mat->SetColor(color[0], color[1], color[2]);
 	}
-	delete[] textureName;
-
-
-	//Color
-	float color[3];
-	bytes = sizeof(float) * 3;
-	memcpy(color, It, bytes);
-	It += bytes;
-	mat->SetColor(color[0], color[1], color[2]);
 }
 
 int ModuleImporter::LoadTexture(char* path, Material* mat)
