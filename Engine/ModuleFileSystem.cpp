@@ -64,6 +64,8 @@ bool ModuleFileSystem::Init()
 	CreateDir("Library");
 	CreateDir("Library/Meshes");
 	CreateDir("Library/Textures");
+	CreateDir("Library/vGOs");
+	CreateDir("Library/Materials");
 
 	PHYSFS_addToSearchPath("Library/", 0);
 
