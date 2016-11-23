@@ -72,6 +72,19 @@ bool ModuleImporter::Start()
 	return true;
 }
 
+// Called before quitting
+bool ModuleImporter::CleanUp()
+{
+	aiDetachAllLogStreams();
+
+	return true;
+}
+
+
+
+
+// ------------------------------- IMPORTING ------------------------------- 
+
 
 void ModuleImporter::ImportFromFolder(const char * path)
 {
@@ -144,6 +157,8 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 	return true;
 }
 
+
+
 bool ModuleImporter::ImportImage(const char * filePath)
 {
 	// Extracted from
@@ -208,6 +223,175 @@ bool ModuleImporter::ImportImage(const char * filePath)
 	}
 	RELEASE_ARRAY(buffer);
 	return true;
+}
+
+
+void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
+{
+	//Setting Name
+
+	char name[MAXLEN];
+	if (isChild)
+	{
+		//If it isn't the root node, the file name will be the object's name
+		memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
+	}
+	else
+	{
+		//If it's the root node, the file name will be the FBX's name
+		strcpy(name, FileName(path).data());
+	}
+
+	LOG("Importing GameObject %s", name);
+
+	//					rot + scal + pos				nMeshes			Material
+	uint transformSize = sizeof(float) * (4 + 3 + 3) + sizeof(uint) + sizeof(uint);
+	char* transform = new char[transformSize];
+	char* transformIt = transform;
+
+	aiQuaternion rot;
+	aiVector3D scal;
+	aiVector3D pos;
+
+	NodetoLoad->mTransformation.Decompose(scal, rot, pos);
+
+	float t[10];
+	t[0] = rot.x;
+	t[1] = rot.y;
+	t[2] = rot.z;
+	t[3] = rot.w;
+	t[4] = scal.x;
+	t[5] = scal.y;
+	t[6] = scal.z;
+	t[7] = pos.x;
+	t[8] = pos.y;
+	t[9] = pos.z;
+
+	transformIt = CopyMem<float>(transformIt, t, 10);
+
+	transformIt = CopyMem<uint>(transformIt, &NodetoLoad->mNumMeshes);
+
+	std::vector<uint> materials;
+	std::vector<std::string> meshes;
+	uint nMeshes = NodetoLoad->mNumMeshes;
+	for (uint n = 0; n <nMeshes; n++)
+	{
+		if (isChild == false)
+		{
+			RootName = name;
+		}
+
+		uint matIndex;
+
+		aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
+
+		meshes.push_back(ImportMesh(toLoad, scene, name, RootName, matIndex));
+		materials.push_back(matIndex);
+	}
+	uint hasMaterial = 0;
+	if (materials.empty() == false)
+	{
+		ImportMaterial(scene, materials, name);
+		hasMaterial = 1;
+	}
+	transformIt = CopyMem<uint>(transformIt, &hasMaterial);
+
+
+	uint nChilds = NodetoLoad->mNumChildren;
+	uint* childsSize = new uint[nChilds];
+	std::vector<std::string> childs;
+
+	uint childFileSize =
+		//nChilds			each child size
+		sizeof(uint) + sizeof(uint) * nChilds;
+
+
+	//Loading child nodes
+	for (uint n = 0; n < nChilds; n++)
+	{
+		std::string toPush(NodetoLoad->mChildren[n]->mName.data);
+		childs.push_back(toPush);
+		childsSize[n] = toPush.length() + 1;
+		childFileSize += sizeof(char) * childsSize[n];
+	}
+
+	char* file_childs = new char[childFileSize];
+	char* childsIt = file_childs;
+
+	//nCHilds
+	childsIt = CopyMem<uint>(childsIt, &nChilds);
+
+	//size of each child
+	childsIt = CopyMem<uint>(childsIt, childsSize, nChilds);
+
+	for (uint n = 0; n < nChilds; n++)
+	{
+		//a child
+		childsIt = CopyMem<char>(childsIt, (childs[n].data()), childsSize[n]);
+	}
+
+	//Getting the total size of the real file
+	uint realFileSize = 0;
+	realFileSize += transformSize;
+	realFileSize += 256 * nMeshes + 256 * hasMaterial;
+	realFileSize += childFileSize;
+
+	//Copying all the buffers we created into a single bigger buffer
+	char* realFile = new char[realFileSize];
+	char* realIt = realFile;
+
+	//file_0
+	realIt = CopyMem<char>(realIt, transform, transformSize);
+
+	for (int n = 0; n < nMeshes; n++)
+	{
+		realIt = CopyMem<char>(realIt, meshes[n].data(), 256);
+	}
+	if (hasMaterial)
+	{
+		realIt = CopyMem<char>(realIt, name, 256);
+	}
+
+	//childs
+	realIt = CopyMem<char>(realIt, file_childs, childFileSize);
+
+	RELEASE_ARRAY(transform);
+	RELEASE_ARRAY(childsSize);
+	RELEASE_ARRAY(file_childs);
+
+	// ---------------- Creating the save file and writting it -----------------------------------------
+
+	std::string toCreate("Library/vGOs/");
+	if (isChild)
+	{
+		toCreate += RootName;
+		toCreate += "/";
+	}
+	else
+	{
+		std::string dir("Library/vGOs/");
+		dir += name;
+		App->fs->CreateDir(dir.data());
+	}
+
+	toCreate += name;
+	toCreate += ".vgo";
+	App->fs->Save(toCreate.data(), realFile, realFileSize);
+
+	RELEASE_ARRAY(realFile);
+
+	//Importing also all the childs
+	for (uint n = 0; n < NodetoLoad->mNumChildren; n++)
+	{
+		if (isChild)
+		{
+			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, RootName);
+		}
+		else
+		{
+			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, name);
+		}
+	}
 }
 
 std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir ,uint& materialID)
@@ -423,6 +607,11 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 	}
 	return NULL;
 }
+
+
+
+// ------------------------------- LOADING ------------------------------- 
+
 
 GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
 {
@@ -700,6 +889,14 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 	return nullptr;
 }
 
+void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
+{
+}
+
+void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
+{
+}
+
 int ModuleImporter::LoadTexture(char* path, Material* mat)
 {
 	if (*path == '\0')
@@ -757,174 +954,9 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	}
 }
 
-void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
-{
-	//Setting Name
-
-	char name[MAXLEN];
-	if (isChild)
-	{
-		//If it isn't the root node, the file name will be the object's name
-		memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
-	}
-	else
-	{
-		//If it's the root node, the file name will be the FBX's name
-		strcpy(name, FileName(path).data());
-	}
-
-	LOG("Importing GameObject %s", name);
-
-		//					rot + scal + pos				nMeshes			Material
-		uint transformSize = sizeof(float) * (4 + 3 + 3) + sizeof(uint)  +	sizeof (uint);
-		char* transform = new char[transformSize];
-		char* transformIt = transform;
-
-		aiQuaternion rot;
-		aiVector3D scal;
-		aiVector3D pos;
-
-		NodetoLoad->mTransformation.Decompose(scal, rot, pos);
-
-		float t[10];
-		t[0] = rot.x;
-		t[1] = rot.y;
-		t[2] = rot.z;
-		t[3] = rot.w;
-		t[4] = scal.x;
-		t[5] = scal.y;
-		t[6] = scal.z;
-		t[7] = pos.x;
-		t[8] = pos.y;
-		t[9] = pos.z;
-
-		transformIt = CopyMem<float>(transformIt, t, 10);
-
-		transformIt = CopyMem<uint>(transformIt, &NodetoLoad->mNumMeshes);
-
-		std::vector<uint> materials;
-		std::vector<std::string> meshes;
-		uint nMeshes = NodetoLoad->mNumMeshes;
-		for (uint n = 0; n <nMeshes; n++)
-		{
-			if (isChild == false)
-			{
-				RootName = name;
-			}
-
-			uint matIndex;
-
-			aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
-
-			meshes.push_back(ImportMesh(toLoad, scene, name, RootName , matIndex));
-			materials.push_back(matIndex);
-		}
-		uint hasMaterial = 0;
-		if (materials.empty() == false)
-		{
-			ImportMaterial(scene, materials, name);
-			hasMaterial = 1;
-		}
-		transformIt = CopyMem<uint>(transformIt, &hasMaterial);
 
 
-		uint nChilds = NodetoLoad->mNumChildren;
-		uint* childsSize = new uint[nChilds];
-		std::vector<std::string> childs;
-
-		uint childFileSize =
-			//nChilds			each child size
-			sizeof(uint) + sizeof(uint) * nChilds;
-
-
-		//Loading child nodes
-		for (uint n = 0; n < nChilds; n++)
-		{
-			std::string toPush(NodetoLoad->mChildren[n]->mName.data);
-			childs.push_back(toPush);
-			childsSize[n] = toPush.length() + 1;
-			childFileSize += sizeof(char) * childsSize[n];
-		}
-
-		char* file_childs = new char[childFileSize];
-		char* childsIt = file_childs;
-
-		//nCHilds
-		childsIt = CopyMem<uint>(childsIt, &nChilds);
-
-		//size of each child
-		childsIt = CopyMem<uint>(childsIt, childsSize, nChilds);
-
-		for (uint n = 0; n < nChilds; n++)
-		{
-			//a child
-			childsIt = CopyMem<char>(childsIt, (childs[n].data()), childsSize[n]);
-		}
-
-		//Getting the total size of the real file
-		uint realFileSize = 0;
-		realFileSize += transformSize;
-		realFileSize += 256 * nMeshes + 256 * hasMaterial;
-		realFileSize += childFileSize;
-
-		//Copying all the buffers we created into a single bigger buffer
-		char* realFile = new char[realFileSize];
-		char* realIt = realFile;
-
-		//file_0
-		realIt = CopyMem<char>(realIt, transform, transformSize);
-
-		for (int n = 0; n < nMeshes; n++)
-		{
-			realIt = CopyMem<char>(realIt, meshes[n].data(), 256);
-		}
-		if (hasMaterial)
-		{
-			realIt = CopyMem<char>(realIt, name, 256);
-		}
-
-		//childs
-		realIt = CopyMem<char>(realIt, file_childs, childFileSize);
-
-		RELEASE_ARRAY(transform);
-		RELEASE_ARRAY(childsSize);
-		RELEASE_ARRAY(file_childs);
-
-		// ---------------- Creating the save file and writting it -----------------------------------------
-
-		std::string toCreate("Library/vGOs/");
-		if (isChild)
-		{
-			toCreate += RootName;
-			toCreate += "/";
-		}
-		else
-		{
-			std::string dir("Library/vGOs/");
-			dir += name;
-			App->fs->CreateDir(dir.data());
-		}
-
-		toCreate += name;
-		toCreate += ".vgo";
-		App->fs->Save(toCreate.data(), realFile, realFileSize);
-
-		RELEASE_ARRAY(realFile);
-
-	//Importing also all the childs
-	for (uint n = 0; n < NodetoLoad->mNumChildren; n++)
-	{
-		if (isChild)
-		{
-			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, RootName);
-		}
-		else
-		{
-			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, name);
-		}
-	}
-}
-
+// ------------------------------- UTILITY ------------------------------- 
 
 std::string ModuleImporter::FileFormat(const char * file)
 {
@@ -971,12 +1003,4 @@ std::string ModuleImporter::FileName(const char * file)
 		*end = '\0';
 	}
 	return std::string(start);
-}
-
-// Called before quitting
-bool ModuleImporter::CleanUp()
-{
-	aiDetachAllLogStreams();
-
-	return true;
 }
