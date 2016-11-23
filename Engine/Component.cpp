@@ -66,7 +66,20 @@ void Component::DrawOnEditor()
 void Component::Save(pugi::xml_node& myNode)
 {
 	pugi::xml_node node = myNode.append_child("General");
-	node.append_attribute("name") = name.data();
+	char tmpName[256];
+	strcpy(tmpName, name.data());
+	char* it = tmpName;
+	for (int n = 0; n < 255; n++)
+	{
+		if (it[0] == '#' && it[1] == '#')
+		{
+			it[0] = '\0';
+			break;
+		}
+		it++;
+	}
+
+	node.append_attribute("name") = tmpName;
 	node.append_attribute("UID") = uid;
 	node.append_attribute("type") = type;
 	node.append_attribute("id") = id;

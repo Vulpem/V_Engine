@@ -252,7 +252,7 @@ void ModuleGoManager::SaveSceneNow()
 		comp->second->Save(Components_node.append_child("Component"));
 	}
 
-	sceneName += ".xml";
+	sceneName += ".vscene";
 
 	std::stringstream stream;
 	data.save(stream);
