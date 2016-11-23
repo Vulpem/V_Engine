@@ -15,6 +15,8 @@ mesh::mesh(GameObject* linkedTo, int id):Component(linkedTo, id)
 	name = tmp;
 	type = C_mesh;
 	aabb.SetNegativeInfinity();
+
+	texMaterialIndex = object->AmountOfComponent(Component::Type::C_mesh);
 }
 
 mesh::~mesh()
@@ -135,7 +137,9 @@ void mesh::EditorContent()
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
 	ImGui::Text("Buffer: %i", id_textureCoords);
 	ImGui::Separator();
-	ImGui::Text("Texture index material: %i", texMaterialIndex);
+	ImGui::Text("Texture index material:");
+	sprintf(tmp, "##MaterialID%i", id);
+	ImGui::InputInt(tmp, &texMaterialIndex);
 }
 
 void mesh::SaveSpecifics(pugi::xml_node& myNode)

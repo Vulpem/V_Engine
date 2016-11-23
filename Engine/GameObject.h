@@ -28,7 +28,7 @@ private:
 	bool Static = false;
 
 	static const uint nComponentTypes = Component::Type::C_None;
-	bool HasComponents[Component::Type::C_None];
+	int HasComponents[Component::Type::C_None];
 
 	AABB originalAABB;
 
@@ -78,6 +78,7 @@ public:
 
 	Component* AddComponent(Component::Type type);
 	bool HasComponent(Component::Type type);
+	uint AmountOfComponent(Component::Type type);
 	Transform* GetTransform();
 
 	void Save(pugi::xml_node& node);

@@ -226,6 +226,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 }
 
 
+
 void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
 {
 	//Setting Name
@@ -285,7 +286,10 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 		aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
 
-		meshes.push_back(ImportMesh(toLoad, scene, name, RootName, matIndex));
+		char meshName[256];
+		sprintf(meshName, "%s_%i", name, n);
+
+		meshes.push_back(ImportMesh(toLoad, scene, meshName, RootName, matIndex));
 		materials.push_back(matIndex);
 	}
 	uint hasMaterial = 0;
@@ -535,8 +539,8 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 	RELEASE_ARRAY(indices);
 
 	std::string toCreate("Library/Meshes/");
-	toCreate += dir;
-	App->fs->CreateDir(toCreate.data());
+//	toCreate += dir;
+//	App->fs->CreateDir(toCreate.data());
 
 	toCreate += "/";
 	toCreate += name;
@@ -545,7 +549,7 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 
 	RELEASE_ARRAY(mesh);
 
-	return toLoad->mName.data;
+	return name;
 }
 
 std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName)
@@ -621,7 +625,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 	std::string fileName = FileName(fileName_NoFileType);
 
 	char* file = nullptr;
-	std::string path("Library/Meshes/");
+	std::string path("Library/vGOs/");
 	if (parent && meshesFolder)
 	{
 		path += meshesFolder;
@@ -676,8 +680,6 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 			bytes = sizeof(uint);
 			memcpy(&hasMaterial, It, bytes);
 			It += bytes;
-
-			char* startOfMesh;
 
 			//Loading each mesh
 			for (uint n = 0; n < nMeshes; n++)
@@ -775,6 +777,7 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 	std::string filePath("Library/Meshes/");
 
 	filePath += path;
+	filePath += ".vmesh";
 
 	LOG("Loading mesh %s", filePath.data());
 
@@ -804,7 +807,7 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 
 				//Actual vertices
 				newMesh->vertices = new float3[newMesh->num_vertices];
-				bytes = sizeof(float3) * newMesh->num_vertices;
+				bytes = sizeof(float) * newMesh->num_vertices * 3;
 				memcpy(newMesh->vertices, It, bytes);
 				It += bytes;
 
@@ -824,7 +827,7 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 				{
 					//Normals
 					newMesh->normals = new float3[newMesh->num_vertices];
-					bytes = sizeof(float) * newMesh->num_normals;
+					bytes = sizeof(float3) * newMesh->num_normals;
 					memcpy(newMesh->normals, It, bytes);
 					It += bytes;
 
@@ -890,44 +893,59 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 
 void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 {
-	Material* mat = (Material*) toLink->AddComponent(Component::Type::C_material);
+	char* file = nullptr;
+	std::string filePath("Library/Materials/");
 
-	uint bytes = 0;
-	uint nTextures = 0;
+	filePath += path;
+	filePath += ".vmat";
 
-	//NumTextures
-	uint numTextures = 0;
-	bytes = sizeof(uint);
-	memcpy(&numTextures, It, bytes);
-	It += bytes;
+	LOG("Loading mesh %s", filePath.data());
 
-	for (int n = 0; n < numTextures; n++)
+	if (App->fs->Exists(filePath.data()))
 	{
-		//Texture name Len
-		uint textureNameLen = 0;
-		bytes = sizeof(uint);
-		memcpy(&textureNameLen, It, bytes);
-		It += bytes;
-
-		//Texture name
-		char* textureName = new char[textureNameLen];
-		bytes = sizeof(char) * textureNameLen;
-		memcpy(textureName, It, bytes);
-		It += bytes;
-
-		if (textureNameLen > 1)
+		int size = App->fs->Load(filePath.data(), &file);
+		if (file != nullptr && size > 0)
 		{
-			newMesh->texMaterialIndex = LoadTexture(textureName, mat);
+			char* It = file;
+			Material* mat = (Material*)toLink->AddComponent(Component::Type::C_material);
+
+			uint bytes = 0;
+			uint nTextures = 0;
+
+			//NumTextures
+			uint numTextures = 0;
+			bytes = sizeof(uint);
+			memcpy(&numTextures, It, bytes);
+			It += bytes;
+
+			for (int n = 0; n < numTextures; n++)
+			{
+				//Texture name Len
+				uint textureNameLen = 0;
+				bytes = sizeof(uint);
+				memcpy(&textureNameLen, It, bytes);
+				It += bytes;
+
+				if (textureNameLen > 1)
+				{
+					//Texture name
+					char* textureName = new char[textureNameLen];
+					bytes = sizeof(char) * textureNameLen;
+					memcpy(textureName, It, bytes);
+					It += bytes;
+
+					LoadTexture(textureName, mat);
+
+					delete[] textureName;
+				}
+				//Color
+				float color[3];
+				bytes = sizeof(float) * 3;
+				memcpy(color, It, bytes);
+				It += bytes;
+				mat->SetColor(color[0], color[1], color[2]);
+			}
 		}
-		delete[] textureName;
-
-
-		//Color
-		float color[3];
-		bytes = sizeof(float) * 3;
-		memcpy(color, It, bytes);
-		It += bytes;
-		mat->SetColor(color[0], color[1], color[2]);
 	}
 }
 

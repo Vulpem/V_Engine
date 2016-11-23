@@ -382,7 +382,7 @@ Component* GameObject::AddComponent(Component::Type type)
 
 	if (toAdd != nullptr)
 	{
-		HasComponents[type] = true;
+		HasComponents[type] += 1;
 		components.push_back(toAdd);
 	}
 	App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
@@ -392,28 +392,12 @@ Component* GameObject::AddComponent(Component::Type type)
 
 bool GameObject::HasComponent(Component::Type type)
 {
+	return (HasComponents[type] != 0);
+}
+
+uint GameObject::AmountOfComponent(Component::Type type)
+{
 	return HasComponents[type];
-	/*if (components.size() > 0)
-	{
-		if (type == Component::Type::C_transform)
-		{
-			if (transform == nullptr)
-			{
-				return false;
-			}
-			return true;
-		}
-		std::vector<Component*>::iterator it = components.begin();
-		while (it != components.end())
-		{
-			if ((*it)->GetType() == type)
-			{
-				return true;
-			}
-			it++;
-		}
-	}
-	return false;*/
 }
 
 Transform * GameObject::GetTransform()
