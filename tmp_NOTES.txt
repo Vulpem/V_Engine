@@ -1,0 +1,110 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+.vgo
+
+
+float * 10
+transform (rot.x, rot.y, rot.z, rot.w; scal.x, scal.y, scal.z; pos.x, pos.y, pos.z)
+
+uint
+nMeshes
+
+uint
+hasMaterial [0,1]
+
+foreach Mesh
+{
+char * 256
+meshName
+}
+
+if(hasMaterial)
+{
+char * 256
+materialName
+}
+
+
+uint
+nChilds
+
+uint * nChilds
+childsSize
+
+foreach 
+{
+char child[n] * childsSize[n]
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+.vmesh
+
+
+bool meshExists
+
+
+uint numVertices
+
+float3 * numVertices
+vertices
+
+
+uint
+numNormals
+
+float3 * numNormals
+normals
+
+
+uint
+numTextureCoords
+
+float2 * numTextureCoords
+textureCoords
+
+
+uint
+numIndices
+
+uint * numIndices
+indices
+
+
+float3
+aabbMaxPoint
+
+float3
+aabbMinPoint
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+.vmat
+
+
+uint nTextures
+
+foreach Texture
+{
+uint
+textureNameLen
+
+char * textureNameLen
+textureName
+
+float3
+color
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+

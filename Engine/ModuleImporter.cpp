@@ -518,15 +518,15 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 		meshIt = CopyMem<float>(meshIt, textureCoords, numTextureCoords * 2);
 	}
 
-	//AABB
-	meshIt = CopyMem<float3>(meshIt, &aabb.maxPoint);
-	meshIt = CopyMem<float3>(meshIt, &aabb.minPoint);
-
 	//num_indices
 	meshIt = CopyMem<uint>(meshIt, &num_indices);
 
 	//indices
 	meshIt = CopyMem<uint>(meshIt, indices, num_indices);
+
+	//AABB
+	meshIt = CopyMem<float3>(meshIt, &aabb.maxPoint);
+	meshIt = CopyMem<float3>(meshIt, &aabb.minPoint);
 
 
 	RELEASE_ARRAY(vertices);
@@ -552,7 +552,8 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 {
 	if (matsIndex.empty() == false)
 	{
-		uint realSize = 0;
+		uint realSize = sizeof(uint);
+		uint nTextures = matsIndex.size();
 
 		uint* materialsSize = new uint[matsIndex.size()];
 		char** materials = new char*[matsIndex.size()];
@@ -586,6 +587,8 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 
 		char* realMat = new char[realSize];
 		char* realIt = realMat;
+		realIt = CopyMem<uint>(realIt, &nTextures);
+
 		for (int n = 0; n < matsIndex.size(); n++)
 		{
 			realIt = CopyMem<char>(realIt, materials[n], materialsSize[n]);
