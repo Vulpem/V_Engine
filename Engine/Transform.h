@@ -16,6 +16,7 @@ public:
 	bool allowRotation = true;
 
 	void SaveSpecifics(pugi::xml_node& myNode);
+	void LoadSpecifics(pugi::xml_node& myNode);
 private:
 	math::Quat localRotation = math::Quat::identity;
 	math::float3 localPosition = math::float3::zero;

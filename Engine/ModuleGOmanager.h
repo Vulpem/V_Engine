@@ -38,10 +38,13 @@ public:
 	bool DeleteGameObject(GameObject* toErase);
 
 	void SaveScene(char* name) { wantToSaveScene = true; sceneName = name; }
+	void LoadScene(char* name) { wantToLoadScene = true; sceneName = name;	}
 private:
 	std::string sceneName;
 	bool wantToSaveScene = false;
+	bool wantToLoadScene = false;
 	void SaveSceneNow();
+	void LoadSceneNow();
 public:
 
 

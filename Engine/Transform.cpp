@@ -46,6 +46,32 @@ void Transform::SaveSpecifics(pugi::xml_node& myNode)
 	node.append_attribute("z") = localScale.z;
 }
 
+void Transform::LoadSpecifics(pugi::xml_node & myNode)
+{
+	allowRotation = myNode.attribute("AllowRotation").as_bool();
+	float tmp[4];
+
+	pugi::xml_node rot = myNode.child("LocalRotation");
+	tmp[0] = rot.attribute("x").as_float();
+	tmp[1] = rot.attribute("y").as_float();
+	tmp[2] = rot.attribute("z").as_float();
+	tmp[3] = rot.attribute("w").as_float();
+	SetLocalRot(tmp[0], tmp[1], tmp[2], tmp[3]);
+
+	pugi::xml_node pos = myNode.child("LocalPosition");
+	tmp[0] = pos.attribute("x").as_float();
+	tmp[1] = pos.attribute("y").as_float();
+	tmp[2] = pos.attribute("z").as_float();
+	SetLocalPos(tmp[0], tmp[1], tmp[2]);
+
+	pugi::xml_node scal = myNode.child("LocalScale");
+	tmp[0] = scal.attribute("x").as_float();
+	tmp[1] = scal.attribute("y").as_float();
+	tmp[2] = scal.attribute("z").as_float();
+	SetLocalScale(tmp[0], tmp[1], tmp[2]);
+
+}
+
 void Transform::Draw()
 {
 	if (!object->HasComponent(Component::Type::C_mesh))

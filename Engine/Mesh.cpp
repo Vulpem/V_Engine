@@ -6,6 +6,9 @@
 #include "GameObject.h"
 #include "Mesh_RenderInfo.h"
 
+#include "Application.h"
+#include "ModuleImporter.h"
+
 //------------------------- MESH --------------------------------------------------------------------------------
 
 mesh::mesh(GameObject* linkedTo, int id):Component(linkedTo, id)
@@ -146,4 +149,13 @@ void mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
 	myNode.append_attribute("MeshPath") = meshPath.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;
+}
+
+void mesh::LoadSpecifics(pugi::xml_node & myNode)
+{
+	std::string path = myNode.attribute("MeshPath").as_string();
+
+	App->importer->LoadMesh(path.data(), object);
+
+	texMaterialIndex = myNode.attribute("TextureIndex").as_int();
 }

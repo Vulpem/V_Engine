@@ -416,18 +416,8 @@ void GameObject::Save(pugi::xml_node& node)
 	}
 	else
 	{
-		GO.append_attribute("parent") = "0000";
+		GO.append_attribute("parent") = "0";
 	}
-
-	pugi::xml_node aabb_node = GO.append_child("Original_AABB");
-
-	aabb_node.append_attribute("minX") = originalAABB.minPoint.x;
-	aabb_node.append_attribute("minY") = originalAABB.minPoint.y;
-	aabb_node.append_attribute("minZ") = originalAABB.minPoint.z;
-
-	aabb_node.append_attribute("maxX") = originalAABB.maxPoint.x;
-	aabb_node.append_attribute("maxY") = originalAABB.maxPoint.y;
-	aabb_node.append_attribute("maxZ") = originalAABB.maxPoint.z;
 
 	for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
 	{

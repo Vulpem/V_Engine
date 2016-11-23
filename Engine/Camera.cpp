@@ -218,6 +218,30 @@ void Camera::SaveSpecifics(pugi::xml_node& myNode)
 
 }
 
+void Camera::LoadSpecifics(pugi::xml_node & myNode)
+{
+	pugi::xml_node frust = myNode.child("Frustum");
+
+	frustum.farPlaneDistance = frust.attribute("FarPlaneDistance").as_float();
+	frustum.nearPlaneDistance = frust.attribute("NearPlaneDistance").as_float();
+	frustum.type = (FrustumType)frust.attribute("FrustumType").as_int();
+	
+	aspectRatio = frust.attribute("AspectRatio").as_float();
+	SetHorizontalFOV(frust.attribute("HorizontalFOV").as_float());
+
+	frustum.front.x = frust.attribute("FrontX").as_float();
+	frustum.front.y = frust.attribute("FrontY").as_float();
+	frustum.front.z = frust.attribute("FrontZ").as_float();
+
+	frustum.up.x = frust.attribute("UpX").as_float();
+	frustum.up.y = frust.attribute("UpY").as_float();
+	frustum.up.z = frust.attribute("UpZ").as_float();
+
+	hasCulling = frust.attribute("HasCulling").as_bool();
+	otherFOV.x = frust.attribute("otherFOV").as_float();
+	otherFOV.y = otherFOV.x * aspectRatio;
+}
+
 void Camera::DrawFrustum()
 {
 	if (object->selected)

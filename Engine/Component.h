@@ -40,7 +40,9 @@ public:
 
 	void Save(pugi::xml_node& myNode);
 protected:
-	virtual void SaveSpecifics(pugi::xml_node& myNode) {};
+	virtual void SaveSpecifics(pugi::xml_node& myNode) {}
+public:
+	virtual void LoadSpecifics(pugi::xml_node& myNode) {}
 
 protected:
 	virtual void OnEnable() {}

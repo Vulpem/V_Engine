@@ -89,3 +89,4 @@ void Component::Save(pugi::xml_node& myNode)
 	SaveSpecifics(myNode.append_child("Specific"));
 }
 
+

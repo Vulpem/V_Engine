@@ -22,6 +22,7 @@ public:
 	void EditorContent();
 
 	void SaveSpecifics(pugi::xml_node& myNode);
+	void LoadSpecifics(pugi::xml_node& myNode);
 
 	void UpdateCamMatrix();
 	void UpdatePos();
