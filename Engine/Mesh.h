@@ -25,6 +25,7 @@ public:
 	uint id_indices = 0;
 	uint num_indices = 0;
 
+	float3* normals;
 	uint id_normals = 0;
 	uint num_normals;
 

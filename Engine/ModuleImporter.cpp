@@ -771,28 +771,29 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 
 void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 {
-			{
-			startOfMesh = It;
+	char* file = nullptr;
+	std::string filePath("Library/Meshes/");
 
-			//Total mesh size (just in case)
-			uint _meshSize = 0;
-			bytes = sizeof(uint);
-			memcpy(&_meshSize, It, bytes);
-			It += bytes;
+	filePath += path;
 
+	LOG("Loading mesh %s", filePath.data());
+
+	if (App->fs->Exists(filePath.data()))
+	{
+		int size = App->fs->Load(filePath.data(), &file);
+		if (file != nullptr && size > 0)
+		{
+			char* It = file;
+
+			//Does this mesh exist?
 			bool _meshExists = true;
-			bytes = sizeof(bool);
+			uint bytes = sizeof(bool);
 			memcpy(&_meshExists, It, bytes);
 			It += bytes;
 
-			if (_meshExists == false)
+			if (_meshExists == true)
 			{
-				It = startOfMesh;
-				It += _meshSize;
-			}
-			else
-			{
-				mesh* newMesh = (mesh*)ret->AddComponent(Component::Type::C_mesh);
+				mesh* newMesh = (mesh*)toLink->AddComponent(Component::Type::C_mesh);
 
 				newMesh->meshPath = path;
 
@@ -802,17 +803,16 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 				It += bytes;
 
 				//Actual vertices
-				float* vertices = new float[newMesh->num_vertices * 3];
-				bytes = sizeof(float) * newMesh->num_vertices * 3;
-				memcpy(vertices, It, bytes);
+				newMesh->vertices = new float3[newMesh->num_vertices];
+				bytes = sizeof(float3) * newMesh->num_vertices;
+				memcpy(newMesh->vertices, It, bytes);
 				It += bytes;
 
 				//Generating vertices buffer
 				glGenBuffers(1, (GLuint*) &(newMesh->id_vertices));
 				glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_vertices);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, vertices, GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
 				//endof Generating vertices buffer
-				RELEASE_ARRAY(vertices);
 
 
 				//Num normals
@@ -823,17 +823,16 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 				if (newMesh->num_normals > 0)
 				{
 					//Normals
-					float* normals = new float[newMesh->num_vertices * 3];
-					bytes = sizeof(float) * newMesh->num_normals * 3;
-					memcpy(normals, It, bytes);
+					newMesh->normals = new float3[newMesh->num_vertices];
+					bytes = sizeof(float) * newMesh->num_normals;
+					memcpy(newMesh->normals, It, bytes);
 					It += bytes;
 
 					//Generating normals buffer
 					glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
 					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, normals, GL_STATIC_DRAW);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
 					//endOf Generating normals buffer
-					RELEASE_ARRAY(normals);
 				}
 
 				//Num texture coords
@@ -857,56 +856,65 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 					RELEASE_ARRAY(textureCoords);
 				}
 
-				//Texture name Len
-				uint textureNameLen = 0;
-				bytes = sizeof(uint);
-				memcpy(&textureNameLen, It, bytes);
-				It += bytes;
-
-				//Texture name
-				char* textureName = new char[textureNameLen];
-				bytes = sizeof(char) * textureNameLen;
-				memcpy(textureName, It, bytes);
-				It += bytes;
-
-				if (textureNameLen > 1)
-				{
-					newMesh->texMaterialIndex = LoadTexture(textureName, mat);
-				}
-				delete[] textureName;
-
-
-				//Color
-				float color[3];
-				bytes = sizeof(float) * 3;
-				memcpy(color, It, bytes);
-				It += bytes;
-				mat->SetColor(color[0], color[1], color[2]);
-
 				//Num indices
 				bytes = sizeof(uint);
 				memcpy(&newMesh->num_indices, It, bytes);
 				It += bytes;
 
 				//Actual indices
-				uint* indices = new uint[newMesh->num_indices];
+				newMesh->indices = new uint[newMesh->num_indices];
 				bytes = sizeof(uint) * newMesh->num_indices;
-				memcpy(indices, It, bytes);
+				memcpy(newMesh->indices, It, bytes);
 				It += bytes;
 
 				//Generating indices buffer
 				glGenBuffers(1, (GLuint*) &(newMesh->id_indices));
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, indices, GL_STATIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
 				//endOf generating indices buffer
 
-				RELEASE_ARRAY(indices);
+
+				//AABB maxPoint
+				bytes = sizeof(float3);
+				memcpy(&newMesh->aabb.maxPoint, It, bytes);
+				It += bytes;
+
+				//AABB minPoint
+				memcpy(&newMesh->aabb.minPoint, It, bytes);
+				It += bytes;
 			}
-			}
+		}
+		RELEASE_ARRAY(file);
+	}
 }
 
 void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 {
+	//Texture name Len
+	uint textureNameLen = 0;
+	bytes = sizeof(uint);
+	memcpy(&textureNameLen, It, bytes);
+	It += bytes;
+
+	//Texture name
+	char* textureName = new char[textureNameLen];
+	bytes = sizeof(char) * textureNameLen;
+	memcpy(textureName, It, bytes);
+	It += bytes;
+
+	if (textureNameLen > 1)
+	{
+		newMesh->texMaterialIndex = LoadTexture(textureName, mat);
+	}
+	delete[] textureName;
+
+
+	//Color
+	float color[3];
+	bytes = sizeof(float) * 3;
+	memcpy(color, It, bytes);
+	It += bytes;
+	mat->SetColor(color[0], color[1], color[2]);
 }
 
 int ModuleImporter::LoadTexture(char* path, Material* mat)
