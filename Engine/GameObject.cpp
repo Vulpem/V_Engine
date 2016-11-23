@@ -230,11 +230,20 @@ void GameObject::Unselect()
 	}
 }
 
-void GameObject::SetOriginalAABB(float3 minPoint, float3 maxPoint)
+void GameObject::SetOriginalAABB()
 {
-	originalAABB.minPoint = minPoint;
-	originalAABB.maxPoint = maxPoint;
-	if (originalAABB.IsFinite() == false)
+	if (HasComponent(Component::Type::C_mesh))
+	{
+		originalAABB.SetNegativeInfinity();
+		std::vector<mesh*> meshes = GetComponent<mesh>();
+
+		for (std::vector<mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
+		{
+			originalAABB.Enclose((*it)->aabb.maxPoint);
+			originalAABB.Enclose((*it)->aabb.minPoint);
+		}
+	}
+	else
 	{
 		originalAABB.minPoint = float3{ -0.25f,-0.25f,-0.25f };
 		originalAABB.maxPoint = float3{ 0.25f,0.25f,0.25f };

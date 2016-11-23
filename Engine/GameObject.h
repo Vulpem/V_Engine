@@ -62,7 +62,7 @@ public:
 	void Select(bool renderNormals = false);
 	void Unselect();
 
-	void SetOriginalAABB(float3 minPoint, float3 maxPoint);
+	void SetOriginalAABB();
 	void UpdateAABB();
 
 	void UpdateTransformMatrix();
