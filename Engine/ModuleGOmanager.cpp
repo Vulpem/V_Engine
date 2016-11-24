@@ -328,32 +328,33 @@ void ModuleGoManager::LoadSceneNow()
 					uint64_t GO = general.attribute("GO").as_ullong();
 
 					bool enabled = general.attribute("enabled").as_bool();
-
-					std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
-					if (go != UIDlib.end())
+					if (GO != 0)
 					{
-						switch (type)
+						std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
+						if (go != UIDlib.end())
 						{
-						case (Component::C_mesh):
-						{
-							pugi::xml_node meshNode = comp.child("Specific");
-							std::string path = meshNode.attribute("MeshPath").as_string();
-							mesh* _mesh = App->importer->LoadMesh(path.data(), go->second);
-							_mesh->texMaterialIndex = meshNode.attribute("TextureIndex").as_int();
-							go->second->SetOriginalAABB();
-							break;
-						}
-						default:
-						{
-							Component* c = go->second->AddComponent(type);
-							if (c != nullptr)
+							switch (type)
 							{
-								c->LoadSpecifics(comp.child("Specific"));
-								components.insert(std::pair<Component::Type, Component*>(c->GetType(), c));
+							case (Component::C_mesh):
+							{
+								pugi::xml_node meshNode = comp.child("Specific");
+								std::string path = meshNode.attribute("MeshPath").as_string();
+								mesh* _mesh = App->importer->LoadMesh(path.data(), go->second);
+								_mesh->texMaterialIndex = meshNode.attribute("TextureIndex").as_int();
+								go->second->SetOriginalAABB();
+								break;
 							}
-							break;
+							default:
+							{
+								Component* c = go->second->AddComponent(type);
+								if (c != nullptr)
+								{
+									c->LoadSpecifics(comp.child("Specific"));
+								}
+								break;
+							}
+							}
 						}
-						}						
 					}
 				}
 

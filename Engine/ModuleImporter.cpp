@@ -577,7 +577,7 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 			scene->mMaterials[(*it)]->Get(AI_MATKEY_COLOR_DIFFUSE, col);
 			float color[3] = { col.r, col.g, col.b };
 
-			materialsSize[n] = sizeof(uint) + sizeof(char) * textureNameLen + sizeof(float) * 3;
+			materialsSize[n] = sizeof(uint) + sizeof(char) * textureNameLen + sizeof(float3);
 			realSize += materialsSize[n];
 			materials[n] = new char[materialsSize[n]];
 			char* materialIt = materials[n];

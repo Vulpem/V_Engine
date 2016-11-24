@@ -506,7 +506,7 @@ void ModuleEditor::AttributeWindow()
 				}
 				ImGui::NewLine();
 				ImGui::Text("Danger Zone:");
-				if (ImGui::Button("Delete"))
+				if (ImGui::Button("Delete##DeleteGO"))
 				{
 					App->GO->DeleteGameObject(selectedGameObject);
 					selectedGameObject = nullptr;
