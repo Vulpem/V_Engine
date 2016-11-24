@@ -409,13 +409,21 @@ void GameObject::Save(pugi::xml_node& node)
 {
 	pugi::xml_node GO = node.append_child("GO");
 	GO.append_attribute("name") = name;
-	GO.append_attribute("UID") = uid;
 	if (parent != nullptr)
 	{
-		GO.append_attribute("parent") = parent->GetUID();
+		GO.append_attribute("UID") = uid;
+		if (parent->parent != nullptr)
+		{
+			GO.append_attribute("parent") = parent->GetUID();
+		}
+		else
+		{
+			GO.append_attribute("parent") = 0;
+		}
 	}
 	else
 	{
+		GO.append_attribute("UID") = 0;
 		GO.append_attribute("parent") = "0";
 	}
 

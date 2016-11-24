@@ -146,12 +146,14 @@ update_status ModuleGoManager::PostUpdate()
 	{
 		TIMER_START_PERF("Saving Scene");
 		SaveSceneNow();
+		wantToSaveScene = false;
 		TIMER_READ_MS("Saving Scene");
 	}
 	if (wantToLoadScene)
 	{
 		TIMER_START_PERF("Loading Scene");
 		LoadSceneNow();
+		wantToLoadScene = false;
 		TIMER_READ_MS("Loading Scene");
 	}
 
@@ -267,8 +269,6 @@ void ModuleGoManager::SaveSceneNow()
 	LOG("Scene saved: %s", sceneName.data());
 
 	data.reset();
-
-	wantToSaveScene = false;
 }
 
 void ModuleGoManager::LoadSceneNow()
@@ -293,9 +293,10 @@ void ModuleGoManager::LoadSceneNow()
 			{
 				for (pugi::xml_node GOs = root.child("GameObjects").first_child(); GOs != nullptr; GOs = GOs.next_sibling())
 				{
-					uint64_t parentUID = GOs.attribute("parent").as_llong();
+					uint64_t parentUID = GOs.attribute("parent").as_ullong();
 					std::string go_name = GOs.attribute("name").as_string();
-					uint64_t UID = GOs.attribute("UID").as_llong();
+					
+					uint64_t UID = GOs.attribute("UID").as_ullong();
 
 					GameObject* toAdd = new GameObject(UID);
 					toAdd->SetName(go_name.data());
@@ -313,10 +314,12 @@ void ModuleGoManager::LoadSceneNow()
 				{
 					pugi::xml_node general = comp.child("General");
 					std::string name = general.attribute("name").as_string();
-					uint64_t UID = general.attribute("UID").as_llong();
+					uint64_t UID = general.attribute("UID").as_ullong();
 					Component::Type type = (Component::Type)general.attribute("type").as_int();
 					int id = general.attribute("id").as_int();
-					uint64_t GO = general.attribute("GO").as_llong();
+
+					uint64_t GO = general.attribute("GO").as_ullong();
+
 					bool enabled = general.attribute("enabled").as_bool();
 
 					std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
@@ -333,14 +336,15 @@ void ModuleGoManager::LoadSceneNow()
 				GameObject* sceneRoot = UIDlib.find(0)->second;
 				for (std::vector<GameObject*>::iterator it = sceneRoot->childs.begin(); it != sceneRoot->childs.end(); it++)
 				{
-					this->root->childs.push_back(*it);
-					(*it)->parent = this->root;
+					AddGOtoRoot((*it));
 				}
+				//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
 				sceneRoot->childs.clear();
 				RELEASE(sceneRoot);
 			}
 		}
 	}
+
 }
 
 void ModuleGoManager::SetStatic(bool Static, GameObject * GO)

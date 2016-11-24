@@ -17,15 +17,15 @@ public:
 
 	std::string meshPath;
 
-	float3* vertices;
+	float3* vertices = nullptr;
 	uint id_vertices = 0;
 	uint num_vertices = 0;
 
-	uint* indices;
+	uint* indices = nullptr;
 	uint id_indices = 0;
 	uint num_indices = 0;
 
-	float3* normals;
+	float3* normals = nullptr;
 	uint id_normals = 0;
 	uint num_normals;
 
