@@ -6,6 +6,8 @@
 
 #include "imGUI\imgui.h"
 
+#include "OpenGL.h"
+
 Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id)
 {
 	char tmp[NAME_MAX_LEN];
@@ -16,7 +18,11 @@ Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id)
 
 Material::~Material()
 {
-	
+	std::vector<uint>::iterator it = textures.begin();
+	for (; it != textures.end(); it++)
+	{
+		glDeleteBuffers(1, &(*it));
+	}
 }
 
 void Material::EditorContent()
