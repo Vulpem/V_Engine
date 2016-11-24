@@ -288,52 +288,57 @@ void ModuleGoManager::LoadSceneNow()
 
 		if (result != NULL)
 		{
-			root = data.child("game_state");
-
-			for (pugi::xml_node GOs = root.child("GameObjects").first_child(); GOs != nullptr; GOs = GOs.next_sibling())
+			root = data.child("Scene");
+			if (root)
 			{
-				uint64_t parentUID = GOs.attribute("parent").as_llong();
-				std::string go_name = GOs.attribute("name").as_string();
-				uint64_t UID = GOs.attribute("UID").as_llong();
-
-				GameObject* toAdd = new GameObject(UID);
-				toAdd->SetName(go_name.data());
-
-				std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
-				if (parent != UIDlib.end())
+				for (pugi::xml_node GOs = root.child("GameObjects").first_child(); GOs != nullptr; GOs = GOs.next_sibling())
 				{
-					toAdd->parent = parent->second;
-					parent->second->childs.push_back(toAdd);
+					uint64_t parentUID = GOs.attribute("parent").as_llong();
+					std::string go_name = GOs.attribute("name").as_string();
+					uint64_t UID = GOs.attribute("UID").as_llong();
+
+					GameObject* toAdd = new GameObject(UID);
+					toAdd->SetName(go_name.data());
+
+					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
+					if (parent != UIDlib.end())
+					{
+						toAdd->parent = parent->second;
+						parent->second->childs.push_back(toAdd);
+					}
+					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
 				}
-				UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
-			}
 
-			for (pugi::xml_node comp = root.child("Components").first_child(); comp != nullptr; comp = comp.next_sibling())
-			{
-				pugi::xml_node general = comp.child("General");
-				std::string name = general.attribute("name").as_string();
-				uint64_t UID = general.attribute("UID").as_llong();
-				Component::Type type = (Component::Type)general.attribute("type").as_int();
-				int id = general.attribute("id").as_int();
-				uint64_t GO = general.attribute("GO").as_llong();
-				bool enabled = general.attribute("enabled").as_bool();
-
-				std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
-				if (go != UIDlib.end())
+				for (pugi::xml_node comp = root.child("Components").first_child(); comp != nullptr; comp = comp.next_sibling())
 				{
-					Component* c = go->second->AddComponent(type);
-					c->LoadSpecifics(comp.child("Specific"));
-				}
-			}
+					pugi::xml_node general = comp.child("General");
+					std::string name = general.attribute("name").as_string();
+					uint64_t UID = general.attribute("UID").as_llong();
+					Component::Type type = (Component::Type)general.attribute("type").as_int();
+					int id = general.attribute("id").as_int();
+					uint64_t GO = general.attribute("GO").as_llong();
+					bool enabled = general.attribute("enabled").as_bool();
 
-			GameObject* sceneRoot = UIDlib.find(0)->second;
-			for (std::vector<GameObject*>::iterator it = sceneRoot->childs.begin(); it != sceneRoot->childs.end(); it++)
-			{
-				this->root->childs.push_back(*it);
-				(*it)->parent = this->root;
+					std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
+					if (go != UIDlib.end())
+					{
+						Component* c = go->second->AddComponent(type);
+						if (c != nullptr)
+						{
+							c->LoadSpecifics(comp.child("Specific"));
+						}
+					}
+				}
+
+				GameObject* sceneRoot = UIDlib.find(0)->second;
+				for (std::vector<GameObject*>::iterator it = sceneRoot->childs.begin(); it != sceneRoot->childs.end(); it++)
+				{
+					this->root->childs.push_back(*it);
+					(*it)->parent = this->root;
+				}
+				sceneRoot->childs.clear();
+				RELEASE(sceneRoot);
 			}
-			sceneRoot->childs.clear();
-			RELEASE(sceneRoot);
 		}
 	}
 }

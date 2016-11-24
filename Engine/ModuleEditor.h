@@ -46,6 +46,7 @@ private:
 	void AttributeWindow();
 	void SwitchViewPorts();
 	void ViewPortUI(const viewPort& port);
+	bool SaveLoadPopups();
 
 	void SelectByViewPort();
 
@@ -84,6 +85,10 @@ private:
 	float selectedPos[3] = { 0,0,0 };
 	float selectedScale[3] = { 1,1,1 };
 	float selectedEuler[3] = { 0,0,0 };
+
+	bool wantToSave = false;
+	bool wantToLoad = false;
+	char sceneName[256];
 };
 
 #endif

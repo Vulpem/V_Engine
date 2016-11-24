@@ -384,8 +384,8 @@ Component* GameObject::AddComponent(Component::Type type)
 	{
 		HasComponents[type] += 1;
 		components.push_back(toAdd);
+		App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
 	}
-	App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
 
 	return toAdd;
 }

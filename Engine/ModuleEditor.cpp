@@ -59,6 +59,8 @@ bool ModuleEditor::Start()
 	OnScreenResize(App->window->GetWindowSize().x, App->window->GetWindowSize().y);
 	SwitchViewPorts();
 
+	strcpy(sceneName, "");
+
 	return true;
 }
 
@@ -121,6 +123,7 @@ update_status ModuleEditor::PostUpdate()
 	Console();
 	Outliner();
 	AttributeWindow();
+	SaveLoadPopups();
 
 	return ret;
 }
@@ -263,17 +266,21 @@ update_status ModuleEditor::MenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Save Scene"))
+			if (ImGui::MenuItem("Save Scene##SaveMenuBar"))
 			{
-				App->GO->SaveScene("TestScene");
+				wantToSave = true;
 			}
-			if (ImGui::MenuItem("Quit"))
+			if (ImGui::MenuItem("Load Scene##LoadMenuBar"))
 			{
-				ret = UPDATE_STOP;
+				wantToLoad = true;
 			}
 			if (ImGui::MenuItem("ClearConsole"))
 			{
 				ClearConsole();
+			}
+			if (ImGui::MenuItem("Quit"))
+			{
+				ret = UPDATE_STOP;
 			}
 			ImGui::EndMenu();
 		}
@@ -574,6 +581,63 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 		ImGui::EndMenuBar();
 	}
 	ImGui::End();
+}
+
+bool ModuleEditor::SaveLoadPopups()
+{
+	ImGui::SetNextWindowSize(ImVec2(300, 120));
+	if (ImGui::BeginPopupModal("Save scene"))
+	{
+		bool close = false;
+		ImGui::Text("Scene name:");
+		ImGui::InputText("##saveSceneInputText", sceneName, 256);
+		if (ImGui::Button("Save##saveButton") && sceneName[0] != '\0')
+		{
+			App->GO->SaveScene(sceneName);
+			close = true;
+		}
+		ImGui::SameLine();
+		if (close || ImGui::Button("Cancel##cancelSaveScene"))
+		{
+			strcpy(sceneName, "");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	ImGui::SetNextWindowSize(ImVec2(300, 120));
+	if (ImGui::BeginPopupModal("Load Scene"))
+	{
+		ImGui::Text("Scene name:");
+		ImGui::InputText("##saveSceneInputText", sceneName, 256);
+		bool close = false;
+		if (ImGui::Button("Load##loadButton") && sceneName[0] != '\0')
+		{
+			strcat(sceneName, ".vscene");
+			App->GO->LoadScene(sceneName);
+			close = true;
+		}
+		ImGui::SameLine();
+		if ( close || ImGui::Button("Cancel##cancelLoadScene"))
+		{
+			strcpy(sceneName, "");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	if (wantToSave)
+	{
+		ImGui::OpenPopup("Save scene");
+		wantToSave = false;
+	}
+	if (wantToLoad)
+	{
+		ImGui::OpenPopup("Load Scene");
+		wantToLoad = false;
+	}
+
+	return false;
 }
 
 void ModuleEditor::SelectByViewPort()
