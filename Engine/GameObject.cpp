@@ -382,7 +382,7 @@ Component* GameObject::AddComponent(Component::Type type)
 
 	if (toAdd != nullptr)
 	{
-		HasComponents[type] += 1;
+		HasComponents[toAdd->GetType()] += 1;
 		components.push_back(toAdd);
 		App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
 	}
@@ -407,28 +407,31 @@ Transform * GameObject::GetTransform()
 
 void GameObject::Save(pugi::xml_node& node)
 {
-	pugi::xml_node GO = node.append_child("GO");
-	GO.append_attribute("name") = name;
-	if (parent != nullptr)
+	if (hiddenOnOutliner == false)
 	{
-		GO.append_attribute("UID") = uid;
-		if (parent->parent != nullptr)
+		pugi::xml_node GO = node.append_child("GO");
+		GO.append_attribute("name") = name;
+		if (parent != nullptr)
 		{
-			GO.append_attribute("parent") = parent->GetUID();
+			GO.append_attribute("UID") = uid;
+			if (parent->parent != nullptr)
+			{
+				GO.append_attribute("parent") = parent->GetUID();
+			}
+			else
+			{
+				GO.append_attribute("parent") = 0;
+			}
 		}
 		else
 		{
-			GO.append_attribute("parent") = 0;
+			GO.append_attribute("UID") = 0;
+			GO.append_attribute("parent") = "0";
 		}
-	}
-	else
-	{
-		GO.append_attribute("UID") = 0;
-		GO.append_attribute("parent") = "0";
-	}
 
-	for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
-	{
-		(*it)->Save(node);
+		for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
+		{
+			(*it)->Save(node);
+		}
 	}
 }

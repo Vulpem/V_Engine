@@ -61,18 +61,18 @@ void Material::SaveSpecifics(pugi::xml_node& myNode)
 
 void Material::LoadSpecifics(pugi::xml_node & myNode)
 {
-	pugi::xml_node col = myNode.child("Color");
-	float color[4];
-	color[0] = col.attribute("R").as_float();
-	color[1] = col.attribute("G").as_float();
-	color[2] = col.attribute("B").as_float();
-	color[3] = col.attribute("A").as_float();
-
 	for (pugi::xml_node tex = myNode.child("Texture"); tex != nullptr; tex = tex.next_sibling())
 	{
 		std::string path = tex.attribute("path").as_string();
 		App->importer->LoadTexture(path._Myptr(), this);
 	}
+
+	pugi::xml_node col = myNode.child("Color");
+
+	color[0] = col.attribute("R").as_float();
+	color[1] = col.attribute("G").as_float();
+	color[2] = col.attribute("B").as_float();
+	color[3] = col.attribute("A").as_float();
 
 }
 

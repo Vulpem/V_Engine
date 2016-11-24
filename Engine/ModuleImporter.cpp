@@ -771,10 +771,11 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 	return nullptr;
 }
 
-void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
+mesh* ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 {
 	char* file = nullptr;
 	std::string filePath("Library/Meshes/");
+	mesh* newMesh = nullptr;
 
 	filePath += path;
 	filePath += ".vmesh";
@@ -796,7 +797,7 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 
 			if (_meshExists == true)
 			{
-				mesh* newMesh = (mesh*)toLink->AddComponent(Component::Type::C_mesh);
+				newMesh = (mesh*)toLink->AddComponent(Component::Type::C_mesh);
 
 				newMesh->meshPath = path;
 
@@ -889,12 +890,14 @@ void ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 		}
 		RELEASE_ARRAY(file);
 	}
+	return newMesh;
 }
 
-void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
+Material* ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 {
 	char* file = nullptr;
 	std::string filePath("Library/Materials/");
+	Material* mat = nullptr;
 
 	filePath += path;
 	filePath += ".vmat";
@@ -907,7 +910,7 @@ void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 		if (file != nullptr && size > 0)
 		{
 			char* It = file;
-			Material* mat = (Material*)toLink->AddComponent(Component::Type::C_material);
+			mat = (Material*)toLink->AddComponent(Component::Type::C_material);
 
 			uint bytes = 0;
 			uint nTextures = 0;
@@ -947,6 +950,7 @@ void ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 			}
 		}
 	}
+	return mat;
 }
 
 int ModuleImporter::LoadTexture(char* path, Material* mat)

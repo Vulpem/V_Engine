@@ -257,7 +257,10 @@ void ModuleGoManager::SaveSceneNow()
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		comp->second->Save(Components_node.append_child("Component"));
+		if (comp->second->object->HiddenFromOutliner() == false)
+		{
+			comp->second->Save(Components_node.append_child("Component"));
+		}
 	}
 
 	sceneName += ".vscene";
@@ -308,6 +311,10 @@ void ModuleGoManager::LoadSceneNow()
 						parent->second->childs.push_back(toAdd);
 					}
 					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
+					if (toAdd->GetUID() != 0)
+					{
+						dynamicGO.push_back(toAdd);
+					}
 				}
 
 				for (pugi::xml_node comp = root.child("Components").first_child(); comp != nullptr; comp = comp.next_sibling())
@@ -325,11 +332,28 @@ void ModuleGoManager::LoadSceneNow()
 					std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
 					if (go != UIDlib.end())
 					{
-						Component* c = go->second->AddComponent(type);
-						if (c != nullptr)
+						switch (type)
 						{
-							c->LoadSpecifics(comp.child("Specific"));
+						case (Component::C_mesh):
+						{
+							pugi::xml_node meshNode = comp.child("Specific");
+							std::string path = meshNode.attribute("MeshPath").as_string();
+							mesh* _mesh = App->importer->LoadMesh(path.data(), go->second);
+							_mesh->texMaterialIndex = meshNode.attribute("TextureIndex").as_int();
+							go->second->SetOriginalAABB();
+							break;
 						}
+						default:
+						{
+							Component* c = go->second->AddComponent(type);
+							if (c != nullptr)
+							{
+								c->LoadSpecifics(comp.child("Specific"));
+								components.insert(std::pair<Component::Type, Component*>(c->GetType(), c));
+							}
+							break;
+						}
+						}						
 					}
 				}
 

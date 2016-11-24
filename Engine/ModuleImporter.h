@@ -12,6 +12,7 @@ struct aiMesh;
 struct aiNode;
 class GameObject;
 class Material;
+class mesh;
 
 class ModuleImporter : public Module
 {
@@ -52,8 +53,8 @@ public:
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, GameObject* parent = nullptr, char* meshesFolder = nullptr);
-	void LoadMesh(const char* path, GameObject* toLink);
-	void LoadMaterial(const char* path, GameObject* toLink);
+	mesh* LoadMesh(const char* path, GameObject* toLink);
+	Material* LoadMaterial(const char* path, GameObject* toLink);
 
 	int LoadTexture(char* path, Material* mat);
 
