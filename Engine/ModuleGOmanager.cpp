@@ -430,8 +430,8 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 				LineSegment transformedRay = ray;
 				transformedRay.Transform(check->second->GetTransform()->GetGlobalTransform().InverseTransposed());
 				//Generating the triangles the mes has, and checking them one by one
-				float3* vertices = (*m)->GetVertices();
-				uint* index = (*m)->GetIndices();
+				const float3* vertices = (*m)->GetVertices();
+				const uint* index = (*m)->GetIndices();
 				for (int n = 0; n < (*m)->num_indices; n += 3)
 				{
 					Triangle tri(vertices[index[n]], vertices[index[n + 1]], vertices[index[n + 2]]);
@@ -454,8 +454,6 @@ bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobje
 						}
 					}
 				}
-				RELEASE_ARRAY(vertices);
-				RELEASE_ARRAY(index);
 			}
 		}
 		else if(onlyMeshes == false)

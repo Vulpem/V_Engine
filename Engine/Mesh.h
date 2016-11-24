@@ -40,14 +40,9 @@ public:
 
 	Mesh_RenderInfo GetMeshInfo();
 
-	//WARNING, the returned value is created via the NEW operator. Remember to destroy it after use
-	float3* GetVertices();
-
-	//WARNING, the returned value is created via the NEW operator. Remember to destroy it after use
-	uint* GetIndices();
-
-	//WARNING, the returned value is created via the NEW operator. Remember to destroy it after use
-	float3* GetNormals();
+	const float3* GetVertices() const;
+	const uint* GetIndices() const;
+	const float3* GetNormals() const;
 
 	void EditorContent();
 
