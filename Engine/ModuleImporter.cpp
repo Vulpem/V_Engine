@@ -172,7 +172,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 
 	std::string saveName("Library/Textures/");
 	saveName += FileName(filePath);
-	saveName += ".dds";
+	saveName += ".vtexture";
 
 	LOG("\nStarted importing texture %s", filePath);
 	char* buffer;
@@ -206,7 +206,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 				}
 				else
 				{
-					LOG("devIl couldn't create de .dds!");
+					LOG("devIl couldn't create the .dds!");
 				}
 				RELEASE_ARRAY(data);
 			}
@@ -965,7 +965,7 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	std::string fullPath(App->fs->GetWrittingDirectory());
 	fullPath += "Library\\Textures\\";
 	fullPath += name;
-	fullPath += ".dds";
+	fullPath += ".vtexture";
 
 	LOG("Loading Texture %s", path);
 
