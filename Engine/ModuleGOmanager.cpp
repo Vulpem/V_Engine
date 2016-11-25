@@ -149,6 +149,11 @@ update_status ModuleGoManager::PostUpdate()
 		wantToSaveScene = false;
 		TIMER_READ_MS("Saving Scene");
 	}
+	if (wantToClearScene)
+	{
+		ClearSceneNow();
+		wantToClearScene = false;
+	}
 	if (wantToLoadScene)
 	{
 		TIMER_START_PERF("Loading Scene");
@@ -156,6 +161,7 @@ update_status ModuleGoManager::PostUpdate()
 		wantToLoadScene = false;
 		TIMER_READ_MS("Loading Scene");
 	}
+
 
 	return UPDATE_CONTINUE;
 }
@@ -239,6 +245,33 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	
 }
 
+void ModuleGoManager::ClearSceneNow()
+{
+	if (root->childs.empty() == false)
+	{
+		std::vector<GameObject*> toSave;
+		while (root->childs.empty() == false)
+		{
+			GameObject* tmp = root->childs.back();
+			if (tmp->HiddenFromOutliner())
+			{
+				toSave.push_back(root->childs.back());
+				root->childs.pop_back();
+			}
+			else
+			{
+				delete tmp;
+			}
+		}
+		root->childs.clear();
+		for (std::vector<GameObject*>::iterator it = toSave.begin(); it != toSave.end(); it++)
+		{
+			root->childs.push_back(*it);
+		}
+		LOG("Scene cleared");
+	}
+}
+
 void ModuleGoManager::SaveSceneNow()
 {
 	// xml object were we will store all data
@@ -277,6 +310,12 @@ void ModuleGoManager::SaveSceneNow()
 void ModuleGoManager::LoadSceneNow()
 {
 	std::map<uint64_t, GameObject*> UIDlib;
+
+	//If the recieved scene had no format, we'll add it
+	if (App->importer->FileFormat(sceneName.data()).length() == 0)
+	{
+		sceneName += ".vscene";
+	}
 
 	char* buffer;
 	uint size = App->fs->Load(sceneName.data(), &buffer);
@@ -366,6 +405,8 @@ void ModuleGoManager::LoadSceneNow()
 				//Deleting a Gameobject will also delete and clear all his childs. In this special case we don't want that
 				sceneRoot->childs.clear();
 				RELEASE(sceneRoot);
+
+				LOG("Scene loaded: %s", sceneName.data());
 			}
 		}
 	}

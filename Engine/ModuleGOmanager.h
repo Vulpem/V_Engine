@@ -39,12 +39,16 @@ public:
 
 	void SaveScene(char* name) { wantToSaveScene = true; sceneName = name; }
 	void LoadScene(char* name) { wantToLoadScene = true; sceneName = name;	}
+	void ClearScene() { wantToClearScene = true; }
+
 private:
 	std::string sceneName;
 	bool wantToSaveScene = false;
 	bool wantToLoadScene = false;
+	bool wantToClearScene = false;
 	void SaveSceneNow();
 	void LoadSceneNow();
+	void ClearSceneNow();
 public:
 
 

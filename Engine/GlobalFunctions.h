@@ -36,7 +36,10 @@
 struct GlobalTime
 {
 	//Time since the application started
-	long float runningTime = 0.0f;
+	long float AppRuntime = 0.0f;
+
+	//Time since the game started
+	long float GameRuntime = 0.0f;
 
 	//Delta time from last frame in seconds
 	float dt = 0.001f;
@@ -45,7 +48,10 @@ struct GlobalTime
 	float gdt = 0.001f;
 
 	//Is the game in "Play mode"?
-	bool playing = false;
+	bool PlayMode = false;
+
+	//Is the game paused?
+	bool Pause = false;
 
 };
 

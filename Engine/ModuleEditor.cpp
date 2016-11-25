@@ -121,6 +121,7 @@ update_status ModuleEditor::PostUpdate()
 	ret = MenuBar();
 	Editor();
 	Console();
+	PlayButtons();
 	Outliner();
 	AttributeWindow();
 	SaveLoadPopups();
@@ -268,6 +269,10 @@ update_status ModuleEditor::MenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("New Scene##NewMenuBar"))
+			{
+				wantNew = true;
+			}
 			if (ImGui::MenuItem("Save Scene##SaveMenuBar"))
 			{
 				wantToSave = true;
@@ -342,16 +347,56 @@ update_status ModuleEditor::MenuBar()
 	return ret;
 }
 
+void ModuleEditor::PlayButtons()
+{
+	ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
+	ImGui::SetNextWindowSize(ImVec2(300.0f, 30.0f));
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar;
+
+	ImGui::Begin("PlayButtons", 0, ImVec2(500, 300), 0.8f, flags);
+
+	if (Time.PlayMode == false)
+	{
+		if (ImGui::Button("Play##PlayButton"))
+		{
+			Time.PlayMode = true;
+			Time.GameRuntime = 0.0f;
+			App->GO->SaveScene("temp");
+		}
+	}
+	else
+	{
+		if (ImGui::Button("Pause##PauseButton"))
+		{
+			Time.Pause = true;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Stop##StopButton"))
+		{
+			Time.PlayMode = false;
+			Time.Pause = false;
+			Time.gdt = 0.0f;
+			App->GO->ClearScene();
+			App->GO->LoadScene("temp");
+		}
+	}
+	ImGui::End();
+}
+
 void ModuleEditor::Editor()
 {
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20 + (screenH - 20) / 2));
 		ImGui::SetNextWindowSize(ImVec2(330, (screenH - 20) / 2));
 
-		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f);
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+		ImGui::Begin("Editor", 0, ImVec2(500, 300), 0.8f, flags);
 
 		if (ImGui::CollapsingHeader("Application"))
 		{
-			ImGui::Text("Time since startup: %f", Time.runningTime);
+			ImGui::Text("Time since startup: %f", Time.AppRuntime);
+			ImGui::Text("Game Time: %f", Time.GameRuntime);
 
 			ImGui::InputInt("Max Framerate:", &App->maxFPS, 15);
 			char tmp[256];
@@ -456,7 +501,9 @@ void ModuleEditor::Console()
 		ImGui::SetNextWindowPos(ImVec2(0.0f, screenH - 200.0f));
 		ImGui::SetNextWindowSize(ImVec2(screenW - 330.0f, 200.0f));
 
-		ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f);
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+		ImGui::Begin("Console", 0, ImVec2(500, 300), 0.8f, flags);
 
 		ImColor col = ImColor(0.6f, 0.6f, 1.0f, 1.0f);
 		ImGui::PushStyleColor(0, col);
@@ -474,10 +521,12 @@ void ModuleEditor::Console()
 
 void ModuleEditor::Outliner()
 {
-		ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
-		ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 220.0f));
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 50.0f));
+		ImGui::SetNextWindowSize(ImVec2(300.0f, screenH - 250.0f));
 
-		ImGui::Begin("Outliner", 0, ImVec2(500, 300), 0.8f);
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+		ImGui::Begin("Outliner", 0, ImVec2(500, 300), 0.8f, flags);
 
 		std::vector<GameObject*>::const_iterator node = App->GO->GetRoot()->childs.begin();
 		while (node != App->GO->GetRoot()->childs.end())
@@ -489,12 +538,14 @@ void ModuleEditor::Outliner()
 		ImGui::End();
 }
 
-
 void ModuleEditor::AttributeWindow()
 {
 		ImGui::SetNextWindowPos(ImVec2(screenW - 330, 20.0f));
 		ImGui::SetNextWindowSize(ImVec2(330, (screenH-20)/2));
-		ImGui::Begin("Attribute Editor", 0, 0.8f);
+
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+
+		ImGui::Begin("Attribute Editor", 0, flags);
 		if (selectedGameObject)
 		{
 			selectedGameObject->DrawOnEditor();
@@ -517,6 +568,7 @@ void ModuleEditor::AttributeWindow()
 		}
 		ImGui::End();
 }
+
 
 void ModuleEditor::SwitchViewPorts()
 {
@@ -588,6 +640,31 @@ void ModuleEditor::ViewPortUI(const viewPort& port)
 bool ModuleEditor::SaveLoadPopups()
 {
 	ImGui::SetNextWindowSize(ImVec2(300, 120));
+	if (ImGui::BeginPopupModal("New scene"))
+	{
+		bool close = false;
+		ImGui::Text("Save current scene?");
+		if (ImGui::Button("Yes##saveCurrentButton"))
+		{
+			wantToSave = true;
+			clearAfterSave = true;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("No##NotSaveCurrentButton"))
+		{
+			App->GO->ClearScene();
+			close = true;
+		}
+		ImGui::SameLine();
+		if (close || ImGui::Button("Cancel##CancelSaveCurrentButton"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+
+	ImGui::SetNextWindowSize(ImVec2(300, 120));
 	if (ImGui::BeginPopupModal("Save scene"))
 	{
 		bool close = false;
@@ -597,11 +674,16 @@ bool ModuleEditor::SaveLoadPopups()
 		{
 			App->GO->SaveScene(sceneName);
 			close = true;
+			if (clearAfterSave)
+			{
+				App->GO->ClearScene();
+			}
 		}
 		ImGui::SameLine();
 		if (close || ImGui::Button("Cancel##cancelSaveScene"))
 		{
 			strcpy(sceneName, "");
+			clearAfterSave = false;
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndPopup();
@@ -628,6 +710,11 @@ bool ModuleEditor::SaveLoadPopups()
 		ImGui::EndPopup();
 	}
 
+	if (wantNew)
+	{
+		ImGui::OpenPopup("New scene");
+		wantNew = false;
+	}
 	if (wantToSave)
 	{
 		ImGui::OpenPopup("Save scene");

@@ -40,6 +40,7 @@ private:
 	void SelectGameObject(GameObject* node);
 
 	update_status MenuBar();
+	void PlayButtons();
 	void Editor();
 	void Console();
 	void Outliner();
@@ -86,8 +87,10 @@ private:
 	float selectedScale[3] = { 1,1,1 };
 	float selectedEuler[3] = { 0,0,0 };
 
+	bool wantNew = false;
 	bool wantToSave = false;
 	bool wantToLoad = false;
+	bool clearAfterSave = false;
 	char sceneName[256];
 };
 

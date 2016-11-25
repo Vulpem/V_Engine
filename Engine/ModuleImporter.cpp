@@ -1026,6 +1026,10 @@ std::string ModuleImporter::FileFormat(const char * file)
 		while (*tmp != '.')
 		{
 			tmp--;
+			if (tmp == name)
+			{
+				return std::string("");
+			}
 		}
 		tmp++;
 		return std::string(tmp);
