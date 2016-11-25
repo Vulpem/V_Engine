@@ -301,7 +301,7 @@ void ModuleGoManager::LoadSceneNow()
 					
 					uint64_t UID = GOs.attribute("UID").as_ullong();
 
-					GameObject* toAdd = new GameObject(UID);
+					GameObject* toAdd = new GameObject();
 					toAdd->SetName(go_name.data());
 
 					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
@@ -311,7 +311,7 @@ void ModuleGoManager::LoadSceneNow()
 						parent->second->childs.push_back(toAdd);
 					}
 					UIDlib.insert(std::pair<uint64_t, GameObject*>(UID, toAdd));
-					if (toAdd->GetUID() != 0)
+					if (UID != 0)
 					{
 						dynamicGO.push_back(toAdd);
 					}

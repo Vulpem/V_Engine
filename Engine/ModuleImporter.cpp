@@ -622,7 +622,7 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 
 GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
 {
-	std::string fileName = FileName(fileName_NoFileType);
+	std::string fileName (fileName_NoFileType);
 
 	char* file = nullptr;
 	std::string path("Library/vGOs/");
@@ -1036,20 +1036,21 @@ std::string ModuleImporter::FileName(const char * file)
 	char name[1024];
 	strcpy(name, file);
 	char* start = name;
-	char* end = name;
 	int size = 0;
 	while (*start != '\0')
 	{
 		size++;
 		start++;
 	}
-	end = start;
+
+	char*  end = start;
 	while (size >= 0  && *start != '/' && *start != '\\')
 	{
 		size--;
 		start--;
 	}
 	start++;
+
 	while (*end != '.' && end != start)
 	{
 		end--;

@@ -70,6 +70,24 @@ GameObject::~GameObject()
 		parent->childs.erase(it);
 	}
 
+	std::vector<Component*>::reverse_iterator comp = components.rbegin();
+	while (comp != components.rend())
+	{
+		std::multimap<Component::Type, Component*>::iterator it = App->GO->components.find((*comp)->GetType());
+		for (; it->first == (*comp)->GetType(); it++)
+		{
+			if (it->second->GetUID() == (*comp)->GetUID())
+			{
+				App->GO->components.erase(it);
+				break;
+			}
+		}
+
+		delete *comp;
+		comp++;
+	}
+	components.clear();
+
 	if (childs.empty() == false)
 	{
 		std::vector<GameObject*>::iterator iterator = childs.begin();
@@ -83,24 +101,6 @@ GameObject::~GameObject()
 			}
 		}
 	}
-
-	std::vector<Component*>::reverse_iterator comp = components.rbegin();
-	while (comp != components.rend())
-	{
-		std::multimap<Component::Type, Component*>::iterator it = App->GO->components.find((*comp)->GetType());
-		for (; it->first == (*comp)->GetType(); it++)
-		{		
-			if (it->second == (*comp))
-			{
-				App->GO->components.erase(it);
-				break;
-			}
-		}
-
-		delete *comp;
-		comp++;
-	}
-	components.clear();
 }
 
 void GameObject::DrawOnEditor()

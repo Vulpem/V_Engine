@@ -227,8 +227,10 @@ void ModuleEditor::SceneTreeGameObject(GameObject* node)
 		{
 			node_flags += ImGuiTreeNodeFlags_Leaf;
 		}
+		char name[256];
+		sprintf(name, "%s##%llu", node->GetName(), node->GetUID());
 
-		if (ImGui::TreeNodeEx(node->GetName(), node_flags))
+		if (ImGui::TreeNodeEx(name, node_flags))
 		{
 			if (ImGui::IsItemClicked())
 			{
