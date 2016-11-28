@@ -14,6 +14,7 @@
 #include "ModuleGoManager.h"
 #include "ModuleFileSystem.h"
 #include "ModuleImporter.h"
+#include "ModuleResourceManager.h"
 
 #include "Timers.h"
 
@@ -35,6 +36,7 @@ Application::Application()
 #if USE_EDITOR
 		Editor = new ModuleEditor(this);
 #endif
+	resources = new ModuleResourceManager(this);
 	GO = new ModuleGoManager(this);
 	importer = new ModuleImporter(this);
 
@@ -55,6 +57,7 @@ Application::Application()
 	AddModule(audio);
 	AddModule(physics);
 	AddModule(importer);
+	AddModule(resources);
 	AddModule(GO);
 
 	// Renderer last!

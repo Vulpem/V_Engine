@@ -388,6 +388,9 @@
     <ClInclude Include="PugiXml\src\pugixml.hpp">
       <Filter>Sources\Libraries\pugiXML</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleResourceManager.h">
+      <Filter>Sources\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -587,6 +590,9 @@
     </ClCompile>
     <ClCompile Include="PugiXml\src\pugixml.cpp">
       <Filter>Sources\Libraries\pugiXML</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleResourceManager.cpp">
+      <Filter>Sources\Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

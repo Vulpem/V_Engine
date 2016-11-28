@@ -20,6 +20,7 @@ class ModuleGoManager;
 class ModulePhysics3D;
 class ModuleFileSystem;
 class ModuleImporter;
+class ModuleResourceManager;
 class TimerManager;
 
 struct viewPort;
@@ -38,6 +39,7 @@ public:
 	ModuleCamera3D* camera;
 
 	ModuleEditor* Editor;
+	ModuleResourceManager* resources;
 	ModuleImporter* importer;
 	ModuleGoManager* GO;
 	ModulePhysics3D* physics;
