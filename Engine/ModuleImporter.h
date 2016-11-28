@@ -13,6 +13,7 @@ struct aiNode;
 class GameObject;
 class Material;
 class mesh;
+class R_mesh;
 
 class ModuleImporter : public Module
 {
@@ -53,7 +54,7 @@ public:
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, GameObject* parent = nullptr, char* meshesFolder = nullptr);
-	mesh* LoadMesh(const char* path, GameObject* toLink);
+	R_mesh* LoadMesh(const char* path);
 	Material* LoadMaterial(const char* path, GameObject* toLink);
 
 	int LoadTexture(char* path, Material* mat);
@@ -66,6 +67,9 @@ public:
 
 	//This function will remove everything from the path except the file's actual name. No format, no path
 	std::string FileName(const char* file);
+
+	//Returns the file name + format
+	std::string File(const char* file);
 
 private:
 	template <typename type>

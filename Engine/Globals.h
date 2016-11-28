@@ -16,6 +16,12 @@ void log(const char file[], int line, const char* format, ...);
 
 #define EDITOR_FRAME_SAMPLES 50
 
+#define SCENE_FORMAT ".vscene"
+#define TEXTURE_FORMAT ".vtexture"
+#define GO_FORMAT ".vgo"
+#define MESH_FORMAT ".vmesh"
+#define MATERIAL_FORMAT ".vmat"
+
 typedef unsigned __int32 uint32;
 typedef unsigned __int64 uint64;
 typedef unsigned int uint;

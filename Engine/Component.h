@@ -65,4 +65,25 @@ private:
 
 };
 
+class ResourceComponent : public Component
+{
+public:
+	ResourceComponent(std::string resource, GameObject* linkedTo, int id) : Component(linkedTo, id)
+	{
+		LinkResource(resource);
+	}
+
+	~ResourceComponent()
+	{
+		UnLinkResource();
+	}
+
+protected:
+	Resource* resource = nullptr;
+
+private:
+	void LinkResource(std::string fileName);
+	void UnLinkResource();
+};
+
 #endif

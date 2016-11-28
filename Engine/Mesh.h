@@ -8,33 +8,16 @@ struct Mesh_RenderInfo;
 struct aiMesh;
 struct aiNode;
 struct aiScene;
+class R_mesh;
 
-class mesh : public  Component
+class mesh : public  ResourceComponent
 {
 public:
-	mesh(GameObject* linkedTo, int id);
+	mesh(std::string resource, GameObject* linkedTo, int id);
 	~mesh();
 
-	std::string meshPath;
-
-	float3* vertices = nullptr;
-	uint id_vertices = 0;
-	uint num_vertices = 0;
-
-	uint* indices = nullptr;
-	uint id_indices = 0;
-	uint num_indices = 0;
-
-	float3* normals = nullptr;
-	uint id_normals = 0;
-	uint num_normals;
-
-	uint id_textureCoords = 0;
-	uint num_textureCoords = 0;
-
+public:
 	int texMaterialIndex = -1;
-
-	AABB aabb;
 
 	bool wires = false;
 

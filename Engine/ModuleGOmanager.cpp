@@ -296,7 +296,7 @@ void ModuleGoManager::SaveSceneNow()
 		}
 	}
 
-	sceneName += ".vscene";
+	sceneName += SCENE_FORMAT;
 
 	std::stringstream stream;
 	data.save(stream);
@@ -314,7 +314,7 @@ void ModuleGoManager::LoadSceneNow()
 	//If the recieved scene had no format, we'll add it
 	if (App->importer->FileFormat(sceneName.data()).length() == 0)
 	{
-		sceneName += ".vscene";
+		sceneName += SCENE_FORMAT;
 	}
 
 	char* buffer;

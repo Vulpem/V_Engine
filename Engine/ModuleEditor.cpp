@@ -697,7 +697,7 @@ bool ModuleEditor::SaveLoadPopups()
 		bool close = false;
 		if (ImGui::Button("Load##loadButton") && sceneName[0] != '\0')
 		{
-			strcat(sceneName, ".vscene");
+			strcat(sceneName, SCENE_FORMAT);
 			App->GO->LoadScene(sceneName);
 			close = true;
 		}

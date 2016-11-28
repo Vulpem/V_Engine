@@ -1,6 +1,9 @@
 #include "Component.h"
 #include "GameObject.h"
 
+#include "Application.h"
+#include "ModuleResourceManager.h"
+
 #include "ImGui\imgui.h"
 
 Component::Component(GameObject* linkedTo, int _id): name("Empty component")
@@ -89,4 +92,17 @@ void Component::Save(pugi::xml_node& myNode)
 	SaveSpecifics(myNode.append_child("Specific"));
 }
 
+void ResourceComponent::LinkResource(std::string fileName)
+{
+	UnLinkResource();
+	resource = App->resources->LinkResource(fileName);
+}
 
+void ResourceComponent::UnLinkResource()
+{
+	if (resource != nullptr)
+	{
+		App->resources->UnlinkResource(resource);
+		resource = nullptr;
+	}
+}

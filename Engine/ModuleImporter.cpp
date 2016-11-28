@@ -8,6 +8,8 @@
 #include "GameObject.h"
 #include "AllComponents.h"
 
+#include "ModuleResourceManager.h"
+
 #include "OpenGL.h"
 
 #include "Devil\include\il.h"
@@ -172,7 +174,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 
 	std::string saveName("Library/Textures/");
 	saveName += FileName(filePath);
-	saveName += ".vtexture";
+	saveName += TEXTURE_FORMAT;
 
 	LOG("\nStarted importing texture %s", filePath);
 	char* buffer;
@@ -379,7 +381,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	}
 
 	toCreate += name;
-	toCreate += ".vgo";
+	toCreate += GO_FORMAT;
 	App->fs->Save(toCreate.data(), realFile, realFileSize);
 
 	RELEASE_ARRAY(realFile);
@@ -544,7 +546,7 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 
 	toCreate += "/";
 	toCreate += name;
-	toCreate += ".vmesh";
+	toCreate += MESH_FORMAT;
 	App->fs->Save(toCreate.data(), mesh, meshSize);
 
 	RELEASE_ARRAY(mesh);
@@ -600,7 +602,7 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 		
 		std::string toCreate("Library/Materials/");
 		toCreate += matName;
-		toCreate += ".vmat";
+		toCreate += MATERIAL_FORMAT;
 		App->fs->Save(toCreate.data(), realMat, realSize);	
 
 		for (int n = 0; n < matsIndex.size(); n++)
@@ -637,7 +639,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 	}
 
 	path += fileName;
-	path += ".vgo";
+	path += GO_FORMAT;
 
 	LOG("Loading vgo %s", path.data());
 
@@ -688,6 +690,7 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				bytes = sizeof(char) * 256;
 				memcpy(&meshName, It, bytes);
 				It += bytes;
+
 				LoadMesh(meshName, ret);
 			}
 
@@ -771,14 +774,14 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 	return nullptr;
 }
 
-mesh* ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
+R_mesh* ModuleImporter::LoadMesh(const char * path)
 {
 	char* file = nullptr;
 	std::string filePath("Library/Meshes/");
-	mesh* newMesh = nullptr;
+	R_mesh* newMesh = nullptr;
 
 	filePath += path;
-	filePath += ".vmesh";
+	filePath += MESH_FORMAT;
 
 	LOG("Loading mesh %s", filePath.data());
 
@@ -797,9 +800,9 @@ mesh* ModuleImporter::LoadMesh(const char * path, GameObject * toLink)
 
 			if (_meshExists == true)
 			{
-				newMesh = (mesh*)toLink->AddComponent(Component::Type::C_mesh);
+				newMesh = new R_mesh();
 
-				newMesh->meshPath = path;
+				newMesh->file = File(filePath.data());
 
 				//Num vertices
 				bytes = sizeof(uint);
@@ -900,7 +903,7 @@ Material* ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 	Material* mat = nullptr;
 
 	filePath += path;
-	filePath += ".vmat";
+	filePath += MATERIAL_FORMAT;
 
 	LOG("Loading mesh %s", filePath.data());
 
@@ -965,7 +968,7 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 	std::string fullPath(App->fs->GetWrittingDirectory());
 	fullPath += "Library\\Textures\\";
 	fullPath += name;
-	fullPath += ".vtexture";
+	fullPath += TEXTURE_FORMAT;
 
 	LOG("Loading Texture %s", path);
 
@@ -1062,6 +1065,26 @@ std::string ModuleImporter::FileName(const char * file)
 	if (end != start)
 	{
 		*end = '\0';
+	}
+	return std::string(start);
+}
+
+std::string ModuleImporter::File(const char * file)
+{
+	const char* start = file;
+
+	while (*start != '\0')
+	{
+		start++;
+	}
+
+	while (*start != '/' && *start != '\\' && start != file)
+	{
+		start--;
+	}
+	if (start != file)
+	{
+		start++;
 	}
 	return std::string(start);
 }
