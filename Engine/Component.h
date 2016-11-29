@@ -18,6 +18,7 @@ public:
 		C_material,
 		C_mesh,
 		C_camera,
+		C_Texture,
 
 		//Keep this "C_None" always last
 		C_None

@@ -57,6 +57,10 @@ Resource * ModuleResourceManager::LoadNewResource(std::string fileName)
 	{
 		return App->importer->LoadMaterial(fileName.data());
 	}
+	if (format == TEXTURE_FORMAT)
+	{
+		return App->importer->LoadTexture(fileName.data());
+	}
 	return nullptr;
 }
 
@@ -140,4 +144,16 @@ R_mesh::~R_mesh()
 
 R_Material::~R_Material()
 {
+	if (textures.empty() == false)
+	{
+		for (std::vector<R_Texture*>::iterator it = textures.begin(); it != textures.end(); it++)
+		{
+			App->resources->UnlinkResource(*it);
+		}
+	}
+}
+
+R_Texture::~R_Texture()
+{
+	glDeleteBuffers(1, &bufferID);
 }

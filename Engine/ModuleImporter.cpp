@@ -902,7 +902,6 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 	R_Material* mat = nullptr;
 
 	filePath += path;
-	filePath += MATERIAL_FORMAT;
 
 	LOG("Loading mesh %s", filePath.data());
 
@@ -916,6 +915,8 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 
 			uint bytes = 0;
 			uint nTextures = 0;
+
+			mat->file = path;
 
 			//NumTextures
 			uint numTextures = 0;
@@ -938,8 +939,13 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 					bytes = sizeof(char) * textureNameLen;
 					memcpy(textureName, It, bytes);
 					It += bytes;
-
-					LoadTexture(textureName, mat);
+					std::string path(textureName);
+					path += TEXTURE_FORMAT;
+					R_Texture* toAdd = (R_Texture*)App->resources->LinkResource(path.data(), Component::C_Texture);
+					if (toAdd != nullptr)
+					{
+						mat->textures.push_back(toAdd);
+					}
 
 					delete[] textureName;
 				}
@@ -958,11 +964,12 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 	return mat;
 }
 
-int ModuleImporter::LoadTexture(char* path, Material* mat)
+R_Texture* ModuleImporter::LoadTexture(const char* path)
 {
+	R_Texture* ret = nullptr;
 	if (*path == '\0')
 	{
-		return -1;
+		return ret;
 	}
 
 	std::string name = FileName(path);
@@ -974,32 +981,15 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 
 	LOG("Loading Texture %s", path);
 
-	//Checking if the texture is already loaded
-	std::vector<std::string>::iterator it = mat->texturePaths.begin();
-	int n = 0;
-	while (it != mat->texturePaths.end())
-	{
-		if (name == it->data())
-		{
-			LOG("It already exists! Passing id %i", mat->textures.at(n));
-			return n;
-			//return mat->textures.at(n);
-		}
-		it++;
-		n++;
-	}
-
-	
-
 	char tmp[1024];
 	strcpy(tmp, fullPath.data());
 	uint ID = ilutGLLoadImage(tmp);
 
 	if (ID != 0)
 	{
-		int ret = mat->textures.size();
-		mat->textures.push_back(ID);
-		mat->texturePaths.push_back(name.data());
+		ret = new R_Texture();
+		ret->file = path;
+		ret->bufferID = ID;
 		return ret;
 	}
 	else
@@ -1011,7 +1001,7 @@ int ModuleImporter::LoadTexture(char* path, Material* mat)
 			//For some reason, this will break and cause a crash
 			//LOG("%s", iluErrorString(error));
 		}
-		return -1;
+		return ret;
 	}
 }
 

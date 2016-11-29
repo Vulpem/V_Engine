@@ -14,6 +14,8 @@ class GameObject;
 class Material;
 class mesh;
 class R_mesh;
+class R_Material;
+class R_Texture;
 
 class ModuleImporter : public Module
 {
@@ -54,10 +56,10 @@ public:
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, GameObject* parent = nullptr, char* meshesFolder = nullptr);
+
 	R_mesh* LoadMesh(const char* path);
 	R_Material* LoadMaterial(const char* path);
-
-	int LoadTexture(char* path, Material* mat);
+	R_Texture* LoadTexture(const char* path);
 
 
 

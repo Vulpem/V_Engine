@@ -24,7 +24,20 @@ public:
 	virtual Component::Type GetType() = 0;
 
 	template <typename T>
-	const T* Read() { return (T*)this; }
+	T* Read() { return (T*)this; }
+};
+
+class R_Texture : public Resource
+{
+public:
+	R_Texture() :Resource() { }
+	R_Texture(uint64_t UID) : Resource(UID) {}
+
+	~R_Texture();
+
+	uint bufferID = 0;
+
+	Component::Type GetType() { return Component::Type::C_Texture; }
 };
 
 class R_Material : public Resource
@@ -37,8 +50,7 @@ public:
 
 	Component::Type GetType() { return Component::Type::C_material; }
 
-	std::vector<uint> textures;
-	std::vector<std::string> texturePaths;
+	std::vector<R_Texture*> textures;
 
 	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
 };

@@ -370,7 +370,7 @@ Component* GameObject::AddComponent(Component::Type type, std::string res)
 	{
 		if (HasComponent(Component::C_material) == false)
 		{
-			toAdd = new Material(this, components.size());
+			toAdd = new Material(res, this, components.size());
 		}
 		break;
 	}
