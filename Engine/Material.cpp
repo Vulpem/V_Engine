@@ -8,7 +8,7 @@
 
 #include "OpenGL.h"
 
-Material::Material(GameObject* linkedTo, int id) :Component(linkedTo, id, C_material)
+Material::Material(std::string res, GameObject* linkedTo, int id) : ResourceComponent(res, linkedTo, id, C_material)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Material##%i", id);

@@ -47,7 +47,16 @@ bool ModuleResourceManager::CleanUp()
 
 Resource * ModuleResourceManager::LoadNewResource(std::string fileName)
 {
-	return App->importer->LoadMesh(fileName.data());
+	std::string format(".");
+	format += App->importer->FileFormat(fileName.data());
+	if (format == MESH_FORMAT)
+	{
+		return App->importer->LoadMesh(fileName.data());
+	}	
+	if (format == MATERIAL_FORMAT)
+	{
+		return App->importer->LoadMaterial(fileName.data());
+	}
 	return nullptr;
 }
 
@@ -127,4 +136,8 @@ R_mesh::~R_mesh()
 	RELEASE_ARRAY(vertices);
 	RELEASE_ARRAY(indices);
 	RELEASE_ARRAY(normals);
+}
+
+R_Material::~R_Material()
+{
 }

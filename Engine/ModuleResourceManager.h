@@ -27,10 +27,26 @@ public:
 	const T* Read() { return (T*)this; }
 };
 
+class R_Material : public Resource
+{
+public:
+	R_Material() :Resource() { }
+	R_Material(uint64_t UID) : Resource(UID) {}
+
+	~R_Material();
+
+	Component::Type GetType() { return Component::Type::C_material; }
+
+	std::vector<uint> textures;
+	std::vector<std::string> texturePaths;
+
+	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
+};
+
 class R_mesh : public Resource
 {
 public:
-	R_mesh():Resource() {}
+	R_mesh() :Resource() { aabb.SetNegativeInfinity(); }
 	R_mesh(uint64_t UID) : Resource(UID) { aabb.SetNegativeInfinity(); }
 
 	~R_mesh();

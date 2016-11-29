@@ -701,7 +701,8 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				bytes = sizeof(char) * 256;
 				memcpy(&materialName, It, bytes);
 				It += bytes;
-				LoadMaterial(materialName, ret);
+				strcat(materialName, MATERIAL_FORMAT);
+				ret->AddComponent(Component::Type::C_material, materialName);
 			}
 			
 			//Num childs
@@ -894,11 +895,11 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 	return newMesh;
 }
 
-Material* ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
+R_Material* ModuleImporter::LoadMaterial(const char * path)
 {
 	char* file = nullptr;
 	std::string filePath("Library/Materials/");
-	Material* mat = nullptr;
+	R_Material* mat = nullptr;
 
 	filePath += path;
 	filePath += MATERIAL_FORMAT;
@@ -911,7 +912,7 @@ Material* ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 		if (file != nullptr && size > 0)
 		{
 			char* It = file;
-			mat = (Material*)toLink->AddComponent(Component::Type::C_material);
+			mat = new R_Material();
 
 			uint bytes = 0;
 			uint nTextures = 0;
@@ -947,7 +948,10 @@ Material* ModuleImporter::LoadMaterial(const char * path, GameObject * toLink)
 				bytes = sizeof(float) * 3;
 				memcpy(color, It, bytes);
 				It += bytes;
-				mat->SetColor(color[0], color[1], color[2]);
+				mat->color[0] = color[0];
+				mat->color[1] = color[1];
+				mat->color[2] = color[2];
+				mat->color[4] = 1.0f;
 			}
 		}
 	}

@@ -5,10 +5,10 @@
 
 #include <vector>
 
-class Material :public Component
+class Material :public ResourceComponent
 {
 public:
-	Material(GameObject* linkedTo, int id);
+	Material(std::string res, GameObject* linkedTo, int id);
 	~Material();
 
 	void EditorContent();
@@ -23,12 +23,6 @@ public:
 	math::float4 GetColor();
 
 	static Type GetType() { return Type::C_material; }
-
-	std::vector<uint> textures;
-	std::vector<std::string> texturePaths;
-private:
-	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
-
 };
 
 #endif
