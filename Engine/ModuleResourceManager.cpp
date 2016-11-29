@@ -94,6 +94,13 @@ void ModuleResourceManager::DeleteNow()
 	{
 		uint64_t uid = toDelete.back();
 
+		std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
+		if (it != resources.end())
+		{
+			RELEASE(it->second);
+			resources.erase(it);
+		}
+
 		for (std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.begin(); it != uidLib.end(); it++)
 		{
 			if (it->second == uid)
@@ -103,12 +110,6 @@ void ModuleResourceManager::DeleteNow()
 			}
 		}
 		
-		std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-		if (it != resources.end())
-		{
-			RELEASE(it->second);
-			resources.erase(it);
-		}
 		toDelete.pop_back();
 	}
 }
