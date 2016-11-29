@@ -6,7 +6,7 @@
 
 #include "ImGui\imgui.h"
 
-Component::Component(GameObject* linkedTo, int _id): name("Empty component")
+Component::Component(GameObject* linkedTo, int _id, Component::Type type): name("Empty component"), type(type)
 {
 	object = linkedTo;
 	id = _id;
@@ -95,7 +95,7 @@ void Component::Save(pugi::xml_node& myNode)
 void ResourceComponent::LinkResource(std::string fileName)
 {
 	UnLinkResource();
-	resource = App->resources->LinkResource(fileName);
+	resource = App->resources->LinkResource(fileName, GetType());
 }
 
 void ResourceComponent::UnLinkResource()

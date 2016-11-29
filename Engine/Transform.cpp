@@ -10,12 +10,11 @@
 #include "imGUI\imgui.h"
 
 
-Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id)
+Transform::Transform(GameObject* linkedTo, int id):Component(linkedTo, id, C_transform)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Transform##%i", id);
 	name = tmp;
-	type = C_transform;
 
 	localPosition.Set(0, 0, 0);
 	localScale.Set(1, 1, 1);

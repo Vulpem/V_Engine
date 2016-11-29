@@ -9,6 +9,7 @@
 #include "ModuleCamera3D.h"
 #include "ModulePhysics3D.h"
 #include "ModuleGOmanager.h"
+#include "ModuleResourceManager.h"
 #include "Timers.h"
 
 #include "AllComponents.h"
@@ -459,6 +460,25 @@ void ModuleEditor::Editor()
 				}
 				ImGui::TreePop();
 			}
+		}
+
+		if (ImGui::CollapsingHeader("Resource Manager"))
+		{
+			ImGui::Text("Loaded resources:");
+			const std::map<uint64_t, Resource*>& res = App->resources->ReadLoadedResources();
+			std::map<uint64_t, Resource*>::const_iterator it = res.begin();
+
+			char name[256];
+			for (; it != res.end(); it++)
+			{
+				sprintf(name, "%s", it->second->file.data());
+				if (ImGui::TreeNode(name))
+				{
+					ImGui::Text("N references: %u", it->second->nReferences);
+					ImGui::TreePop();
+				} 
+			}
+
 		}
 
 		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))

@@ -13,12 +13,11 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-mesh::mesh(std::string resource, GameObject* linkedTo, int id):ResourceComponent(resource, linkedTo, id)
+mesh::mesh(std::string resource, GameObject* linkedTo, int id): ResourceComponent(resource, linkedTo, id, C_mesh)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Mesh##%i", id);
 	name = tmp;
-	type = C_mesh;
 
 	texMaterialIndex = object->AmountOfComponent(Component::Type::C_mesh);
 }
@@ -59,13 +58,15 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 
 		ret.renderNormals = object->renderNormals;
 
-		ret.num_indices = resource->num_indices;
-		ret.num_vertices = resource->num_vertices;
+		const R_mesh* res = resource->Read<R_mesh>();
 
-		ret.vertexBuffer = resource->id_vertices;
-		ret.normalsBuffer = resource->id_normals;
-		ret.textureCoordsBuffer = resource->id_textureCoords;
-		ret.indicesBuffer = resource->id_indices;
+		ret.num_indices = res->num_indices;
+		ret.num_vertices = res->num_vertices;
+
+		ret.vertexBuffer = res->id_vertices;
+		ret.normalsBuffer = res->id_normals;
+		ret.textureCoordsBuffer = res->id_textureCoords;
+		ret.indicesBuffer = res->id_indices;
 	}
 	return ret;
 }
@@ -77,42 +78,58 @@ const float3 * mesh::GetVertices() const
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * num_vertices, ret);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-	return resource->vertices;
+	return resource->Read<R_mesh>()->vertices;
+}
+
+const uint mesh::GetNumVertices()
+{
+	return resource->Read<R_mesh>()->num_vertices;
 }
 
 const uint* mesh::GetIndices() const
 {
-	return resource->indices;
+	return resource->Read<R_mesh>()->indices;
+}
+
+const uint mesh::GetNumIndices()
+{
+	return resource->Read<R_mesh>()->num_indices;
 }
 
 const float3 * mesh::GetNormals() const
 {
-	return resource->normals;
+	return resource->Read<R_mesh>()->normals;
+}
+
+AABB mesh::GetAABB()
+{
+	return resource->Read<R_mesh>()->aabb;
 }
 
 void mesh::EditorContent()
 {
+	const R_mesh* res = resource->Read<R_mesh>();
 	char tmp[48];
 	sprintf(tmp, "Wireframe##%i", id);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
-	ImGui::Text("Resource: %s", resource->file);
+	ImGui::Text("Resource: %s", resource->file.data());
 
-	ImGui::Text("Vertices in memory: %i", resource->num_vertices);
+	ImGui::Text("Vertices in memory: %i", res->num_vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", resource->id_vertices);
+	ImGui::Text("Buffer: %i", res->id_vertices);
 
-	ImGui::Text("Indices in memory: %i", resource->num_indices);
+	ImGui::Text("Indices in memory: %i", res->num_indices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", resource->id_indices);
+	ImGui::Text("Buffer: %i", res->id_indices);
 
-	ImGui::Text("Normals in memory: %i", resource->num_normals);
+	ImGui::Text("Normals in memory: %i", res->num_normals);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", resource->id_normals);
+	ImGui::Text("Buffer: %i", res->id_normals);
 
-	ImGui::Text("UV_Coords in memory: %i", resource->num_textureCoords);
+	ImGui::Text("UV_Coords in memory: %i", res->num_textureCoords);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", resource->id_textureCoords);
+	ImGui::Text("Buffer: %i", res->id_textureCoords);
 	ImGui::Separator();
 	ImGui::Text("Texture index material:");
 	sprintf(tmp, "##MaterialID%i", id);

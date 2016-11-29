@@ -5,7 +5,6 @@
 #include "Globals.h"
 #include "AllComponents.h"
 #include <map>
-#include <queue>
 
 class Resource
 {
@@ -21,6 +20,11 @@ public:
 
 	//Filename this resource extraced the data from
 	std::string file;
+
+	virtual Component::Type GetType() = 0;
+
+	template <typename T>
+	const T* Read() { return (T*)this; }
 };
 
 class R_mesh : public Resource
@@ -31,7 +35,7 @@ public:
 
 	~R_mesh();
 
-	static Component::Type GetType() { return Component::Type::C_mesh; }
+	Component::Type GetType() { return Component::Type::C_mesh; }
 
 	float3* vertices = nullptr;
 	uint id_vertices = 0;
@@ -68,18 +72,20 @@ public:
 
 private:
 	std::map<uint64_t, Resource*> resources;
-	std::map<std::string, uint64_t> uidLib;
+	std::map<std::pair<Component::Type, std::string>, uint64_t> uidLib;
 
-	std::queue<uint64_t> toDelete;
+	std::vector<uint64_t> toDelete;
 
 	Resource* LoadNewResource(std::string fileName);
 
 public:
 	void UnlinkResource(Resource* res);
 	void UnlinkResource(uint64_t uid);
-	void UnlinkResource(std::string fileName);
+	void UnlinkResource(std::string fileName, Component::Type type);
 
 	void DeleteNow();
+
+	const std::map<uint64_t, Resource*>& ReadLoadedResources() const;
 
 	Resource* LinkResource(uint64_t uid)
 	{
@@ -93,27 +99,26 @@ public:
 		return ret;
 	}
 
-	Resource* LinkResource(std::string fileName)
+	Resource* LinkResource(std::string fileName, Component::Type type)
 	{
 		Resource* ret = nullptr;
-		std::map<std::string, uint64_t>::iterator it = uidLib.find(fileName);
+		std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.find(std::pair<Component::Type, std::string>(type, fileName));
 		if (it != uidLib.end())
 		{
-			ret = GetResource(it->second);
+			ret = LinkResource(it->second);
 		}
 
 		if (ret == nullptr)
 		{
-
-			Resource* ret = LoadNewResource(fileName);
+			ret = LoadNewResource(fileName);
 			if (ret != nullptr)
 			{
-				resources.insert(std::pair<uint64_t, Resource*>(ret->uid, res));
-				uidLib.insert(std::pair<std::string, uint64_t>(ret->file, ret->uid));
+				resources.insert(std::pair<uint64_t, Resource*>(ret->uid, ret));
+				std::pair<Component::Type, std::string> tmp(ret->GetType(), ret->file);
+				uidLib.insert(std::pair<std::pair<Component::Type, std::string>, uint64_t>(tmp, ret->uid));
 				ret->nReferences++;
 			}
 		}
-
 		return ret;
 	}
 

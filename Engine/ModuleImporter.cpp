@@ -690,8 +690,9 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				bytes = sizeof(char) * 256;
 				memcpy(&meshName, It, bytes);
 				It += bytes;
-
-				LoadMesh(meshName, ret);
+				strcat(meshName, MESH_FORMAT);
+				ret->AddComponent(Component::Type::C_mesh, meshName);
+				ret->SetOriginalAABB();
 			}
 
 			if (hasMaterial != 0)
@@ -702,8 +703,6 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObjec
 				It += bytes;
 				LoadMaterial(materialName, ret);
 			}
-
-			ret->SetOriginalAABB();
 			
 			//Num childs
 			uint nChilds = 0;
@@ -781,7 +780,6 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 	R_mesh* newMesh = nullptr;
 
 	filePath += path;
-	filePath += MESH_FORMAT;
 
 	LOG("Loading mesh %s", filePath.data());
 

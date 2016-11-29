@@ -5,9 +5,6 @@
 #include "Component.h"
 
 struct Mesh_RenderInfo;
-struct aiMesh;
-struct aiNode;
-struct aiScene;
 class R_mesh;
 
 class mesh : public  ResourceComponent
@@ -24,8 +21,12 @@ public:
 	Mesh_RenderInfo GetMeshInfo();
 
 	const float3* GetVertices() const;
+	const uint GetNumVertices();
 	const uint* GetIndices() const;
+	const uint GetNumIndices();
 	const float3* GetNormals() const;
+
+	AABB GetAABB();
 
 	void EditorContent();
 

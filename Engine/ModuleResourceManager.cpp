@@ -62,13 +62,13 @@ void ModuleResourceManager::UnlinkResource(uint64_t uid)
 	it->second->nReferences--;
 	if (it->second->nReferences <= 0)
 	{
-		toDelete.push(it->first);
+		toDelete.push_back(it->first);
 	}
 }
 
-void ModuleResourceManager::UnlinkResource(std::string fileName)
+void ModuleResourceManager::UnlinkResource(std::string fileName, Component::Type type)
 {
-	std::map<std::string, uint64_t>::iterator it = uidLib.find(fileName);
+	std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.find(std::pair<Component::Type, std::string>(type, fileName));
 	if (it != uidLib.end())
 	{
 		UnlinkResource(it->second);
@@ -79,9 +79,9 @@ void ModuleResourceManager::DeleteNow()
 {
 	while (toDelete.empty() == false)
 	{
-		uint64_t uid = toDelete.front();
+		uint64_t uid = toDelete.back();
 
-		for (std::map<std::string, uint64_t>::iterator it = uidLib.begin(); it != uidLib.end(); it++)
+		for (std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.begin(); it != uidLib.end(); it++)
 		{
 			if (it->second == uid)
 			{
@@ -96,7 +96,13 @@ void ModuleResourceManager::DeleteNow()
 			RELEASE(it->second);
 			resources.erase(it);
 		}
+		toDelete.pop_back();
 	}
+}
+
+const std::map<uint64_t, Resource*>& ModuleResourceManager::ReadLoadedResources() const
+{
+	return resources;
 }
 
 R_mesh::~R_mesh()

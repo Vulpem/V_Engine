@@ -7,6 +7,7 @@
 #include "PugiXml\src\pugixml.hpp"
 
 class GameObject;
+class Resource;
 
 class Component
 {
@@ -22,7 +23,7 @@ public:
 		C_None
 	};
 
-	Component(GameObject* linkedTo, int id);
+	Component(GameObject* linkedTo, int id, Component::Type type);
 	virtual ~Component();
 
 	virtual void Enable();
@@ -68,7 +69,7 @@ private:
 class ResourceComponent : public Component
 {
 public:
-	ResourceComponent(std::string resource, GameObject* linkedTo, int id) : Component(linkedTo, id)
+	ResourceComponent(std::string resource, GameObject* linkedTo, int id, Component::Type type) : Component(linkedTo, id, type)
 	{
 		LinkResource(resource);
 	}

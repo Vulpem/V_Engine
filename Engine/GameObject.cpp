@@ -239,8 +239,8 @@ void GameObject::SetOriginalAABB()
 
 		for (std::vector<mesh*>::iterator it = meshes.begin(); it != meshes.end(); it++)
 		{
-			originalAABB.Enclose((*it)->aabb.maxPoint);
-			originalAABB.Enclose((*it)->aabb.minPoint);
+			originalAABB.Enclose((*it)->GetAABB().maxPoint);
+			originalAABB.Enclose((*it)->GetAABB().minPoint);
 		}
 	}
 	else
@@ -344,7 +344,7 @@ const char * GameObject::GetName()
 	return name;
 }
 
-Component* GameObject::AddComponent(Component::Type type)
+Component* GameObject::AddComponent(Component::Type type, std::string res)
 {
 	Component* toAdd = nullptr;
 	switch (type)
@@ -360,7 +360,11 @@ Component* GameObject::AddComponent(Component::Type type)
 	}
 	case Component::Type::C_mesh:
 	{
-		toAdd = new mesh(this, components.size()); break;
+		if (res.length() > 1)
+		{
+			toAdd = new mesh(res ,this, components.size());
+		} 
+		break;
 	}
 	case Component::Type::C_material:
 	{
