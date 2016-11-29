@@ -38,6 +38,7 @@ public:
 	//REMEMBER TO ADD THIS FUNCTION ALWAYS ON YOUR COMPONENTS
 	Type GetType() { return type; }
 	bool IsEnabled() { return enabled; }
+	virtual bool MissingComponent() { return false; }
 
 	void Save(pugi::xml_node& myNode);
 protected:
@@ -78,6 +79,8 @@ public:
 	{
 		UnLinkResource();
 	}
+
+	virtual bool MissingComponent() { return (resource == nullptr); }
 
 protected:
 	Resource* resource = nullptr;

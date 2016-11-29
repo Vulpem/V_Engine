@@ -378,7 +378,6 @@ void ModuleGoManager::LoadSceneNow()
 							{
 								pugi::xml_node meshNode = comp.child("Specific");
 								std::string path = meshNode.attribute("MeshPath").as_string();
-								path += MESH_FORMAT;
 								mesh* m = (mesh*)go->second->AddComponent(Component::Type::C_mesh, path);
 								m->texMaterialIndex = meshNode.attribute("TextureIndex").as_int();
 								go->second->SetOriginalAABB();

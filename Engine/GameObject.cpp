@@ -386,9 +386,17 @@ Component* GameObject::AddComponent(Component::Type type, std::string res)
 
 	if (toAdd != nullptr)
 	{
-		HasComponents[toAdd->GetType()] += 1;
-		components.push_back(toAdd);
-		App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
+		if (toAdd->MissingComponent() == false)
+		{
+			HasComponents[toAdd->GetType()] += 1;
+			components.push_back(toAdd);
+			App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
+		}
+		else
+		{
+			LOG("Error loading a component from %s", toAdd->name.data());
+			RELEASE(toAdd);
+		}
 	}
 
 	return toAdd;
