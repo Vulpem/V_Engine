@@ -429,7 +429,7 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 	{
 		numNormals = num_vertices;
 		normals = new float[num_vertices * 3];
-		memcpy_s(normals, sizeof(float) * num_vertices * 3, toLoad->mNormals, sizeof(float) * num_vertices * 3);
+		memcpy(normals, toLoad->mNormals, sizeof(float) * num_vertices * 3);
 	}
 
 	//Importing texture coords
@@ -810,7 +810,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 
 				//Actual vertices
 				newMesh->vertices = new float3[newMesh->num_vertices];
-				bytes = sizeof(float) * newMesh->num_vertices * 3;
+				bytes = sizeof(float3) * newMesh->num_vertices;
 				memcpy(newMesh->vertices, It, bytes);
 				It += bytes;
 
@@ -829,7 +829,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 				if (newMesh->num_normals > 0)
 				{
 					//Normals
-					newMesh->normals = new float3[newMesh->num_vertices];
+					newMesh->normals = new float3[newMesh->num_normals];
 					bytes = sizeof(float3) * newMesh->num_normals;
 					memcpy(newMesh->normals, It, bytes);
 					It += bytes;

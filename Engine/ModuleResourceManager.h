@@ -12,6 +12,8 @@ public:
 	Resource() { uid = GenerateUUID(); }
 	Resource(uint64_t UID) { this->uid = UID; }
 
+	virtual ~Resource() { }
+
 	//Number of references to this resource. Won't unload while it's over 0
 	uint nReferences = 0;
 
