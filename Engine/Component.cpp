@@ -15,7 +15,6 @@ Component::Component(GameObject* linkedTo, int _id, Component::Type type): name(
 
 Component::~Component()
 {
-
 }
 
 void Component::Enable()

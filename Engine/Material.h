@@ -9,7 +9,6 @@ class Material :public ResourceComponent
 {
 public:
 	Material(std::string res, GameObject* linkedTo, int id);
-	~Material();
 
 	void EditorContent();
 

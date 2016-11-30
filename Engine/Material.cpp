@@ -17,10 +17,6 @@ Material::Material(std::string res, GameObject* linkedTo, int id) : ResourceComp
 	name = tmp;
 }
 
-Material::~Material()
-{
-}
-
 void Material::EditorContent()
 {
 	ImGui::ColorEdit3("Color", resource->Read<R_Material>()->color);

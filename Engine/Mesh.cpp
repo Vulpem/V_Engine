@@ -22,10 +22,6 @@ mesh::mesh(std::string resource, GameObject* linkedTo, int id): ResourceComponen
 	texMaterialIndex = object->AmountOfComponent(Component::Type::C_mesh);
 }
 
-mesh::~mesh()
-{
-}
-
 Mesh_RenderInfo mesh::GetMeshInfo()
 {
 	Mesh_RenderInfo ret;

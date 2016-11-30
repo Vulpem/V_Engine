@@ -11,7 +11,6 @@ class mesh : public  ResourceComponent
 {
 public:
 	mesh(std::string resource, GameObject* linkedTo, int id);
-	~mesh();
 
 public:
 	int texMaterialIndex = -1;

@@ -90,27 +90,31 @@ void ModuleResourceManager::UnlinkResource(std::string fileName, Component::Type
 
 void ModuleResourceManager::DeleteNow()
 {
-	while (toDelete.empty() == false)
+	if (toDelete.empty() == false)
 	{
-		uint64_t uid = toDelete.back();
-
-		std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-		if (it != resources.end())
+		std::vector<uint64_t> tmp = toDelete;
+		toDelete.clear();
+		while (tmp.empty() == false)
 		{
-			RELEASE(it->second);
-			resources.erase(it);
-		}
+			uint64_t uid = tmp.back();
 
-		for (std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.begin(); it != uidLib.end(); it++)
-		{
-			if (it->second == uid)
+			std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
+			if (it != resources.end())
 			{
-				uidLib.erase(it);
-				break;
+				RELEASE(it->second);
+				resources.erase(it);
 			}
+
+			for (std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.begin(); it != uidLib.end(); it++)
+			{
+				if (it->second == uid)
+				{
+					uidLib.erase(it);
+					break;
+				}
+			}
+			tmp.pop_back();
 		}
-		
-		toDelete.pop_back();
 	}
 }
 
