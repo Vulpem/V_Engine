@@ -52,9 +52,10 @@ public:
 
 	Component::Type GetType() { return Component::Type::C_material; }
 
+	float color[5] = { 1.0f, 1.0f, 1.0f,1.0f };
+
 	std::vector<R_Texture*> textures;
 
-	float color[4] = { 1.0f,1.0f,1.0f,1.0f };
 };
 
 class R_mesh : public Resource
