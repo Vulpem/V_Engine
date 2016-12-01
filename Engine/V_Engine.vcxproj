@@ -78,6 +78,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AllComponents.h" />
+    <ClInclude Include="AllResources.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
@@ -186,6 +187,10 @@
     <ClInclude Include="PhysBody3D.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="R_Material.h" />
+    <ClInclude Include="R_mesh.h" />
+    <ClInclude Include="R_Resource.h" />
+    <ClInclude Include="R_Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Timers.h" />
     <ClInclude Include="Transform.h" />

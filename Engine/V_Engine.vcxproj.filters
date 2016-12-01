@@ -52,6 +52,12 @@
     <Filter Include="Sources\Libraries\pugiXML">
       <UniqueIdentifier>{fb8e26ed-592a-4d43-9971-4e7accb06d33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\GameObjectStuff\Components">
+      <UniqueIdentifier>{9d923719-6b71-4311-98ed-23082a954ebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\ResourceManager">
+      <UniqueIdentifier>{668df96d-0ffa-4a05-870c-01f11f5292e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h">
@@ -330,21 +336,6 @@
     <ClInclude Include="GameObject.h">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleGOmanager.h">
-      <Filter>Sources\Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClInclude>
     <ClInclude Include="AllComponents.h">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
@@ -359,9 +350,6 @@
     </ClInclude>
     <ClInclude Include="ModuleImporter.h">
       <Filter>Sources\Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Sources\GameObjectStuff</Filter>
     </ClInclude>
     <ClInclude Include="Mesh_RenderInfo.h">
       <Filter>Sources\Containers</Filter>
@@ -388,8 +376,41 @@
     <ClInclude Include="PugiXml\src\pugixml.hpp">
       <Filter>Sources\Libraries\pugiXML</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClInclude>
     <ClInclude Include="ModuleResourceManager.h">
-      <Filter>Sources\Modules</Filter>
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleGOmanager.h">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="R_Resource.h">
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="R_Material.h">
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="R_Texture.h">
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="R_mesh.h">
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AllResources.h">
+      <Filter>Sources\ResourceManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -549,29 +570,11 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleGOmanager.cpp">
-      <Filter>Sources\Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Sources\GameObjectStuff</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleEditor.cpp">
       <Filter>Sources\Modules</Filter>
     </ClCompile>
     <ClCompile Include="ModuleImporter.cpp">
       <Filter>Sources\Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Sources\GameObjectStuff</Filter>
     </ClCompile>
     <ClCompile Include="QuadTree.cpp">
       <Filter>Sources\Containers</Filter>
@@ -591,8 +594,26 @@
     <ClCompile Include="PugiXml\src\pugixml.cpp">
       <Filter>Sources\Libraries\pugiXML</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
+    </ClCompile>
     <ClCompile Include="ModuleResourceManager.cpp">
-      <Filter>Sources\Modules</Filter>
+      <Filter>Sources\ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleGOmanager.cpp">
+      <Filter>Sources\GameObjectStuff</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Sources\GameObjectStuff\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

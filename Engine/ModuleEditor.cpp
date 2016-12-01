@@ -13,6 +13,7 @@
 #include "Timers.h"
 
 #include "AllComponents.h"
+#include "AllResources.h"
 
 #include "Imgui/imgui_impl_sdl_gl3.h"
 #include "OpenGL.h"

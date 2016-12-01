@@ -256,6 +256,8 @@ bool Application::CleanUp()
 		ret = (*item)->CleanUp();
 		item++;
 	}
+	RELEASE(timers);
+
 	return ret;
 }
 

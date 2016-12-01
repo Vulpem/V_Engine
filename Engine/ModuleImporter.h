@@ -35,6 +35,9 @@ public:
 	//Import everything inside a folder and sub-folders
 	void ImportFromFolder(const char* path);
 
+	//Import a file, without specificating which type of file it is
+	void Import(const char* path);
+
 	//Import a specific 3D model and decompose it
 	bool Import3dScene(const char* filePath);
 	//Import any image to dds

@@ -9,6 +9,10 @@ TimerManager::TimerManager()
 
 TimerManager::~TimerManager()
 {
+	perfTimers.clear();
+	stdTimers.clear();
+	lastReads.clear();
+	timerIDs.clear();
 }
 
 void TimerManager::CreatePerfTimer(std::string key)

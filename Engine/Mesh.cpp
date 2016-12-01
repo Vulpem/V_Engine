@@ -10,6 +10,7 @@
 #include "ModuleImporter.h"
 
 #include "ModuleResourceManager.h"
+#include "R_mesh.h"
 
 //------------------------- MESH --------------------------------------------------------------------------------
 

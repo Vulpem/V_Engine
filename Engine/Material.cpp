@@ -5,6 +5,7 @@
 #include "Application.h"
 
 #include "ModuleResourceManager.h"
+#include "R_Material.h"
 
 #include "imGUI\imgui.h"
 

@@ -10,6 +10,8 @@
 
 #include "ModuleResourceManager.h"
 
+#include "AllResources.h"
+
 #include "OpenGL.h"
 
 #include "Devil\include\il.h"
@@ -100,11 +102,7 @@ void ModuleImporter::ImportFromFolder(const char * path)
 		std::string toSend(path);
 		toSend += "/";
 		toSend += files[n].data();
-		if (Import3dScene(toSend.data()) == false)
-		{
-			ImportImage(toSend.data());
-		}
-
+		Import(toSend.data());
 	}
 	files.clear();
 	for (uint n = 0; n < folders.size(); n++)
@@ -115,6 +113,14 @@ void ModuleImporter::ImportFromFolder(const char * path)
 		ImportFromFolder(toSend.data());
 	}
 
+}
+
+void ModuleImporter::Import(const char * path)
+{
+	if (Import3dScene(path) == false)
+	{
+		ImportImage(path);
+	}
 }
 
 bool ModuleImporter::Import3dScene(const char * filePath)
@@ -959,6 +965,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 				mat->color[2] = color[2];
 				mat->color[4] = 1.0f;
 			}
+			RELEASE(file);
 		}
 	}
 	return mat;
