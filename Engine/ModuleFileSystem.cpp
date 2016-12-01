@@ -21,8 +21,6 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	// By default we include executable's own directory
 	// without this we won't be able to find config.xml :-(
 	AddPath(".");
-
-	AddPath("./../Game");
 }
 
 // Destructor
@@ -45,29 +43,30 @@ bool ModuleFileSystem::Init()
 //		AddPath(path.child_value());
 //	}
 
-	// Ask SDL for a write dir
-	char* write_path = SDL_GetPrefPath(App->GetOrganization(), App->GetTitle());
+	char* tmp = SDL_GetBasePath();
+	std::string writePath(tmp);
 
-	if (PHYSFS_setWriteDir(write_path) == 0)
+	if (PHYSFS_setWriteDir(writePath.data()) == 0)
 	{
 		LOG("File System error while creating write dir: %s", PHYSFS_getLastError());
 	}
 	else
 	{
 		// We add the writing directory as a reading directory too with speacial mount point
-		LOG("Writing directory is %s", write_path);
-		AddPath(write_path);
+		LOG("Writing directory is %s", writePath.data());
+		AddPath(writePath.data());
 	}
 
-	SDL_free(write_path);
+	SDL_free(tmp);
 
 	CreateDir("Library");
 	CreateDir("Library/Meshes");
 	CreateDir("Library/Textures");
 	CreateDir("Library/vGOs");
 	CreateDir("Library/Materials");
+	CreateDir("Scenes");
 
-	PHYSFS_addToSearchPath("Library/", 0);
+	AddPath("Library/");
 
 	return ret;
 }
