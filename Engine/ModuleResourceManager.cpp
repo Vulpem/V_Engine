@@ -4,10 +4,12 @@
 #include "ModuleResourceManager.h"
 
 #include "ModuleImporter.h"
+#include "ModuleFileSystem.h"
+
 #include "R_Resource.h"
 
 
-ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)
+ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled), resBaseFolder("Assets", "Assets")
 {
 	name = "ModuleResourceManager";
 }
@@ -68,6 +70,126 @@ Resource * ModuleResourceManager::LoadNewResource(std::string fileName)
 		return (Resource*)App->importer->LoadTexture(fileName.data());
 	}
 	return nullptr;
+}
+
+void ModuleResourceManager::Refresh()
+{
+	RefreshFolder("Assets");
+}
+
+void ModuleResourceManager::RefreshFolder(const char * path)
+{
+	R_Folder meta = ReadFolderMeta(path);
+	R_Folder real = ReadFolder(path);
+
+	for (std::vector<std::string>::iterator metaIt = real.subFoldersPath.begin(); metaIt != real.subFoldersPath.end(); metaIt++)
+	{
+		for (std::vector<std::string>::iterator realIt = meta.subFoldersPath.begin(); realIt != meta.subFoldersPath.end(); realIt++)
+		{
+
+		}
+	}
+
+	for (std::vector<std::string>::iterator it = real.subFoldersPath.begin(); it != real.subFoldersPath.end(); it++)
+	{
+
+	}
+
+}
+
+R_Folder ModuleResourceManager::ReadFolder(const char * path)
+{
+	R_Folder ret(App->importer->FileName(path).data(), path);
+
+	std::vector<std::string> folders;
+	std::vector<std::string> files;
+	App->fs->GetFilesIn(path, &folders, &files);
+
+	for (std::vector<std::string>::iterator it = folders.begin(); it != folders.end(); it++)
+	{
+		ret.subFoldersPath.push_back(it->data());
+	}
+	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++)
+	{
+		ret.files.push_back(it->data());
+	}
+
+	return ret;
+}
+
+void ModuleResourceManager::CreateFolderMeta(R_Folder & folder)
+{
+	pugi::xml_document data;
+	pugi::xml_node root_node;
+
+	std::string fileName(folder.path);
+	fileName += META_FORMAT;
+
+	root_node = data.append_child("folder");
+
+	root_node.append_attribute("name") = folder.name.data();
+
+	for (std::vector<std::string>::iterator it = folder.subFoldersPath.begin(); it != folder.subFoldersPath.end(); it++)
+	{
+		pugi::xml_node sub = root_node.append_child("sub");
+		sub.append_attribute("data") = it->data();
+	}
+
+	for (std::vector<std::string>::iterator it = folder.files.begin(); it != folder.files.end(); it++)
+	{
+		pugi::xml_node sub = root_node.append_child("file");
+		sub.append_attribute("data") = it->data();
+	}
+
+	std::stringstream stream;
+	data.save(stream);
+	// we are done, so write data to disk
+	App->fs->Save(fileName.data(), stream.str().c_str(), stream.str().length());
+	LOG("Created: %s", fileName.data());
+
+	data.reset();
+}
+
+R_Folder ModuleResourceManager::ReadFolderMeta(const char * path)
+{
+	char* buffer;
+	std::string _path = path;
+	_path += META_FORMAT;
+	uint size = App->fs->Load(_path.data(), &buffer);
+
+	if (size > 0)
+	{
+		pugi::xml_document data;
+		pugi::xml_node root;
+
+		pugi::xml_parse_result result = data.load_buffer(buffer, size);
+		RELEASE(buffer);
+
+		if (result != NULL)
+		{
+			root = data.child("folder");
+			if (root)
+			{
+				std::string name = root.attribute("name").as_string();
+
+				R_Folder ret(name.data(), path);
+
+				for (pugi::xml_node folder = root.child("sub"); folder != nullptr; folder = folder.next_sibling("folder"))
+				{
+					ret.subFoldersPath.push_back(folder.attribute("data").as_string());
+				}
+
+				for (pugi::xml_node files = root.child("file"); files != nullptr; files = files.next_sibling("file"))
+				{
+					ret.subFoldersPath.push_back(files.attribute("data").as_string());
+				}
+
+				return ret;
+			}
+		}
+	}
+	LOG("Tried to read an unexisting folder meta.\n%s", path)
+	return R_Folder("", "");
 }
 
 Resource * ModuleResourceManager::LinkResource(uint64_t uid)
@@ -202,4 +324,23 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 	}
 
 	return ret;
+}
+
+R_Folder::R_Folder(const char* name, R_Folder* parent) : name(name)
+{
+	if (parent != nullptr)
+	{
+		std::string myPath(parent->path);
+		myPath += "/";
+		myPath += name;
+		path = myPath;
+	}
+	else
+	{
+		path = name;
+	}
+}
+
+R_Folder::R_Folder(const char * name, const char * path) : name(name), path(path)
+{
 }

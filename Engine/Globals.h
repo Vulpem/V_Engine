@@ -22,6 +22,8 @@ void log(const char file[], int line, const char* format, ...);
 #define MESH_FORMAT ".vmesh"
 #define MATERIAL_FORMAT ".vmat"
 
+#define META_FORMAT ".vmeta"
+
 typedef unsigned __int32 uint32;
 typedef unsigned __int64 uint64;
 typedef unsigned int uint;

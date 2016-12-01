@@ -6,6 +6,17 @@
 #include "AllComponents.h"
 #include <map>
 
+struct R_Folder
+{
+	R_Folder(const char* name, R_Folder* parent);
+	R_Folder(const char* name, const char* path);
+
+	std::string name;
+	std::string path;
+
+	std::vector<std::string> subFoldersPath;
+	std::vector<std::string> files;
+};
 
 
 class ModuleResourceManager : public Module
@@ -26,8 +37,21 @@ private:
 
 	std::vector<uint64_t> toDelete;
 
+	R_Folder resBaseFolder;
+
 	Resource* LoadNewResource(std::string fileName);
 
+public:
+	void Refresh();
+private:
+	void RefreshFolder(const char* path);
+
+	//Warning, this folder will be incomplete. It will have no parent or path
+	R_Folder ReadFolder(const char* path);
+
+
+	void CreateFolderMeta(R_Folder& folder);
+	R_Folder ReadFolderMeta(const char* path);
 public:
 	Resource* LinkResource(uint64_t uid);
 	Resource* LinkResource(std::string fileName, Component::Type type);
