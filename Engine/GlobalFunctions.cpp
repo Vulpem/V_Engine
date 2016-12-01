@@ -10,7 +10,7 @@ uint64_t GenerateUUID()
 
 	for (int n = 0; n < bytes; n++)
 	{
-		myString[n] = rand() % 256;
+		myString[n] = rand() % 255;
 	}
 
 	memcpy(&ret, myString, bytes);
