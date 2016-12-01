@@ -1,7 +1,7 @@
 #ifndef __COMPONENT__
 #define __COMPONENT__
 
-#include "C_String.h"
+#include "Globals.h"
 #include "Math.h"
 
 #include "PugiXml\src\pugixml.hpp"

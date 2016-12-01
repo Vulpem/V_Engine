@@ -1,7 +1,6 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include "Globals.h"
 #include "Component.h"
 
 struct Mesh_RenderInfo;

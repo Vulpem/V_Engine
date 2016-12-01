@@ -1,11 +1,8 @@
-
 #include "Transform.h"
 
 #include "GameObject.h"
 
 #include "Camera.h"
-
-#include "Math.h"
 
 #include "imGUI\imgui.h"
 

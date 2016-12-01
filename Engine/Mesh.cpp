@@ -1,15 +1,12 @@
 #include "Mesh.h"
 
-#include "OpenGL.h"
 #include "imGUI\imgui.h"
 
 #include "GameObject.h"
 #include "Mesh_RenderInfo.h"
 
 #include "Application.h"
-#include "ModuleImporter.h"
 
-#include "ModuleResourceManager.h"
 #include "R_mesh.h"
 
 //------------------------- MESH --------------------------------------------------------------------------------

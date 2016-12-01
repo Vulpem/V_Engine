@@ -6,13 +6,8 @@
 #include "ModuleFileSystem.h"
 
 #include "GameObject.h"
-#include "AllComponents.h"
-
-#include "ModuleResourceManager.h"
 
 #include "AllResources.h"
-
-#include "OpenGL.h"
 
 #include "Devil\include\il.h"
 #include "Devil\include\ilu.h"

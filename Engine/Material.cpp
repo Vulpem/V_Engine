@@ -1,15 +1,11 @@
 #include "Material.h"
 
 #include "GameObject.h"
-#include "ModuleImporter.h"
 #include "Application.h"
 
-#include "ModuleResourceManager.h"
 #include "R_Material.h"
 
 #include "imGUI\imgui.h"
-
-#include "OpenGL.h"
 
 Material::Material(std::string res, GameObject* linkedTo, int id) : ResourceComponent(res, linkedTo, id, C_material)
 {

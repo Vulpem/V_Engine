@@ -3,8 +3,6 @@
 
 #include "Component.h"
 
-#include <vector>
-
 class Material :public ResourceComponent
 {
 public:

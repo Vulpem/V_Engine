@@ -1,7 +1,6 @@
 #ifndef __CAMERA__
 #define __CAMERA__
 
-#include "Globals.h"
 #include "Component.h"
 
 enum FrustumCollision
