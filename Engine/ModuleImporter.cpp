@@ -577,9 +577,13 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 
 			//Importing color for this mesh
 			aiColor3D col;
-			scene->mMaterials[(*it)]->Get(AI_MATKEY_COLOR_DIFFUSE, col);
-			float color[3] = { col.r, col.g, col.b };
-
+			float color[3];
+				if (scene->mMaterials[(*it)]->Get(AI_MATKEY_COLOR_DIFFUSE, col) == aiReturn_SUCCESS)
+				{
+					color[0] = col.r;
+					color[1] = col.g;
+					color[2] = col.b;
+				}
 			materialsSize[n] = sizeof(uint) + sizeof(char) * textureNameLen + sizeof(float3);
 			realSize += materialsSize[n];
 			materials[n] = new char[materialsSize[n]];
@@ -949,6 +953,10 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 					}
 
 					delete[] textureName;
+				}
+				else
+				{
+					It++;
 				}
 				//Color
 				float color[3];
