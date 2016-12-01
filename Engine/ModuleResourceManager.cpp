@@ -85,8 +85,15 @@ Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 Resource * ModuleResourceManager::LinkResource(std::string fileName, Component::Type type)
 {
 	Resource* ret = nullptr;
-	std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.find(std::pair<Component::Type, std::string>(type, fileName));
-	if (it != uidLib.end())
+	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
+	if (tmpMap == uidLib.end())
+	{
+		uidLib.insert(std::pair<Component::Type, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
+		tmpMap = uidLib.find(type);
+	}
+	std::map<std::string, uint64_t> ::iterator it = tmpMap->second.find(fileName);
+
+	if (it != tmpMap->second.end())
 	{
 		ret = LinkResource(it->second);
 	}
@@ -97,8 +104,7 @@ Resource * ModuleResourceManager::LinkResource(std::string fileName, Component::
 		if (ret != nullptr)
 		{
 			resources.insert(std::pair<uint64_t, Resource*>(ret->uid, ret));
-			std::pair<Component::Type, std::string> tmp(ret->GetType(), ret->file);
-			uidLib.insert(std::pair<std::pair<Component::Type, std::string>, uint64_t>(tmp, ret->uid));
+			tmpMap->second.insert(std::pair<std::string, uint64_t>(ret->file, ret->uid));
 			ret->nReferences++;
 		}
 	}
@@ -125,10 +131,14 @@ void ModuleResourceManager::UnlinkResource(uint64_t uid)
 
 void ModuleResourceManager::UnlinkResource(std::string fileName, Component::Type type)
 {
-	std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.find(std::pair<Component::Type, std::string>(type, fileName));
-	if (it != uidLib.end())
+	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
+	if (tmpMap != uidLib.end())
 	{
-		UnlinkResource(it->second);
+		std::map<std::string, uint64_t>::iterator it = tmpMap->second.find(fileName);
+		if (it != tmpMap->second.end())
+		{
+			UnlinkResource(it->second);
+		}
 	}
 }
 
@@ -142,6 +152,7 @@ void ModuleResourceManager::DeleteNow()
 		{
 			uint64_t uid = tmp.back();
 
+			//Erasing the resource itself
 			std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
 			if (it != resources.end())
 			{
@@ -149,20 +160,46 @@ void ModuleResourceManager::DeleteNow()
 				resources.erase(it);
 			}
 
-			for (std::map<std::pair<Component::Type, std::string>, uint64_t>::iterator it = uidLib.begin(); it != uidLib.end(); it++)
+			//TODO
+			//When metadata is created, we won't erase from here anymore
+
+			/*bool found = false;
+			//Erasing its reference in the uid Lib
+			std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.begin();
+			for (; tmpMap != uidLib.end() && found == false; tmpMap++)
 			{
-				if (it->second == uid)
+				std::map<std::string, uint64_t>::iterator it = tmpMap->second.begin();
+				for (;it != tmpMap->second.end() && found == false; it++)
 				{
-					uidLib.erase(it);
-					break;
+					if (it->second == uid)
+					{
+						tmpMap->second.erase(it);
+						found = true;
+					}
 				}
-			}
+			}*/
 			tmp.pop_back();
 		}
 	}
 }
 
-const std::map<uint64_t, Resource*>& ModuleResourceManager::ReadLoadedResources() const
+const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 {
-	return resources;
+	std::vector<Resource*> ret;
+
+	std::map<Component::Type, std::map<std::string, uint64_t>>::const_iterator tmpMap = uidLib.cbegin();
+	for (; tmpMap != uidLib.end(); tmpMap++)
+	{
+		std::map<std::string, uint64_t>::const_iterator it = tmpMap->second.cbegin();
+		for (; it != tmpMap->second.end(); it++)
+		{
+			std::map<uint64_t, Resource*>::const_iterator res = resources.find(it->second);
+			if (res != resources.cend())
+			{
+				ret.push_back(res->second);
+			}
+		}
+	}
+
+	return ret;
 }

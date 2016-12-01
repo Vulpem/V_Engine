@@ -466,16 +466,21 @@ void ModuleEditor::Editor()
 		if (ImGui::CollapsingHeader("Resource Manager"))
 		{
 			ImGui::Text("Loaded resources:");
-			const std::map<uint64_t, Resource*>& res = App->resources->ReadLoadedResources();
-			std::map<uint64_t, Resource*>::const_iterator it = res.begin();
-
+			const std::vector<Resource*> res = App->resources->ReadLoadedResources();
+			std::vector<Resource*>::const_iterator it = res.begin();
+			Component::Type lastType = Component::Type::C_None;
 			char name[256];
 			for (; it != res.end(); it++)
 			{
-				sprintf(name, "%s", it->second->file.data());
+				if (lastType != (*it)->GetType())
+				{
+					lastType = (*it)->GetType();
+					ImGui::Separator();
+				}
+				sprintf(name, "%s", (*it)->file.data());
 				if (ImGui::TreeNode(name))
 				{
-					ImGui::Text("N references: %u", it->second->nReferences);
+					ImGui::Text("N references: %u", (*it)->nReferences);
 					ImGui::TreePop();
 				} 
 			}

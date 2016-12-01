@@ -22,7 +22,7 @@ public:
 
 private:
 	std::map<uint64_t, Resource*> resources;
-	std::map<std::pair<Component::Type, std::string>, uint64_t> uidLib;
+	std::map<Component::Type, std::map<std::string, uint64_t>> uidLib;
 
 	std::vector<uint64_t> toDelete;
 
@@ -38,7 +38,7 @@ public:
 
 	void DeleteNow();
 
-	const std::map<uint64_t, Resource*>& ReadLoadedResources() const;
+	const std::vector<Resource*> ReadLoadedResources() const;
 };
 
 #endif

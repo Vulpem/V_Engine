@@ -15,10 +15,10 @@ public:
 	static const enum Type
 	{
 		C_transform = 1,
-		C_material,
 		C_mesh,
-		C_camera,
+		C_material,
 		C_Texture,
+		C_camera,
 
 		//Keep this "C_None" always last
 		C_None
