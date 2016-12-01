@@ -10,7 +10,7 @@
 
 ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name.create("ModuleCamera3D");
+	name = "ModuleCamera3D";
 }
 
 ModuleCamera3D::~ModuleCamera3D()

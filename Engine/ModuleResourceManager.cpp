@@ -9,7 +9,7 @@
 
 ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name.create("ModuleResourceManager");
+	name = "ModuleResourceManager";
 }
 
 // Destructor

@@ -50,8 +50,8 @@ public:
 		return "save/";
 	}
 
-	C_String GetFileFormat(char* fullPath);
-	C_String RemoveFilePath(char* fileWithPath);
+	std::string GetFileFormat(char* fullPath);
+	std::string RemoveFilePath(char* fileWithPath);
 
 private:
 

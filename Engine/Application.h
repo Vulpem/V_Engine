@@ -4,7 +4,6 @@
 #include "Globals.h"
 #include "Timer.h"
 #include "PerfTimer.h"
-#include "C_String.h"
 
 #include <vector>
 #include <list>
@@ -60,8 +59,8 @@ private:
 	int previous_maxFPS = maxFPS;
 	bool gameRunning = false;
 
-	C_String title;
-	C_String organisation;
+	std::string title;
+	std::string organisation;
 
 public:
 

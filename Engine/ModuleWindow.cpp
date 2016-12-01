@@ -12,7 +12,7 @@ ModuleWindow::ModuleWindow(Application* app, bool start_enabled) : Module(app, s
 // Destructor
 ModuleWindow::~ModuleWindow()
 {
-	name.create("ModuleWindow");
+	name = "ModuleWindow";
 }
 
 // Called before render is available

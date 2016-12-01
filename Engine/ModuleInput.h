@@ -25,7 +25,7 @@ public:
 	update_status PreUpdate();
 	bool CleanUp();
 
-	C_String DroppedFileFormat();
+	std::string DroppedFileFormat();
 
 	KEY_STATE GetKey(int id) const
 	{

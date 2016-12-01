@@ -11,7 +11,7 @@
 
 ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name.create("ModuleFileSystem");
+	name = "ModuleFileSystem";
 
 	// need to be created before Awake so other modules can use it
 	char* base_path = SDL_GetBasePath();
@@ -136,7 +136,7 @@ void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::strin
 	for (it = f; *it != nullptr; it++)
 	{
 		std::string toPush(*it);
-		if (GetFileFormat(*it).Length() > 0)
+		if (GetFileFormat(*it).length() > 0)
 		{
 			files->push_back(toPush);
 		}
@@ -168,10 +168,10 @@ bool ModuleFileSystem::EraseFile(const char* file)
 
 unsigned int ModuleFileSystem::Load(const char* path, const char* file, char** buffer) const
 {
-	C_String fullPath(path);
+	std::string fullPath(path);
 	fullPath += file;
 
-	return Load(fullPath.GetString(), buffer);
+	return Load(fullPath.data(), buffer);
 }
 
 // Read a whole file and put it in a new buffer
@@ -361,7 +361,7 @@ void AssimpClose(aiFileIO* io, aiFile* file)
 		LOG("File System error while CLOSE via assimp: %s", PHYSFS_getLastError());
 }
 
-C_String ModuleFileSystem::GetFileFormat(char* fullPath)
+std::string ModuleFileSystem::GetFileFormat(char* fullPath)
 {
 	char* tmp = fullPath;
 	int size = 0;
@@ -376,14 +376,14 @@ C_String ModuleFileSystem::GetFileFormat(char* fullPath)
 		size--;
 		if (size <= 1)
 		{
-			return C_String("");
+			return std::string("");
 		}
 	}
 	tmp++;
-	return C_String(tmp);
+	return std::string(tmp);
 }
 
-C_String ModuleFileSystem::RemoveFilePath(char * fileWithPath)
+std::string ModuleFileSystem::RemoveFilePath(char * fileWithPath)
 {
 	char* it = fileWithPath;
 	while (*it != '\0')
@@ -395,7 +395,7 @@ C_String ModuleFileSystem::RemoveFilePath(char * fileWithPath)
 		it--;
 	}
 	it++;
-	return C_String(it);
+	return std::string(it);
 }
 
 void ModuleFileSystem::CreateAssimpIO()

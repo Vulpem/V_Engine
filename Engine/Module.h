@@ -5,8 +5,8 @@ class Application;
 struct PhysBody3D;
 struct viewPort;
 
-#include "C_String.h"
 #include "PugiXml\src\pugixml.hpp"
+#include "Globals.h"
 
 class Module
 {
@@ -14,7 +14,7 @@ private :
 	bool enabled;
 
 protected:
-	C_String name;
+	std::string name;
 
 public:
 	Application* App;
@@ -88,7 +88,7 @@ public:
 		return true; 
 	}
 
-	C_String GetName()
+	std::string GetName()
 	{
 		return name;
 	}

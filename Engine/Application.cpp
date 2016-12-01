@@ -296,12 +296,12 @@ void Application::Log(char* str)
 
 const char* Application::GetOrganization()
 {
-	return organisation.GetString();
+	return organisation.data();
 }
 
 const char* Application::GetTitle()
 {
-	return title.GetString();
+	return title.data();
 }
 
 void Application::OnScreenResize(int width, int heigth)

@@ -306,9 +306,6 @@
     <ClInclude Include="ModuleFileSystem.h">
       <Filter>Sources\Modules</Filter>
     </ClInclude>
-    <ClInclude Include="C_String.h">
-      <Filter>Sources\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="Devil\include\config.h">
       <Filter>Sources\Libraries\devIL</Filter>
     </ClInclude>

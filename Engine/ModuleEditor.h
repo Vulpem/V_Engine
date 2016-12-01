@@ -79,7 +79,7 @@ private:
 
 	char toImport[256];
 	char testConsoleInput[256];
-	C_String importResult;
+	std::string importResult;
 	math::float3 changeGeometryPos;
 
 	GameObject* selectedGameObject = nullptr;

@@ -12,7 +12,7 @@
 
 ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name.create("ModuleInput");
+	name = "ModuleInput";
 
 	keyboard = new KEY_STATE[MAX_KEYS];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
@@ -135,7 +135,7 @@ update_status ModuleInput::PreUpdate()
 					SDL_free(e.drop.file);
 					file_was_dropped = true;
 					LOG("Dropped %s", dropped_file);
-					LOG("File was detected as a %s", DroppedFileFormat().GetString());
+					LOG("File was detected as a %s", DroppedFileFormat().data());
 					break;
 				}
 				case SDL_QUIT:
@@ -178,7 +178,7 @@ bool ModuleInput::CleanUp()
 	return true;
 }
 
-C_String ModuleInput::DroppedFileFormat()
+std::string ModuleInput::DroppedFileFormat()
 {
 	if (file_was_dropped)
 	{
@@ -192,10 +192,10 @@ C_String ModuleInput::DroppedFileFormat()
 			tmp--;
 		}
 		tmp++;
-		return C_String(tmp);
+		return std::string(tmp);
 
 	}
-	return C_String("Error_Reading_format");
+	return std::string("Error_Reading_format");
 }
 
 bool ModuleInput::CaptureMouse(SDL_Event& e)

@@ -23,7 +23,7 @@
 
 ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
-	name.create("ModuleGeometry");
+	name = "ModuleGeometry";
 }
 
 ModuleGoManager::~ModuleGoManager()
