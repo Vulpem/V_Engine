@@ -30,7 +30,7 @@ public:
 	ModuleResourceManager(Application* app, bool start_enabled = true);
 	~ModuleResourceManager();
 
-	bool Init();
+	bool Start();
 	update_status PreUpdate();
 	update_status PostUpdate();
 	bool CleanUp();
@@ -52,7 +52,6 @@ private:
 
 	//Warning, this folder will be incomplete. It will have no parent or path
 	R_Folder ReadFolder(const char* path);
-
 
 	void CreateFolderMeta(R_Folder& folder);
 	R_Folder ReadFolderMeta(const char* path);

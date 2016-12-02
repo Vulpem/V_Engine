@@ -6,6 +6,7 @@
 
 #include "Math.h"
 #include <vector>
+#include <map>
 
 struct aiScene;
 struct aiMesh;
@@ -41,18 +42,19 @@ public:
 	//Import a specific 3D model and decompose it
 	bool Import3dScene(const char* filePath);
 	//Import any image to dds
-	bool ImportImage(const char* filePath);
+	uint64_t ImportImage(const char* filePath, uint64_t uid = 0);
 
 private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
 	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = nullptr);
 	//Create a vmesh from a certain mesh. COntains all mesh info
-	std::string ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir, uint& textureID);
+	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir, uint& textureID);
 	//Create a vmat from a material, with colors & texture names
-	std::string ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName);
+	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName);
+
 public:
 
-
+	std::map<std::vector<uint>, uint64_t> tmp_loadedMaterials;
 
 // ------------------------------- LOADING ------------------------------- 
 

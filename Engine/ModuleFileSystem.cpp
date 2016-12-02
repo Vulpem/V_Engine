@@ -59,15 +59,6 @@ bool ModuleFileSystem::Init()
 
 	SDL_free(tmp);
 
-	CreateDir("Library");
-	CreateDir("Library/Meshes");
-	CreateDir("Library/Textures");
-	CreateDir("Library/vGOs");
-	CreateDir("Library/Materials");
-	CreateDir("Scenes");
-
-	AddPath("Library/");
-
 	return ret;
 }
 

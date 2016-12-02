@@ -20,8 +20,18 @@ ModuleResourceManager::~ModuleResourceManager()
 }
 
 // Called before render is available
-bool ModuleResourceManager::Init()
+bool ModuleResourceManager::Start()
 {
+	App->fs->CreateDir("Library");
+	App->fs->CreateDir("Library/Meshes");
+	App->fs->CreateDir("Library/Textures");
+	App->fs->CreateDir("Library/vGOs");
+	App->fs->CreateDir("Library/Materials");
+	App->fs->CreateDir("Library/Meta");
+	App->fs->CreateDir("Assets/Scenes");
+
+	App->fs->AddPath("Library/");
+
 	return true;
 }
 

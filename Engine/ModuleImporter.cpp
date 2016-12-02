@@ -163,7 +163,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 
 
 
-bool ModuleImporter::ImportImage(const char * filePath)
+uint64_t ModuleImporter::ImportImage(const char * filePath, uint64_t _uid)
 {
 	// Extracted from
 	//http://openil.sourceforge.net/features.php
@@ -174,9 +174,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 		return false;
 	}
 
-	std::string saveName("Library/Textures/");
-	saveName += FileName(filePath);
-	saveName += TEXTURE_FORMAT;
+	uint64_t uid = _uid;
 
 	LOG("\nStarted importing texture %s", filePath);
 	char* buffer;
@@ -205,7 +203,14 @@ bool ModuleImporter::ImportImage(const char * filePath)
 				if (ilSaveL(IL_DDS, data, newSize) > 0)
 				{
 					// Save to buffer with the ilSaveIL function
-					App->fs->Save(saveName.data(), (const char*)data, newSize);
+					if (uid == 0)
+					{
+						uid = GenerateUUID();
+					}
+					char toCreate[524];
+					sprintf(toCreate, "Library/Textures/%llu%s", uid, TEXTURE_FORMAT);
+
+					App->fs->Save(toCreate, (const char*)data, newSize);
 					LOG("Succesfully imported!");
 				}
 				else
@@ -226,7 +231,7 @@ bool ModuleImporter::ImportImage(const char * filePath)
 		LOG("Couldn't open the file!");
 	}
 	RELEASE_ARRAY(buffer);
-	return true;
+	return uid;
 }
 
 
@@ -277,7 +282,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	transformIt = CopyMem<uint>(transformIt, &NodetoLoad->mNumMeshes);
 
 	std::vector<uint> materials;
-	std::vector<std::string> meshes;
+	std::vector<uint64_t> meshes;
 	uint nMeshes = NodetoLoad->mNumMeshes;
 	for (uint n = 0; n <nMeshes; n++)
 	{
@@ -353,7 +358,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 	for (int n = 0; n < nMeshes; n++)
 	{
-		realIt = CopyMem<char>(realIt, meshes[n].data(), 256);
+		realIt = CopyMem<uint64_t>(realIt, &meshes[n]);
 	}
 	if (hasMaterial)
 	{
@@ -402,7 +407,7 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	}
 }
 
-std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir ,uint& materialID)
+uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir ,uint& materialID)
 {
 	//Importing vertex
 	uint num_vertices = toLoad->mNumVertices;
@@ -482,8 +487,8 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 	}
 
 	uint meshSize =
-		//Mesh size		//Mesh exists?
-		sizeof(uint) + sizeof(bool) +
+		//UUID				//Mesh size		//Mesh exists?
+		sizeof (long long) + sizeof(uint) + sizeof(bool) +
 
 		//num_vertices				   vertices				num_normals   normals
 		sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
@@ -498,6 +503,10 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 
 	char* mesh = new char[meshSize];
 	char* meshIt = mesh;
+
+	//UUID
+	uint64_t uid = GenerateUUID();
+	meshIt = CopyMem<uint64_t>(meshIt, &uid);
 
 	//Does this mesh actually exist?
 	meshIt = CopyMem<bool>(meshIt, &meshExists);
@@ -542,26 +551,24 @@ std::string ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, con
 	RELEASE_ARRAY(textureCoords);
 	RELEASE_ARRAY(indices);
 
-	std::string toCreate("Library/Meshes/");
-//	toCreate += dir;
-//	App->fs->CreateDir(toCreate.data());
+	char toCreate[524];
+	sprintf(toCreate, "Library/Meshes/%llu%s", uid, MESH_FORMAT);
 
-	toCreate += "/";
-	toCreate += name;
-	toCreate += MESH_FORMAT;
-	App->fs->Save(toCreate.data(), mesh, meshSize);
+	App->fs->Save(toCreate, mesh, meshSize);
 
 	RELEASE_ARRAY(mesh);
 
-	return name;
+	return GenerateUUID();
 }
 
-std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName)
+uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName)
 {
 	if (matsIndex.empty() == false)
 	{
-		uint realSize = sizeof(uint);
+		uint realSize = sizeof(uint) + sizeof(long long);
 		uint nTextures = matsIndex.size();
+
+		uint64_t uid = GenerateUUID();
 
 		uint* materialsSize = new uint[matsIndex.size()];
 		char** materials = new char*[matsIndex.size()];
@@ -599,6 +606,9 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 
 		char* realMat = new char[realSize];
 		char* realIt = realMat;
+
+		realIt = CopyMem<uint64_t>(realIt, &uid);
+
 		realIt = CopyMem<uint>(realIt, &nTextures);
 
 		for (int n = 0; n < matsIndex.size(); n++)
@@ -606,10 +616,10 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 			realIt = CopyMem<char>(realIt, materials[n], materialsSize[n]);
 		}
 		
-		std::string toCreate("Library/Materials/");
-		toCreate += matName;
-		toCreate += MATERIAL_FORMAT;
-		App->fs->Save(toCreate.data(), realMat, realSize);	
+		char toCreate[524];
+		sprintf(toCreate, "Library/Materials/%llu%s", uid, MATERIAL_FORMAT);
+
+		App->fs->Save(toCreate, realMat, realSize);	
 
 		for (int n = 0; n < matsIndex.size(); n++)
 		{
@@ -618,9 +628,9 @@ std::string ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<ui
 		RELEASE_ARRAY(materialsSize);
 		RELEASE_ARRAY(materials);
 		RELEASE_ARRAY(realMat);
-		return matName;
+		return uid;
 	}
-	return NULL;
+	return 0;
 }
 
 
