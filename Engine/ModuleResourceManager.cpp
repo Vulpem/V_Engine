@@ -192,6 +192,16 @@ R_Folder ModuleResourceManager::ReadFolderMeta(const char * path)
 	return R_Folder("", "");
 }
 
+Resource * ModuleResourceManager::Peek(uint64_t uid) const
+{
+	std::map<uint64_t, Resource*>::const_iterator it = resources.find(uid);
+	if (it != resources.end())
+	{
+		return it->second;
+	}
+	return nullptr;
+}
+
 Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 {
 	Resource* ret = nullptr;
@@ -204,7 +214,7 @@ Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 	return ret;
 }
 
-Resource * ModuleResourceManager::LinkResource(std::string fileName, Component::Type type)
+uint64_t ModuleResourceManager::LinkResource(std::string fileName, Component::Type type)
 {
 	Resource* ret = nullptr;
 	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
@@ -230,7 +240,12 @@ Resource * ModuleResourceManager::LinkResource(std::string fileName, Component::
 			ret->nReferences++;
 		}
 	}
-	return ret;
+
+	if (ret != nullptr)
+	{
+		return ret->uid;
+	}
+	return 0;
 }
 
 void ModuleResourceManager::UnlinkResource(Resource * res)
@@ -241,7 +256,7 @@ void ModuleResourceManager::UnlinkResource(Resource * res)
 void ModuleResourceManager::UnlinkResource(uint64_t uid)
 {
 	std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
-	if (it != resources.end())
+	if (it != resources.end() && it->second != nullptr)
 	{
 		it->second->nReferences--;
 		if (it->second->nReferences <= 0)

@@ -1,9 +1,9 @@
 #ifndef __MATERIAL__
 #define __MATERIAL__
 
-#include "Component.h"
+#include "ResourcedComponent.h"
 
-class Material :public ResourceComponent
+class Material :public ResourcedComponent
 {
 public:
 	Material(std::string res, GameObject* linkedTo, int id);

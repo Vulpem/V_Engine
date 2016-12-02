@@ -3,8 +3,12 @@
 
 #include "Module.h"
 #include "Globals.h"
-#include "AllComponents.h"
+
+#include "Component.h"
+
 #include <map>
+
+class Resource;
 
 struct R_Folder
 {
@@ -53,8 +57,10 @@ private:
 	void CreateFolderMeta(R_Folder& folder);
 	R_Folder ReadFolderMeta(const char* path);
 public:
-	Resource* LinkResource(uint64_t uid);
-	Resource* LinkResource(std::string fileName, Component::Type type);
+	Resource* Peek(uint64_t uid) const;
+
+	Resource* LinkResource(uint64_t uid) ;
+	uint64_t LinkResource(std::string fileName, Component::Type type);
 
 	void UnlinkResource(Resource* res);
 	void UnlinkResource(uint64_t uid);

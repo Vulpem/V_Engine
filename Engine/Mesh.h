@@ -1,12 +1,11 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include "Component.h"
+#include "ResourcedComponent.h"
 
 struct Mesh_RenderInfo;
-class R_mesh;
 
-class mesh : public  ResourceComponent
+class mesh : public  ResourcedComponent
 {
 public:
 	mesh(std::string resource, GameObject* linkedTo, int id);

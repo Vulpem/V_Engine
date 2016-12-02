@@ -90,18 +90,3 @@ void Component::Save(pugi::xml_node& myNode)
 
 	SaveSpecifics(myNode.append_child("Specific"));
 }
-
-void ResourceComponent::LinkResource(std::string fileName)
-{
-	UnLinkResource();
-	resource = App->resources->LinkResource(fileName, GetType());
-}
-
-void ResourceComponent::UnLinkResource()
-{
-	if (resource != nullptr)
-	{
-		App->resources->UnlinkResource(resource);
-		resource = nullptr;
-	}
-}

@@ -7,7 +7,6 @@
 #include "PugiXml\src\pugixml.hpp"
 
 class GameObject;
-class Resource;
 
 class Component
 {
@@ -66,29 +65,6 @@ protected:
 private:
 	bool enabled = true;
 
-};
-
-class ResourceComponent : public Component
-{
-public:
-	ResourceComponent(std::string resource, GameObject* linkedTo, int id, Component::Type type) : Component(linkedTo, id, type)
-	{
-		LinkResource(resource);
-	}
-
-	~ResourceComponent()
-	{
-		UnLinkResource();
-	}
-
-	virtual bool MissingComponent() { return (resource == nullptr); }
-
-protected:
-	Resource* resource = nullptr;
-
-private:
-	void LinkResource(std::string fileName);
-	void UnLinkResource();
 };
 
 #endif

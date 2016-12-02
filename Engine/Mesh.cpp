@@ -11,7 +11,7 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-mesh::mesh(std::string resource, GameObject* linkedTo, int id): ResourceComponent(resource, linkedTo, id, C_mesh)
+mesh::mesh(std::string resource, GameObject* linkedTo, int id): ResourcedComponent(resource, linkedTo, id, C_mesh)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Mesh##%i", id);
@@ -52,7 +52,7 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 
 		ret.renderNormals = object->renderNormals;
 
-		const R_mesh* res = resource->Read<R_mesh>();
+		const R_mesh* res = ReadRes<R_mesh>();
 
 		ret.num_indices = res->num_indices;
 		ret.num_vertices = res->num_vertices;
@@ -65,49 +65,49 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 	return ret;
 }
 
-const float3 * mesh::GetVertices() const
+const float3* mesh::GetVertices() const
 {
 	/*//Obtaining the vertices data from the buffer
 	float3* ret = new float3[num_vertices];
 	glBindBuffer(GL_ARRAY_BUFFER, id_vertices);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float3) * num_vertices, ret);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-	return resource->Read<R_mesh>()->vertices;
+	return ReadRes<R_mesh>()->vertices;
 }
 
 const uint mesh::GetNumVertices()
 {
-	return resource->Read<R_mesh>()->num_vertices;
+	return ReadRes<R_mesh>()->num_vertices;
 }
 
 const uint* mesh::GetIndices() const
 {
-	return resource->Read<R_mesh>()->indices;
+	return ReadRes<R_mesh>()->indices;
 }
 
 const uint mesh::GetNumIndices()
 {
-	return resource->Read<R_mesh>()->num_indices;
+	return ReadRes<R_mesh>()->num_indices;
 }
 
 const float3 * mesh::GetNormals() const
 {
-	return resource->Read<R_mesh>()->normals;
+	return ReadRes<R_mesh>()->normals;
 }
 
 AABB mesh::GetAABB()
 {
-	return resource->Read<R_mesh>()->aabb;
+	return ReadRes<R_mesh>()->aabb;
 }
 
 void mesh::EditorContent()
 {
-	const R_mesh* res = resource->Read<R_mesh>();
+	const R_mesh* res = ReadRes<R_mesh>();
 	char tmp[48];
 	sprintf(tmp, "Wireframe##%i", id);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
-	ImGui::Text("Resource: %s", resource->file.data());
+	ImGui::Text("Resource: %s", res->file.data());
 
 	ImGui::Text("Vertices in memory: %i", res->num_vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
@@ -132,6 +132,6 @@ void mesh::EditorContent()
 
 void mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
-	myNode.append_attribute("MeshPath") = resource->file.data();
+	myNode.append_attribute("MeshPath") = ReadRes<R_mesh>()->file.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;
 }

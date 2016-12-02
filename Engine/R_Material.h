@@ -15,7 +15,7 @@ public:
 	{
 		if (textures.empty() == false)
 		{
-			for (std::vector<R_Texture*>::iterator it = textures.begin(); it != textures.end(); it++)
+			for (std::vector<uint64_t>::iterator it = textures.begin(); it != textures.end(); it++)
 			{
 				App->resources->UnlinkResource(*it);
 			}
@@ -26,7 +26,7 @@ public:
 
 	float color[5] = { 1.0f, 1.0f, 1.0f,1.0f };
 
-	std::vector<R_Texture*> textures;
+	std::vector<uint64_t> textures;
 
 };
 

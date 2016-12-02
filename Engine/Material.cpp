@@ -7,7 +7,7 @@
 
 #include "imGUI\imgui.h"
 
-Material::Material(std::string res, GameObject* linkedTo, int id) : ResourceComponent(res, linkedTo, id, C_material)
+Material::Material(std::string res, GameObject* linkedTo, int id) : ResourcedComponent(res, linkedTo, id, C_material)
 {
 	char tmp[NAME_MAX_LEN];
 	sprintf(tmp, "Material##%i", id);
@@ -16,16 +16,16 @@ Material::Material(std::string res, GameObject* linkedTo, int id) : ResourceComp
 
 void Material::EditorContent()
 {
-	ImGui::ColorEdit3("Color", resource->Read<R_Material>()->color);
+	ImGui::ColorEdit3("Color", ReadRes<R_Material>()->color);
 
-	for (uint n = 0; n < resource->Read<R_Material>()->textures.size(); n++)
+	for (uint n = 0; n < ReadRes<R_Material>()->textures.size(); n++)
 	{
 		ImGui::Separator();
 		char tmp[524];
-		sprintf(tmp, "Id: %i    %s",n , resource->Read<R_Material>()->textures.at(n)->file.data());
+		sprintf(tmp, "Id: %i    %s",n , App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->file.data());
 		if (ImGui::TreeNode(tmp))
 		{
-			ImTextureID image = (void*)resource->Read<R_Material>()->textures.at(n)->bufferID;
+			ImTextureID image = (void*) App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->Read<R_Texture>()->bufferID;
 			ImGui::Image(image, ImVec2(270,270));
 
 			ImGui::TreePop();
@@ -36,14 +36,14 @@ void Material::EditorContent()
 void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
 	pugi::xml_node color_n = myNode.append_child("Color");
-	color_n.append_attribute("R") = resource->Read<R_Material>()->color[0];
-	color_n.append_attribute("G") = resource->Read<R_Material>()->color[1];
-	color_n.append_attribute("B") = resource->Read<R_Material>()->color[2];
-	color_n.append_attribute("A") = resource->Read<R_Material>()->color[3];
-	for (std::vector<R_Texture*>::iterator it = resource->Read<R_Material>()->textures.begin(); it != resource->Read<R_Material>()->textures.end(); it++)
+	color_n.append_attribute("R") = ReadRes<R_Material>()->color[0];
+	color_n.append_attribute("G") = ReadRes<R_Material>()->color[1];
+	color_n.append_attribute("B") = ReadRes<R_Material>()->color[2];
+	color_n.append_attribute("A") = ReadRes<R_Material>()->color[3];
+	for (std::vector<uint64_t>::iterator it = ReadRes<R_Material>()->textures.begin(); it != ReadRes<R_Material>()->textures.end(); it++)
 	{
 		pugi::xml_node tex = myNode.append_child("Texture");		
-		tex.append_attribute("path") = (*it)->file.data();
+		tex.append_attribute("path") = App->resources->Peek(ReadRes<R_Material>()->textures.at(*it))->file.data();
 	}
 
 }
@@ -53,34 +53,34 @@ void Material::LoadSpecifics(pugi::xml_node & myNode)
 	for (pugi::xml_node tex = myNode.child("Texture"); tex != nullptr; tex = tex.next_sibling())
 	{
 		std::string path = tex.attribute("path").as_string();
-		R_Texture* toAdd = (R_Texture*)App->resources->LinkResource(path, Component::C_Texture);
-		if (toAdd != nullptr)
+		uint64_t toAdd = App->resources->LinkResource(path, Component::C_Texture);
+		if (toAdd != 0)
 		{
-			resource->Read<R_Material>()->textures.push_back(toAdd);
+			ReadRes<R_Material>()->textures.push_back(toAdd);
 		}
 	}
 
 	pugi::xml_node col = myNode.child("Color");
 
-	resource->Read<R_Material>()->color[0] = col.attribute("R").as_float();
-	resource->Read<R_Material>()->color[1] = col.attribute("G").as_float();
-	resource->Read<R_Material>()->color[2] = col.attribute("B").as_float();
-	resource->Read<R_Material>()->color[3] = col.attribute("A").as_float();
+	ReadRes<R_Material>()->color[0] = col.attribute("R").as_float();
+	ReadRes<R_Material>()->color[1] = col.attribute("G").as_float();
+	ReadRes<R_Material>()->color[2] = col.attribute("B").as_float();
+	ReadRes<R_Material>()->color[3] = col.attribute("A").as_float();
 
 }
 
 uint Material::NofTextures()
 {
-	return resource->Read<R_Material>()->textures.size();
+	return ReadRes<R_Material>()->textures.size();
 }
 
 int Material::GetTexture(uint n)
 {
 	if (IsEnabled())
 	{
-		if (n >= 0 && n < resource->Read<R_Material>()->textures.size())
+		if (n >= 0 && n < ReadRes<R_Material>()->textures.size())
 		{
-			return resource->Read<R_Material>()->textures.at(n)->bufferID;
+			return App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->Read<R_Texture>()->bufferID;
 		}
 	}
 	return -1;
@@ -88,13 +88,13 @@ int Material::GetTexture(uint n)
 
 void Material::SetColor(float r, float g, float b, float a)
 {
-	resource->Read<R_Material>()->color[0] = r;
-	resource->Read<R_Material>()->color[1] = g;
-	resource->Read<R_Material>()->color[2] = b;
-	resource->Read<R_Material>()->color[3] = a;
+	ReadRes<R_Material>()->color[0] = r;
+	ReadRes<R_Material>()->color[1] = g;
+	ReadRes<R_Material>()->color[2] = b;
+	ReadRes<R_Material>()->color[3] = a;
 }
 
 math::float4 Material::GetColor()
 {
-	return math::float4(resource->Read<R_Material>()->color);
+	return math::float4(ReadRes<R_Material>()->color);
 }

@@ -8,6 +8,7 @@
 #include "GameObject.h"
 
 #include "AllResources.h"
+#include "AllComponents.h"
 
 #include "Devil\include\il.h"
 #include "Devil\include\ilu.h"
@@ -946,8 +947,8 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 					It += bytes;
 					std::string path(textureName);
 					path += TEXTURE_FORMAT;
-					R_Texture* toAdd = (R_Texture*)App->resources->LinkResource(path.data(), Component::C_Texture);
-					if (toAdd != nullptr)
+					uint64_t toAdd = App->resources->LinkResource(path.data(), Component::C_Texture);
+					if (toAdd != 0)
 					{
 						mat->textures.push_back(toAdd);
 					}
