@@ -62,6 +62,7 @@ public:
 	void ClearLibrary();
 
 	void SaveMetaData();
+	void SaveMetaData(std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileToSave);
 	void LoadMetaData();
 
 	void Refresh();

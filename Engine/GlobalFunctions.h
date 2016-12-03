@@ -47,6 +47,9 @@ struct GlobalTime
 	//Game delta time from last frame in seconds
 	float gdt = 0.001f;
 
+	//Game speed multiplier
+	float gdtModifier = 1.0f;
+
 	//Is the game in "Play mode"?
 	bool PlayMode = false;
 

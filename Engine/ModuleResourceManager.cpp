@@ -94,6 +94,7 @@ void ModuleResourceManager::CreateLibraryDirs()
 
 void ModuleResourceManager::ReimportAll()
 {
+	TIMER_START("Res Reimport All");
 	ClearLibrary();
 
 	metaData.clear();
@@ -132,6 +133,7 @@ void ModuleResourceManager::ReimportAll()
 	}
 
 	SaveMetaData();
+	TIMER_READ_MS("Res Reimport All");
 }
 
 void ModuleResourceManager::ClearLibrary()
@@ -145,48 +147,58 @@ void ModuleResourceManager::SaveMetaData()
 	App->fs->DelDir("Library/Meta");
 	App->fs->CreateDir("Library/Meta");
 
-	uint n = 0;
 	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
 	for (; fileIt != metaData.end(); fileIt++)
 	{
-		pugi::xml_document data;
-		pugi::xml_node root_node;
+		SaveMetaData(fileIt);
+	}
+}
 
-		char fileName[524];
-		sprintf(fileName, "Library/Meta/%u%s", n, META_FORMAT);
+void ModuleResourceManager::SaveMetaData(std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileToSave)
+{
+	pugi::xml_document data;
+	pugi::xml_node root_node;
 
-		root_node = data.append_child("File");
-
-		pugi::xml_node fileData = root_node.append_child("FileData");
-		fileData.append_attribute("name") = fileIt->first.data();
-
-		std::map<std::string, Date>::iterator date = meta_lastMod.find(fileIt->first);
-
-		fileData.append_attribute("year") = date->second.year;
-		fileData.append_attribute("month") = date->second.month;
-		fileData.append_attribute("day") = date->second.day;
-		fileData.append_attribute("hour") = date->second.hour;
-		fileData.append_attribute("min") = date->second.min;
-		fileData.append_attribute("sec") = date->second.sec;
-
-		std::multimap<Component::Type, MetaInf>::iterator it = fileIt->second.begin();
-		for (; it != fileIt->second.end(); it++)
-		{
-			pugi::xml_node link = root_node.append_child("link");
-			link.append_attribute("name") = it->second.name.data();
-			link.append_attribute("type") = it->second.type;
-			link.append_attribute("uid") = it->second.uid;
-		}
-
-		std::stringstream stream;
-		data.save(stream);
-		// we are done, so write data to disk
-		App->fs->Save(fileName, stream.str().c_str(), stream.str().length());
-		LOG("Created: %s", fileName);
-
-		data.reset();
+	uint n = 0;
+	char fileName[524];
+	sprintf(fileName, "Library/Meta/%s%u%s", App->importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
+	while (App->fs->Exists(fileName) == true)
+	{
+		sprintf(fileName, "Library/Meta/%s%u%s", App->importer->FileName(fileToSave->first.data()).data(), n, META_FORMAT);
 		n++;
 	}
+
+	root_node = data.append_child("File");
+
+	pugi::xml_node fileData = root_node.append_child("FileData");
+	fileData.append_attribute("name") = fileToSave->first.data();
+
+	std::map<std::string, Date>::iterator date = meta_lastMod.find(fileToSave->first);
+
+	fileData.append_attribute("year") = date->second.year;
+	fileData.append_attribute("month") = date->second.month;
+	fileData.append_attribute("day") = date->second.day;
+	fileData.append_attribute("hour") = date->second.hour;
+	fileData.append_attribute("min") = date->second.min;
+	fileData.append_attribute("sec") = date->second.sec;
+
+	std::multimap<Component::Type, MetaInf>::iterator it = fileToSave->second.begin();
+	for (; it != fileToSave->second.end(); it++)
+	{
+		pugi::xml_node link = root_node.append_child("link");
+		link.append_attribute("name") = it->second.name.data();
+		link.append_attribute("type") = it->second.type;
+		link.append_attribute("uid") = it->second.uid;
+	}
+
+	std::stringstream stream;
+	data.save(stream);
+	// we are done, so write data to disk
+	App->fs->Save(fileName, stream.str().c_str(), stream.str().length());
+	LOG("Created: %s", fileName);
+
+	data.reset();
+	n++;
 }
 
 void ModuleResourceManager::LoadMetaData()
@@ -213,7 +225,7 @@ void ModuleResourceManager::LoadMetaData()
 			pugi::xml_node root;
 
 			pugi::xml_parse_result result = data.load_buffer(buffer, size);
-			RELEASE(buffer);
+			RELEASE_ARRAY(buffer);
 
 			if (result != NULL)
 			{
@@ -262,6 +274,7 @@ void ModuleResourceManager::LoadMetaData()
 
 void ModuleResourceManager::Refresh()
 {
+	TIMER_START("Res Refresh");
 	std::queue<R_Folder> pendantFolders;
 	std::queue<std::string> filesToCheck;
 
@@ -282,6 +295,8 @@ void ModuleResourceManager::Refresh()
 		}
 		pendantFolders.pop();
 	}
+
+	std::vector<std::string> metaToSave;
 
 	while (filesToCheck.empty() == false)
 	{
@@ -314,12 +329,21 @@ void ModuleResourceManager::Refresh()
 					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
 				}
 				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
+				
+				metaToSave.push_back(filesToCheck.front());
 
 				meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
 			}
 		}
 		filesToCheck.pop();
 	}
+
+	while(metaToSave.size() > 0)
+	{
+		SaveMetaData(metaData.find(metaToSave.back()));
+		metaToSave.pop_back();
+	}
+	TIMER_READ_MS("Res Refresh");
 }
 
 const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const char * component)

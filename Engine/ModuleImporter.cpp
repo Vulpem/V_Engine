@@ -622,257 +622,258 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, GameObject* parent)
 {
 	const MetaInf* meta = App->resources->GetMetaData(fileName, Component::C_GO, vGoName);
-
-	char path[1024];
-	sprintf(path, "Library/vGOs/%llu%s", meta->uid, GO_FORMAT);
-
-	char* file = nullptr;
-
-	if (parent == nullptr)
+	if (meta != nullptr)
 	{
-		LOG("\n ------- [Began loading %s] ---------", fileName);
-	}
+		char path[1024];
+		sprintf(path, "Library/vGOs/%llu%s", meta->uid, GO_FORMAT);
 
-	LOG("Loading vgo %s", vGoName);
+		char* file = nullptr;
 
-	if (App->fs->Exists(path))
-	{
-		int size = App->fs->Load(path, &file);
-		if (file != nullptr && size > 0)
-		{			
-			char* It = file;
+		if (parent == nullptr)
+		{
+			LOG("\n ------- [Began loading %s] ---------", fileName);
+		}
 
-			//Creating basic components for a GameObject
-			GameObject* ret = new GameObject;
-			Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
+		LOG("Loading vgo %s", vGoName);
 
-			//Setting name
-			ret->SetName(meta->name.data());
-			//Setting parent
-			ret->parent = parent;
-
-			//Setting transform
-			float _transform[10];
-			uint bytes = sizeof(float) * 10;
-			memcpy(_transform, It, bytes);
-			It += bytes;
-
-			trans->SetLocalRot(_transform[0], _transform[1], _transform[2], _transform[3]);
-			trans->SetLocalScale(_transform[4], _transform[5], _transform[6]);
-			trans->SetLocalPos(_transform[7], _transform[8], _transform[9]);
-
-			trans->UpdateEditorValues();
-
-			//Number of meshes
-			uint nMeshes = 0;
-			bytes = sizeof(uint);
-			memcpy(&nMeshes, It, bytes);
-			It += bytes;
-
-			//HasMaterial
-			uint hasMaterial = 0;
-			bytes = sizeof(uint);
-			memcpy(&hasMaterial, It, bytes);
-			It += bytes;
-
-			//Loading each mesh
-			for (uint n = 0; n < nMeshes; n++)
+		if (App->fs->Exists(path))
+		{
+			int size = App->fs->Load(path, &file);
+			if (file != nullptr && size > 0)
 			{
-				uint64_t meshUID;
-				bytes = sizeof(uint64_t);
-				memcpy(&meshUID, It, bytes);
+				char* It = file;
+
+				//Creating basic components for a GameObject
+				GameObject* ret = new GameObject;
+				Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
+
+				//Setting name
+				ret->SetName(meta->name.data());
+				//Setting parent
+				ret->parent = parent;
+
+				//Setting transform
+				float _transform[10];
+				uint bytes = sizeof(float) * 10;
+				memcpy(_transform, It, bytes);
 				It += bytes;
-				std::string meshName = App->resources->GetMetaData(fileName, Component::C_mesh, meshUID)->name;
-				ret->AddComponent(Component::Type::C_mesh, meshName);
-				ret->SetOriginalAABB();
-			}
 
-			if (hasMaterial != 0)
-			{
-				char materialName[256];
-				bytes = sizeof(char) * 256;
-				memcpy(&materialName, It, bytes);
+				trans->SetLocalRot(_transform[0], _transform[1], _transform[2], _transform[3]);
+				trans->SetLocalScale(_transform[4], _transform[5], _transform[6]);
+				trans->SetLocalPos(_transform[7], _transform[8], _transform[9]);
+
+				trans->UpdateEditorValues();
+
+				//Number of meshes
+				uint nMeshes = 0;
+				bytes = sizeof(uint);
+				memcpy(&nMeshes, It, bytes);
 				It += bytes;
-				ret->AddComponent(Component::Type::C_material, materialName);
-			}
-			
-			//Num childs
-			uint nChilds = 0;
-			bytes = sizeof(uint);
-			memcpy(&nChilds, It, bytes);
-			It += bytes;
 
-			if (nChilds > 0)
-			{
-				std::vector<uint64_t> childs;
-				//Loading each child name into a separate string
-				for (uint n = 0; n < nChilds; n++)
+				//HasMaterial
+				uint hasMaterial = 0;
+				bytes = sizeof(uint);
+				memcpy(&hasMaterial, It, bytes);
+				It += bytes;
+
+				//Loading each mesh
+				for (uint n = 0; n < nMeshes; n++)
 				{
-					uint64_t childUID;
-					bytes = sizeof(unsigned long long);
-					memcpy(&childUID, It, bytes);
+					uint64_t meshUID;
+					bytes = sizeof(uint64_t);
+					memcpy(&meshUID, It, bytes);
 					It += bytes;
-
-					childs.push_back(childUID);
+					std::string meshName = App->resources->GetMetaData(fileName, Component::C_mesh, meshUID)->name;
+					ret->AddComponent(Component::Type::C_mesh, meshName);
+					ret->SetOriginalAABB();
 				}
 
-				std::vector<uint64_t>::iterator childsUID = childs.begin();
-				while (childsUID != childs.end())
+				if (hasMaterial != 0)
 				{
-					const MetaInf* inf = App->resources->GetMetaData(fileName, Component::C_GO, *childsUID);
-					if (inf != nullptr)
-					{
-						GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
-						if (child)
-						{
-							ret->childs.push_back(child);
-						}
-					}
-					else
-					{
-						LOG("Error loading child for %s", vGoName);
-					}
-					childsUID++;
+					char materialName[256];
+					bytes = sizeof(char) * 256;
+					memcpy(&materialName, It, bytes);
+					It += bytes;
+					ret->AddComponent(Component::Type::C_material, materialName);
 				}
+
+				//Num childs
+				uint nChilds = 0;
+				bytes = sizeof(uint);
+				memcpy(&nChilds, It, bytes);
+				It += bytes;
+
+				if (nChilds > 0)
+				{
+					std::vector<uint64_t> childs;
+					//Loading each child name into a separate string
+					for (uint n = 0; n < nChilds; n++)
+					{
+						uint64_t childUID;
+						bytes = sizeof(unsigned long long);
+						memcpy(&childUID, It, bytes);
+						It += bytes;
+
+						childs.push_back(childUID);
+					}
+
+					std::vector<uint64_t>::iterator childsUID = childs.begin();
+					while (childsUID != childs.end())
+					{
+						const MetaInf* inf = App->resources->GetMetaData(fileName, Component::C_GO, *childsUID);
+						if (inf != nullptr)
+						{
+							GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
+							if (child)
+							{
+								ret->childs.push_back(child);
+							}
+						}
+						else
+						{
+							LOG("Error loading child for %s", vGoName);
+						}
+						childsUID++;
+					}
+				}
+
+				delete[] file;
+
+				return ret;
 			}
-
-			delete[] file;
-
-			return ret;
+			else
+			{
+				LOG("Something went wrong while loading %s", fileName);
+			}
 		}
 		else
 		{
-			LOG("Something went wrong while loading %s", fileName);
+			LOG("Woops! This .vgo doesn't really exist.")
 		}
 	}
-	else
-	{
-		LOG("Woops! This .vgo doesn't really exist.")
-	}
-
 	return nullptr;
 }
 
 R_mesh* ModuleImporter::LoadMesh(const char * resName)
 {
 	char* file = nullptr;
-
-	const MetaInf* inf = App->resources->GetMetaData(Component::C_mesh, resName);
-
-	char filePath[526];
-	sprintf(filePath, "Library/Meshes/%llu%s", inf->uid, MESH_FORMAT);
 	R_mesh* newMesh = nullptr;
-
-
-	LOG("Loading mesh %s", filePath);
-
-	if (App->fs->Exists(filePath))
+	const MetaInf* inf = App->resources->GetMetaData(Component::C_mesh, resName);
+	if (inf != nullptr)
 	{
-		int size = App->fs->Load(filePath, &file);
-		if (file != nullptr && size > 0)
+		char filePath[526];
+		sprintf(filePath, "Library/Meshes/%llu%s", inf->uid, MESH_FORMAT);
+
+		LOG("Loading mesh %s", inf->name.data());
+
+		if (App->fs->Exists(filePath))
 		{
-			char* It = file;
-
-			//Does this mesh exist?
-			bool _meshExists = true;
-			uint bytes = sizeof(bool);
-			memcpy(&_meshExists, It, bytes);
-			It += bytes;
-
-			if (_meshExists == true)
+			int size = App->fs->Load(filePath, &file);
+			if (file != nullptr && size > 0)
 			{
-				newMesh = new R_mesh();
+				char* It = file;
 
-				newMesh->name = resName;
-
-				//Num vertices
-				bytes = sizeof(uint);
-				memcpy(&newMesh->num_vertices, It, bytes);
+				//Does this mesh exist?
+				bool _meshExists = true;
+				uint bytes = sizeof(bool);
+				memcpy(&_meshExists, It, bytes);
 				It += bytes;
 
-				//Actual vertices
-				newMesh->vertices = new float3[newMesh->num_vertices];
-				bytes = sizeof(float3) * newMesh->num_vertices;
-				memcpy(newMesh->vertices, It, bytes);
-				It += bytes;
-
-				//Generating vertices buffer
-				glGenBuffers(1, (GLuint*) &(newMesh->id_vertices));
-				glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_vertices);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
-				//endof Generating vertices buffer
-
-
-				//Num normals
-				bytes = sizeof(uint);
-				memcpy(&newMesh->num_normals, It, bytes);
-				It += bytes;
-
-				if (newMesh->num_normals > 0)
+				if (_meshExists == true)
 				{
-					//Normals
-					newMesh->normals = new float3[newMesh->num_normals];
-					bytes = sizeof(float3) * newMesh->num_normals;
-					memcpy(newMesh->normals, It, bytes);
+					newMesh = new R_mesh();
+
+					newMesh->name = resName;
+
+					//Num vertices
+					bytes = sizeof(uint);
+					memcpy(&newMesh->num_vertices, It, bytes);
 					It += bytes;
 
-					//Generating normals buffer
-					glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
-					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
-					//endOf Generating normals buffer
-				}
-
-				//Num texture coords
-				bytes = sizeof(uint);
-				memcpy(&newMesh->num_textureCoords, It, bytes);
-				It += bytes;
-
-				if (newMesh->num_textureCoords > 0)
-				{
-					//Texture coords
-					float* textureCoords = new float[newMesh->num_vertices * 2];
-					bytes = sizeof(float) * newMesh->num_normals * 2;
-					memcpy(textureCoords, It, bytes);
+					//Actual vertices
+					newMesh->vertices = new float3[newMesh->num_vertices];
+					bytes = sizeof(float3) * newMesh->num_vertices;
+					memcpy(newMesh->vertices, It, bytes);
 					It += bytes;
 
-					//Generating UVs buffer
-					glGenBuffers(1, (GLuint*) &(newMesh->id_textureCoords));
-					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, textureCoords, GL_STATIC_DRAW);
-					//endOF Generatinv UVs buffer
-					RELEASE_ARRAY(textureCoords);
+					//Generating vertices buffer
+					glGenBuffers(1, (GLuint*) &(newMesh->id_vertices));
+					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_vertices);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
+					//endof Generating vertices buffer
+
+
+					//Num normals
+					bytes = sizeof(uint);
+					memcpy(&newMesh->num_normals, It, bytes);
+					It += bytes;
+
+					if (newMesh->num_normals > 0)
+					{
+						//Normals
+						newMesh->normals = new float3[newMesh->num_normals];
+						bytes = sizeof(float3) * newMesh->num_normals;
+						memcpy(newMesh->normals, It, bytes);
+						It += bytes;
+
+						//Generating normals buffer
+						glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
+						glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
+						glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
+						//endOf Generating normals buffer
+					}
+
+					//Num texture coords
+					bytes = sizeof(uint);
+					memcpy(&newMesh->num_textureCoords, It, bytes);
+					It += bytes;
+
+					if (newMesh->num_textureCoords > 0)
+					{
+						//Texture coords
+						float* textureCoords = new float[newMesh->num_vertices * 2];
+						bytes = sizeof(float) * newMesh->num_normals * 2;
+						memcpy(textureCoords, It, bytes);
+						It += bytes;
+
+						//Generating UVs buffer
+						glGenBuffers(1, (GLuint*) &(newMesh->id_textureCoords));
+						glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
+						glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, textureCoords, GL_STATIC_DRAW);
+						//endOF Generatinv UVs buffer
+						RELEASE_ARRAY(textureCoords);
+					}
+
+					//Num indices
+					bytes = sizeof(uint);
+					memcpy(&newMesh->num_indices, It, bytes);
+					It += bytes;
+
+					//Actual indices
+					newMesh->indices = new uint[newMesh->num_indices];
+					bytes = sizeof(uint) * newMesh->num_indices;
+					memcpy(newMesh->indices, It, bytes);
+					It += bytes;
+
+					//Generating indices buffer
+					glGenBuffers(1, (GLuint*) &(newMesh->id_indices));
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
+					//endOf generating indices buffer
+
+
+					//AABB maxPoint
+					bytes = sizeof(float3);
+					memcpy(&newMesh->aabb.maxPoint, It, bytes);
+					It += bytes;
+
+					//AABB minPoint
+					memcpy(&newMesh->aabb.minPoint, It, bytes);
+					It += bytes;
 				}
-
-				//Num indices
-				bytes = sizeof(uint);
-				memcpy(&newMesh->num_indices, It, bytes);
-				It += bytes;
-
-				//Actual indices
-				newMesh->indices = new uint[newMesh->num_indices];
-				bytes = sizeof(uint) * newMesh->num_indices;
-				memcpy(newMesh->indices, It, bytes);
-				It += bytes;
-
-				//Generating indices buffer
-				glGenBuffers(1, (GLuint*) &(newMesh->id_indices));
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
-				//endOf generating indices buffer
-
-
-				//AABB maxPoint
-				bytes = sizeof(float3);
-				memcpy(&newMesh->aabb.maxPoint, It, bytes);
-				It += bytes;
-
-				//AABB minPoint
-				memcpy(&newMesh->aabb.minPoint, It, bytes);
-				It += bytes;
 			}
+			RELEASE_ARRAY(file);
 		}
-		RELEASE_ARRAY(file);
 	}
 	return newMesh;
 }
@@ -883,71 +884,74 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 	
 	const MetaInf* inf = App->resources->GetMetaData(Component::C_material, resName);
 
-	char filePath[526];
-	sprintf(filePath, "Library/Materials/%llu%s", inf->uid, MATERIAL_FORMAT);
-
 	R_Material* mat = nullptr;
 
-	LOG("Loading mesh %s", filePath);
-
-	if (App->fs->Exists(filePath))
+	if (inf != nullptr)
 	{
-		int size = App->fs->Load(filePath, &file);
-		if (file != nullptr && size > 0)
+		char filePath[526];
+		sprintf(filePath, "Library/Materials/%llu%s", inf->uid, MATERIAL_FORMAT);
+
+		LOG("Loading material %s", inf->name);
+
+		if (App->fs->Exists(filePath))
 		{
-			char* It = file;
-			mat = new R_Material();
-
-			uint bytes = 0;
-			uint nTextures = 0;
-
-			mat->name = resName;
-
-			//NumTextures
-			uint numTextures = 0;
-			bytes = sizeof(uint);
-			memcpy(&numTextures, It, bytes);
-			It += bytes;
-
-			for (int n = 0; n < numTextures; n++)
+			int size = App->fs->Load(filePath, &file);
+			if (file != nullptr && size > 0)
 			{
-				//Texture name Len
-				uint textureNameLen = 0;
+				char* It = file;
+				mat = new R_Material();
+
+				uint bytes = 0;
+				uint nTextures = 0;
+
+				mat->name = resName;
+
+				//NumTextures
+				uint numTextures = 0;
 				bytes = sizeof(uint);
-				memcpy(&textureNameLen, It, bytes);
+				memcpy(&numTextures, It, bytes);
 				It += bytes;
 
-				if (textureNameLen > 1)
+				for (int n = 0; n < numTextures; n++)
 				{
-					//Texture name
-					char* textureName = new char[textureNameLen];
-					bytes = sizeof(char) * textureNameLen;
-					memcpy(textureName, It, bytes);
+					//Texture name Len
+					uint textureNameLen = 0;
+					bytes = sizeof(uint);
+					memcpy(&textureNameLen, It, bytes);
 					It += bytes;
-					std::string path(textureName);
-					uint64_t toAdd = App->resources->LinkResource(path.data(), Component::C_Texture);
-					if (toAdd != 0)
-					{
-						mat->textures.push_back(toAdd);
-					}
 
-					delete[] textureName;
+					if (textureNameLen > 1)
+					{
+						//Texture name
+						char* textureName = new char[textureNameLen];
+						bytes = sizeof(char) * textureNameLen;
+						memcpy(textureName, It, bytes);
+						It += bytes;
+						std::string path(textureName);
+						uint64_t toAdd = App->resources->LinkResource(path.data(), Component::C_Texture);
+						if (toAdd != 0)
+						{
+							mat->textures.push_back(toAdd);
+						}
+
+						delete[] textureName;
+					}
+					else
+					{
+						It++;
+					}
+					//Color
+					float color[3];
+					bytes = sizeof(float) * 3;
+					memcpy(color, It, bytes);
+					It += bytes;
+					mat->color[0] = color[0];
+					mat->color[1] = color[1];
+					mat->color[2] = color[2];
+					mat->color[4] = 1.0f;
 				}
-				else
-				{
-					It++;
-				}
-				//Color
-				float color[3];
-				bytes = sizeof(float) * 3;
-				memcpy(color, It, bytes);
-				It += bytes;
-				mat->color[0] = color[0];
-				mat->color[1] = color[1];
-				mat->color[2] = color[2];
-				mat->color[4] = 1.0f;
+				RELEASE_ARRAY(file);
 			}
-			RELEASE(file);
 		}
 	}
 	return mat;
@@ -967,7 +971,7 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 		char fullPath[526];
 		sprintf(fullPath, "%sLibrary/Textures/%llu%s", NormalizePath(App->fs->GetWrittingDirectory().data()).data(), inf->uid, TEXTURE_FORMAT);
 
-		LOG("Loading Texture %s", fullPath);
+		LOG("Loading Texture %s", inf->name);
 
 		uint ID = ilutGLLoadImage(fullPath);
 

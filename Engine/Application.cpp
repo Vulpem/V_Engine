@@ -142,10 +142,12 @@ void Application::PrepareUpdate()
 	//////////
 	TIMER_START_PERF("App PreUpdate");
 	frameCount++;
+
+	//Time managing
 	Time.dt = ms_timer.ReadMs() / 1000.0f;
 	if (Time.PlayMode && Time.Pause == false)
 	{
-		Time.gdt = Time.dt;
+		Time.gdt = Time.dt / Time.gdtModifier;
 		Time.GameRuntime += Time.dt;
 	}
 	else
@@ -153,6 +155,7 @@ void Application::PrepareUpdate()
 		Time.gdt = 0.0f;
 	}
 	Time.AppRuntime = totalTimer.Read() / 1000.0f;
+	//
 
 	ms_timer.Start();
 
