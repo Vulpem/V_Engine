@@ -300,6 +300,10 @@ update_status ModuleEditor::MenuBar()
 			{
 				App->resources->ReimportAll();
 			}
+			if (ImGui::MenuItem("Refresh Assets"))
+			{
+				App->resources->Refresh();
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("View"))

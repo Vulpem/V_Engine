@@ -42,11 +42,6 @@ childs UID
 
 bool meshExists
 
-uint
-nameLen
-
-char * nameLen
-name
 
 uint numVertices
 
