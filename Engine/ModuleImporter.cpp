@@ -390,7 +390,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	// ---------------- Creating the save file and writting it -----------------------------------------
 
 	char toCreate[524];
-	sprintf(toCreate, "Library/Meshes/%llu%s", uid, GO_FORMAT);
+	sprintf(toCreate, "Library/vGOs/%llu%s", uid, GO_FORMAT);
 
 	App->fs->Save(toCreate, realFile, realFileSize);
 

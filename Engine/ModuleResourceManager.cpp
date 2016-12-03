@@ -106,7 +106,12 @@ void ModuleResourceManager::ReimportAll()
 			std::vector<MetaInf> toAdd = App->importer->Import(path.data());
 			if (toAdd.empty() == false)
 			{
-				metaData.insert(std::pair<std::string, std::vector<MetaInf>>(path, toAdd));
+				std::multimap<Component::Type, MetaInf> tmp;
+				for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
+				{
+					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
+				}
+				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
 			}
 		}
 

@@ -48,7 +48,7 @@ private:
 
 	std::vector<uint64_t> toDelete;
 
-	std::map<std::string, std::vector<MetaInf>> metaData;
+	std::map<std::string, std::multimap<Component::Type,MetaInf>> metaData;
 
 	//R_Folder resBaseFolder;
 
