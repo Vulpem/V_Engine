@@ -293,6 +293,14 @@ update_status ModuleEditor::MenuBar()
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Import"))
+		{
+			if (ImGui::MenuItem("Reimport All Assets"))
+			{
+				App->resources->ReimportAll();
+			}
+			ImGui::EndMenu();
+		}
 		if (ImGui::BeginMenu("View"))
 		{
 			if (ImGui::Checkbox("Multiple Views", &multipleViews))

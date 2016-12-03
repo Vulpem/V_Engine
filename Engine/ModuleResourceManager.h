@@ -9,22 +9,13 @@
 #include <map>
 
 class Resource;
+struct Date;
 
 struct MetaInf
 {
 	std::string name;
 	uint64_t uid;
 	Component::Type type;
-};
-
-struct Date
-{
-	uint year = 0;
-	uint month = 0;
-	uint day = 0;
-	uint hour = 0;
-	uint min = 0;
-	uint sec = 0;
 };
 
 struct R_Folder
@@ -66,10 +57,13 @@ private:
 	Resource* LoadNewResource(std::string fileName);
 
 public:
+	void CreateLibraryDirs();
 	void ReimportAll();
 	void ClearLibrary();
 
 	void SaveMetaData();
+
+	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
 private:
 	//void RefreshFolder(const char* path);
 

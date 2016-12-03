@@ -7,6 +7,9 @@
 #include "Assimp/include/cfileio.h"
 #include "Assimp/include/types.h"
 
+#include <sys/stat.h>
+#include <time.h>
+
 #pragma comment( lib, "PhysFS/libx86/physfs.lib" )
 
 ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -188,6 +191,25 @@ void ModuleFileSystem::GetFilesIn(const char * directory, std::vector<std::strin
 	}
 
 	PHYSFS_freeList(f);
+}
+
+Date ModuleFileSystem::ReadFileDate(const char * path)
+{
+	struct tm *foo;
+	struct stat attrib;
+
+	stat(path, &attrib);
+	foo = gmtime(&(attrib.st_mtime));
+
+	Date date;
+	date.year = foo->tm_year;
+	date.month = foo->tm_mon;
+	date.day = foo->tm_mday;
+	date.hour = foo->tm_hour;
+	date.min = foo->tm_min;
+	date.sec = foo->tm_sec;
+
+	return date;
 }
 
 

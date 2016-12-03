@@ -70,8 +70,8 @@ update_status ModuleGoManager::Update()
 	{
 		char droppedFile[1024];
 		strcpy(droppedFile, App->input->dropped_file);
-		std::string onlyName = App->importer->FileName(droppedFile);
-		LoadGO(onlyName.data());
+		std::string file = App->importer->NormalizePath(droppedFile);
+		LoadGO(file.data());
 	}
 
 	TIMER_START("Components Update");

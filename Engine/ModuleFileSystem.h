@@ -9,6 +9,16 @@ int close_sdl_rwops(SDL_RWops *rw);
 
 struct aiFileIO;
 
+struct Date
+{
+	uint year = 0;
+	uint month = 0;
+	uint day = 0;
+	uint hour = 0;
+	uint min = 0;
+	uint sec = 0;
+};
+
 class ModuleFileSystem : public Module
 {
 public:
@@ -34,6 +44,8 @@ public:
 	bool IsDirectory(const char* file) const;
 	std::string GetWrittingDirectory();
 	void GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files);
+
+	Date ReadFileDate(const char* path);
 
 	bool EraseFile(const char* file);
 

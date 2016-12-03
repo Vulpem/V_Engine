@@ -10,9 +10,6 @@
 
 #include <queue>
 
-#include <sys/stat.h>
-#include <time.h>
-
 
 ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
 {
@@ -27,15 +24,7 @@ ModuleResourceManager::~ModuleResourceManager()
 // Called before render is available
 bool ModuleResourceManager::Start()
 {
-	App->fs->CreateDir("Library");
-	App->fs->CreateDir("Library/Meshes");
-	App->fs->CreateDir("Library/Textures");
-	App->fs->CreateDir("Library/vGOs");
-	App->fs->CreateDir("Library/Materials");
-	App->fs->CreateDir("Library/Meta");
-	App->fs->CreateDir("Assets/Scenes");
-
-	ReimportAll();
+	CreateLibraryDirs();
 
 	return true;
 }
@@ -87,6 +76,17 @@ Resource * ModuleResourceManager::LoadNewResource(std::string fileName)
 	return nullptr;
 }
 
+void ModuleResourceManager::CreateLibraryDirs()
+{
+	App->fs->CreateDir("Library");
+	App->fs->CreateDir("Library/Meshes");
+	App->fs->CreateDir("Library/Textures");
+	App->fs->CreateDir("Library/vGOs");
+	App->fs->CreateDir("Library/Materials");
+	App->fs->CreateDir("Library/Meta");
+	App->fs->CreateDir("Assets/Scenes");
+}
+
 void ModuleResourceManager::ReimportAll()
 {
 	ClearLibrary();
@@ -116,22 +116,7 @@ void ModuleResourceManager::ReimportAll()
 				}
 				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
 
-				struct tm *foo;
-				struct stat attrib;
-
-				stat(path.data(), &attrib);
-				foo = gmtime(&(attrib.st_mtime));
-
-				Date date;
-				date.year = foo->tm_year;
-				date.month = foo->tm_mon;
-				date.day = foo->tm_mday;
-				date.hour = foo->tm_hour;
-				date.min = foo->tm_min;
-				date.sec = foo->tm_sec;
-
-				meta_lastMod.insert(std::pair<std::string, Date>(path, date));
-
+				meta_lastMod.insert(std::pair<std::string, Date>(path, App->fs->ReadFileDate(path.data())));
 			}
 		}
 
@@ -144,14 +129,7 @@ void ModuleResourceManager::ReimportAll()
 void ModuleResourceManager::ClearLibrary()
 {
 	App->fs->DelDir("Library");
-
-	App->fs->CreateDir("Library");
-	App->fs->CreateDir("Library/Meshes");
-	App->fs->CreateDir("Library/Textures");
-	App->fs->CreateDir("Library/vGOs");
-	App->fs->CreateDir("Library/Materials");
-	App->fs->CreateDir("Library/Meta");
-	App->fs->CreateDir("Assets/Scenes");
+	CreateLibraryDirs();
 }
 
 void ModuleResourceManager::SaveMetaData()
@@ -197,6 +175,24 @@ void ModuleResourceManager::SaveMetaData()
 
 		data.reset();
 	}
+}
+
+const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const char * component)
+{
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.find(file);
+	if (f != metaData.end())
+	{
+		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
+		while (it->first == type && it != f->second.end())
+		{
+			if (it->second.name.compare(component) == 0)
+			{
+				return &it->second;
+			}
+			it++;
+		}
+	}
+	return nullptr;
 }
 
 /*

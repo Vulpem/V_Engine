@@ -82,6 +82,9 @@ public:
 	//Returns the file name + format
 	std::string File(const char* file);
 
+	//Will change any "\\" into a "/" && will set the start of the path at "Assets", if found
+	std::string NormalizePath(const char* path);
+
 private:
 	template <typename type>
 	char* CopyMem(char* copyTo, const type* copyFrom, int amount = 1)

@@ -5,6 +5,8 @@
 
 #include "ModuleFileSystem.h"
 
+#include "ModuleResourceManager.h"
+
 #include "GameObject.h"
 
 #include "AllResources.h"
@@ -649,9 +651,11 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 // ------------------------------- LOADING ------------------------------- 
 
 
-GameObject * ModuleImporter::LoadVgo(const char * fileName_NoFileType, GameObject* parent, char* meshesFolder)
+GameObject * ModuleImporter::LoadVgo(const char * _fileName, GameObject* parent, char* meshesFolder)
 {
-	std::string fileName (fileName_NoFileType);
+	const MetaInf* meta = App->resources->GetMetaData(_fileName, Component::C_GO, "RootNode");
+
+	std::string fileName (_fileName);
 
 	char* file = nullptr;
 	std::string path("Library/vGOs/");
@@ -1111,4 +1115,37 @@ std::string ModuleImporter::File(const char * file)
 		start++;
 	}
 	return std::string(start);
+}
+
+std::string ModuleImporter::NormalizePath(const char * path)
+{
+	char tmp[MAXLEN];
+	strcpy(tmp, path);
+	char* it = tmp;
+
+	uint len = 0;
+	uint n = 0;
+
+	while (*it != '\0')
+	{
+		if (*it == '\\')
+		{
+			*it = '/';
+		}
+		it++;
+		len++;
+	}
+
+	it = tmp;
+
+	while (n < len - 7)
+	{
+		if (it[0] == 'A' && it[1] == 's'&& it[2] == 's'&& it[3] == 'e'&& it[4] == 't'&& it[5] == 's'&& it[6] == '/')
+		{
+			return std::string(it);
+		}
+		it++;
+		n++;
+	}
+	return std::string(tmp);
 }
