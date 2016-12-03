@@ -64,6 +64,8 @@ public:
 	void SaveMetaData();
 	void LoadMetaData();
 
+	void Refresh();
+
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
 private:
 	//void RefreshFolder(const char* path);

@@ -26,6 +26,7 @@ bool ModuleResourceManager::Start()
 {
 	CreateLibraryDirs();
 	LoadMetaData();
+	Refresh();
 
 	return true;
 }
@@ -245,6 +246,57 @@ void ModuleResourceManager::LoadMetaData()
 			LOG("Tried to read an unexisting folder meta.\n%s", path)
 		}
 	}
+}
+
+void ModuleResourceManager::Refresh()
+{
+	std::queue<R_Folder> pendantFolders;
+	std::queue<std::string> filesToCheck;
+
+	pendantFolders.push(ReadFolder("Assets"));
+	while (pendantFolders.empty() == false)
+	{
+		for (std::vector<std::string>::iterator it = pendantFolders.front().subFoldersPath.begin(); it != pendantFolders.front().subFoldersPath.end(); it++)
+		{
+			pendantFolders.push(ReadFolder(it->data()));
+		}
+
+		for (std::vector<std::string>::iterator it = pendantFolders.front().files.begin(); it != pendantFolders.front().files.end(); it++)
+		{
+			std::string path(pendantFolders.front().path);
+			path += "/";
+			path += it->data();
+			filesToCheck.push(path.data());			
+		}
+		pendantFolders.pop();
+	}
+
+	while (filesToCheck.empty() == false)
+	{
+		std::map<std::string, Date>::iterator it = meta_lastMod.find(filesToCheck.front());
+		if (it != meta_lastMod.end() && it->second == App->fs->ReadFileDate(filesToCheck.front().data()))
+		{
+			
+		}
+		else
+		{
+			std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data());
+			if (toAdd.empty() == false)
+			{
+				std::multimap<Component::Type, MetaInf> tmp;
+				for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
+				{
+					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
+				}
+				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
+
+				meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
+			}
+		}
+		filesToCheck.pop();
+	}
+
+	//std::vector<MetaInf> toAdd = App->importer->Import(path.data());
 }
 
 const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const char * component)

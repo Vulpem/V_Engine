@@ -17,6 +17,16 @@ struct Date
 	uint hour = 0;
 	uint min = 0;
 	uint sec = 0;
+
+	bool operator ==(const Date b)
+	{
+		if (year == b.year && month == b.month && day == b.day && hour == b.hour && min == b.min && sec == b.sec)
+		{
+			return true;
+		}
+		return false;
+	}
+
 };
 
 class ModuleFileSystem : public Module
