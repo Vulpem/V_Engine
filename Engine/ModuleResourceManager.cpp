@@ -10,6 +10,9 @@
 
 #include <queue>
 
+#include <sys/stat.h>
+#include <time.h>
+
 
 ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
 {
@@ -112,11 +115,30 @@ void ModuleResourceManager::ReimportAll()
 					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
 				}
 				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(path, tmp));
+
+				struct tm *foo;
+				struct stat attrib;
+
+				stat(path.data(), &attrib);
+				foo = gmtime(&(attrib.st_mtime));
+
+				Date date;
+				date.year = foo->tm_year;
+				date.month = foo->tm_mon;
+				date.day = foo->tm_mday;
+				date.hour = foo->tm_hour;
+				date.min = foo->tm_min;
+				date.sec = foo->tm_sec;
+
+				meta_lastMod.insert(std::pair<std::string, Date>(path, date));
+
 			}
 		}
 
 		pendant.pop();
 	}
+
+	SaveMetaData();
 }
 
 void ModuleResourceManager::ClearLibrary()
@@ -130,6 +152,51 @@ void ModuleResourceManager::ClearLibrary()
 	App->fs->CreateDir("Library/Materials");
 	App->fs->CreateDir("Library/Meta");
 	App->fs->CreateDir("Assets/Scenes");
+}
+
+void ModuleResourceManager::SaveMetaData()
+{
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
+	for (; fileIt != metaData.end(); fileIt++)
+	{
+		pugi::xml_document data;
+		pugi::xml_node root_node;
+
+		std::string fileName("Library/Meta/");
+		fileName += App->importer->FileName(fileIt->first.data());
+		fileName += META_FORMAT;
+
+		root_node = data.append_child("File");
+
+		pugi::xml_node fileData = root_node.append_child("FileData");
+		fileData.append_attribute("name") = fileIt->first.data();
+
+		std::map<std::string, Date>::iterator date = meta_lastMod.find(fileIt->first);
+
+		fileData.append_attribute("year") = date->second.year;
+		fileData.append_attribute("month") = date->second.month;
+		fileData.append_attribute("day") = date->second.day;
+		fileData.append_attribute("hour") = date->second.hour;
+		fileData.append_attribute("min") = date->second.min;
+		fileData.append_attribute("sec") = date->second.sec;
+
+		std::multimap<Component::Type, MetaInf>::iterator it = fileIt->second.begin();
+		for (; it != fileIt->second.end(); it++)
+		{
+			pugi::xml_node link = root_node.append_child("link");
+			link.append_attribute("name") = it->second.name.data();
+			link.append_attribute("type") = it->second.type;
+			link.append_attribute("uid") = it->second.uid;
+		}
+
+		std::stringstream stream;
+		data.save(stream);
+		// we are done, so write data to disk
+		App->fs->Save(fileName.data(), stream.str().c_str(), stream.str().length());
+		LOG("Created: %s", fileName.data());
+
+		data.reset();
+	}
 }
 
 /*

@@ -17,6 +17,16 @@ struct MetaInf
 	Component::Type type;
 };
 
+struct Date
+{
+	uint year = 0;
+	uint month = 0;
+	uint day = 0;
+	uint hour = 0;
+	uint min = 0;
+	uint sec = 0;
+};
+
 struct R_Folder
 {
 	R_Folder(const char* name, R_Folder* parent);
@@ -49,6 +59,7 @@ private:
 	std::vector<uint64_t> toDelete;
 
 	std::map<std::string, std::multimap<Component::Type,MetaInf>> metaData;
+	std::map<std::string, Date> meta_lastMod;
 
 	//R_Folder resBaseFolder;
 
@@ -58,6 +69,7 @@ public:
 	void ReimportAll();
 	void ClearLibrary();
 
+	void SaveMetaData();
 private:
 	//void RefreshFolder(const char* path);
 
