@@ -65,9 +65,9 @@ public:
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, const char* vGoName, GameObject* parent = nullptr);
 
-	R_mesh* LoadMesh(const char* path);
-	R_Material* LoadMaterial(const char* path);
-	R_Texture* LoadTexture(const char* path);
+	R_mesh* LoadMesh(const char* resName);
+	R_Material* LoadMaterial(const char* resName);
+	R_Texture* LoadTexture(const char* resName);
 
 
 

@@ -693,7 +693,6 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 				bytes = sizeof(char) * 256;
 				memcpy(&materialName, It, bytes);
 				It += bytes;
-				strcat(materialName, MATERIAL_FORMAT);
 				ret->AddComponent(Component::Type::C_material, materialName);
 			}
 			
@@ -878,19 +877,22 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 	return newMesh;
 }
 
-R_Material* ModuleImporter::LoadMaterial(const char * path)
+R_Material* ModuleImporter::LoadMaterial(const char * resName)
 {
 	char* file = nullptr;
-	std::string filePath("Library/Materials/");
+	
+	const MetaInf* inf = App->resources->GetMetaData(Component::C_material, resName);
+
+	char filePath[526];
+	sprintf(filePath, "Library/Materials/%llu%s", inf->uid, MATERIAL_FORMAT);
+
 	R_Material* mat = nullptr;
 
-	filePath += path;
+	LOG("Loading mesh %s", filePath);
 
-	LOG("Loading mesh %s", filePath.data());
-
-	if (App->fs->Exists(filePath.data()))
+	if (App->fs->Exists(filePath))
 	{
-		int size = App->fs->Load(filePath.data(), &file);
+		int size = App->fs->Load(filePath, &file);
 		if (file != nullptr && size > 0)
 		{
 			char* It = file;
@@ -899,7 +901,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 			uint bytes = 0;
 			uint nTextures = 0;
 
-			mat->name = path;
+			mat->name = resName;
 
 			//NumTextures
 			uint numTextures = 0;
