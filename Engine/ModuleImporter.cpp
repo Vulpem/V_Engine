@@ -925,7 +925,6 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 					memcpy(textureName, It, bytes);
 					It += bytes;
 					std::string path(textureName);
-					path += TEXTURE_FORMAT;
 					uint64_t toAdd = App->resources->LinkResource(path.data(), Component::C_Texture);
 					if (toAdd != 0)
 					{
@@ -954,44 +953,46 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 	return mat;
 }
 
-R_Texture* ModuleImporter::LoadTexture(const char* path)
+R_Texture* ModuleImporter::LoadTexture(const char* resName)
 {
 	R_Texture* ret = nullptr;
-	if (*path == '\0')
+	if (*resName == '\0')
 	{
 		return ret;
 	}
 
-	std::string name = FileName(path);
-
-	std::string fullPath(App->fs->GetWrittingDirectory());
-	fullPath += "Library\\Textures\\";
-	fullPath += name;
-	fullPath += TEXTURE_FORMAT;
-
-	LOG("Loading Texture %s", path);
-
-	char tmp[1024];
-	strcpy(tmp, fullPath.data());
-	uint ID = ilutGLLoadImage(tmp);
-
-	if (ID != 0)
+	const MetaInf* inf = App->resources->GetMetaData(Component::C_Texture, resName);
+	if (inf != nullptr)
 	{
-		ret = new R_Texture();
-		ret->name = path;
-		ret->bufferID = ID;
-		return ret;
+		char fullPath[526];
+		sprintf(fullPath, "%sLibrary/Textures/%llu%s", NormalizePath(App->fs->GetWrittingDirectory().data()).data(), inf->uid, TEXTURE_FORMAT);
+
+		LOG("Loading Texture %s", fullPath);
+
+		uint ID = ilutGLLoadImage(fullPath);
+
+		if (ID != 0)
+		{
+			ret = new R_Texture();
+			ret->name = inf->name;
+			ret->bufferID = ID;
+			return ret;
+		}
+		else
+		{
+			LOG("Error loading texture %s", fullPath);
+			for (ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
+			{
+				LOG("devIL got error %d", error);
+				//For some reason, this will break and cause a crash
+				//LOG("%s", iluErrorString(error));
+			}
+			return ret;
+		}
 	}
 	else
 	{
-		LOG("Error loading texture %s", path);
-		for (ILenum error = ilGetError(); error != IL_NO_ERROR; error = ilGetError())
-		{
-			LOG("devIL got error %d", error);
-			//For some reason, this will break and cause a crash
-			//LOG("%s", iluErrorString(error));
-		}
-		return ret;
+		LOG("Couldn't find in resources texture %s", resName)
 	}
 }
 
