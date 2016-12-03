@@ -31,7 +31,7 @@
 
 ModuleImporter::ModuleImporter(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name = "ModuleImporter";
+	moduleName = "ModuleImporter";
 }
 
 // DestructorF
@@ -87,44 +87,19 @@ bool ModuleImporter::CleanUp()
 // ------------------------------- IMPORTING ------------------------------- 
 
 
-void ModuleImporter::ImportFromFolder(const char * path)
-{
-	LOG("Importing all assets in folder: %s", path);
-	std::vector<std::string> folders;
-	std::vector<std::string> files;
-	App->fs->GetFilesIn(path, &folders, &files);
-
-	for (uint n = 0; n < files.size(); n++)
-	{
-		std::string toSend(path);
-		toSend += "/";
-		toSend += files[n].data();
-//		Import(toSend.data());
-	}
-	files.clear();
-	for (uint n = 0; n < folders.size(); n++)
-	{
-		std::string toSend(path);
-		toSend += "/";
-		toSend += folders[n].data();
-		ImportFromFolder(toSend.data());
-	}
-
-}
-
-std::vector<MetaInf> ModuleImporter::Import(const char * path)
+std::vector<MetaInf> ModuleImporter::Import(const char * path, bool overWritting)
 {
 	std::vector<MetaInf> ret;
-	ret = Import3dScene(path);
+	ret = Import3dScene(path, overWritting);
 
 	if (ret.empty())
 	{
-		ret = ImportImage(path);
+		ret = ImportImage(path, overWritting);
 	}
 	return ret;
 }
 
-std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath)
+std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
 	//Making sure the file recieved is supported by the assimp library
@@ -169,7 +144,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath)
 
 
 
-std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t _uid)
+std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t _uid, bool overWritting)
 {
 	std::vector<MetaInf> ret;
 
@@ -222,6 +197,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t
 
 					MetaInf tmp;
 					tmp.name = FileName(filePath);
+					tmp.name += TEXTURE_FORMAT;
 					tmp.type = Component::C_Texture;
 					tmp.uid = uid;
 					ret.push_back(tmp);
@@ -251,19 +227,21 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t
 
 
 
-std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene)
+std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, uint64_t uid)
 {
 	std::vector<MetaInf> ret;
 
-	uint64_t uid = GenerateUUID();
+	if (uid == 0)
+	{
+		uid = GenerateUUID();
+	}
 
 	//Setting Name
 
-	char name[MAXLEN];
-	//If it isn't the root node, the file name will be the object's name
-	memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
+	std::string vGoName = (NodetoLoad->mName.data);
+	uint nameLen = vGoName.length();
 
-	LOG("Importing GameObject %s", name);
+	LOG("Importing GameObject %s", vGoName.data());
 
 	//					rot + scal + pos				nMeshes			Material
 	uint transformSize = sizeof(float) * (4 + 3 + 3) + sizeof(uint) + sizeof(uint);
@@ -288,10 +266,6 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	t[8] = pos.y;
 	t[9] = pos.z;
 
-	transformIt = CopyMem<float>(transformIt, t, 10);
-
-	transformIt = CopyMem<uint>(transformIt, &NodetoLoad->mNumMeshes);
-
 	std::vector<uint> materials;
 	std::vector<uint64_t> meshes;
 	uint nMeshes = NodetoLoad->mNumMeshes;
@@ -301,12 +275,13 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 
 		aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
 
-		char meshName[256];
-		sprintf(meshName, "%s_%i", name, n);
+		char meshName[1024];
+		sprintf(meshName, "%s%s_%i",vGoName.data(), toLoad->mName.data, n);
 
-		uint64_t meshUID = ImportMesh(toLoad, scene, meshName, matIndex);
+		uint64_t meshUID = ImportMesh(toLoad, scene, vGoName.data(), matIndex);
 		MetaInf meshMeta;
 		meshMeta.name = meshName;
+		meshMeta.name += MESH_FORMAT;
 		meshMeta.uid = meshUID;
 		meshMeta.type = Component::C_mesh;
 		ret.push_back(meshMeta);
@@ -318,31 +293,29 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	if (materials.empty() == false)
 	{
 		MetaInf matMeta;
-		matMeta.uid = ImportMaterial(scene, materials, name);
-		matMeta.name = name;
+		matMeta.uid = ImportMaterial(scene, materials, vGoName.data());
+		matMeta.name = vGoName;
+		matMeta.name += MATERIAL_FORMAT;
 		matMeta.type = Component::C_material;
 		ret.push_back(matMeta);
 		hasMaterial = 1;
 	}
+
+	transformIt = CopyMem<float>(transformIt, t, 10);
+	transformIt = CopyMem<uint>(transformIt, &nMeshes);
 	transformIt = CopyMem<uint>(transformIt, &hasMaterial);
 
-
 	uint nChilds = NodetoLoad->mNumChildren;
-	uint* childsSize = new uint[nChilds];
-	std::vector<std::string> childs;
+	unsigned long long* childs = new unsigned long long[nChilds];
 
 	uint childFileSize =
-		//nChilds			each child size
-		sizeof(uint) + sizeof(uint) * nChilds;
+		//nChilds			each child
+		sizeof(uint) + sizeof(unsigned long long) * nChilds;
 
-
-	//Loading child nodes
+	//Deciding the uid for each child
 	for (uint n = 0; n < nChilds; n++)
 	{
-		std::string toPush(NodetoLoad->mChildren[n]->mName.data);
-		childs.push_back(toPush);
-		childsSize[n] = toPush.length() + 1;
-		childFileSize += sizeof(char) * childsSize[n];
+		childs[n] = GenerateUUID();
 	}
 
 	char* file_childs = new char[childFileSize];
@@ -351,19 +324,14 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	//nCHilds
 	childsIt = CopyMem<uint>(childsIt, &nChilds);
 
-	//size of each child
-	childsIt = CopyMem<uint>(childsIt, childsSize, nChilds);
+	//childs UIDs
+	childsIt = CopyMem<unsigned long long>(childsIt, childs, nChilds);
 
-	for (uint n = 0; n < nChilds; n++)
-	{
-		//a child
-		childsIt = CopyMem<char>(childsIt, (childs[n].data()), childsSize[n]);
-	}
 
 	//Getting the total size of the real file
 	uint realFileSize = 0;
 	realFileSize += transformSize;
-	realFileSize += 256 * nMeshes + 256 * hasMaterial;
+	realFileSize += sizeof(unsigned long long) * nMeshes + 256 * hasMaterial;
 	realFileSize += childFileSize;
 
 	//Copying all the buffers we created into a single bigger buffer
@@ -379,14 +347,13 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	}
 	if (hasMaterial)
 	{
-		realIt = CopyMem<char>(realIt, name, 256);
+		realIt = CopyMem<char>(realIt, vGoName.data(), 256);
 	}
 
 	//childs
 	realIt = CopyMem<char>(realIt, file_childs, childFileSize);
 
 	RELEASE_ARRAY(transform);
-	RELEASE_ARRAY(childsSize);
 	RELEASE_ARRAY(file_childs);
 
 	// ---------------- Creating the save file and writting it -----------------------------------------
@@ -399,7 +366,8 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	RELEASE_ARRAY(realFile);
 
 	MetaInf GoMeta;
-	GoMeta.name = name;
+	GoMeta.name = vGoName;
+	GoMeta.name += GO_FORMAT;
 	GoMeta.uid = uid;
 	GoMeta.type = Component::C_GO;
 	ret.push_back(GoMeta);
@@ -409,7 +377,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	{
 		std::vector<MetaInf> childsMeta;
 
-		childsMeta = ImportGameObject(path, NodetoLoad->mChildren[n], scene);
+		childsMeta = ImportGameObject(path, NodetoLoad->mChildren[n], scene, childs[n]);
 
 		for (std::vector<MetaInf>::iterator it = childsMeta.begin(); it != childsMeta.end(); it++)
 		{
@@ -417,11 +385,16 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		}
 	}
 
+	RELEASE_ARRAY(childs);
 	return ret;
 }
 
-uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name ,uint& materialID)
+uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName,uint& materialID)
 {
+	std::string name(vGoName);
+	uint nameLen = name.length();
+
+
 	//Importing vertex
 	uint num_vertices = toLoad->mNumVertices;
 	float* vertices = new float[num_vertices * 3];
@@ -500,8 +473,8 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	}
 
 	uint meshSize =
-		//UUID				//Mesh size		//Mesh exists?
-		sizeof (long long) + sizeof(uint) + sizeof(bool) +
+		//UUID				//Mesh size		//Mesh exists?  //Name length	//Name
+		sizeof (long long) + sizeof(uint) + sizeof(bool) + sizeof(uint) + sizeof(char) * nameLen +
 
 		//num_vertices				   vertices				num_normals   normals
 		sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
@@ -523,6 +496,12 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 
 	//Does this mesh actually exist?
 	meshIt = CopyMem<bool>(meshIt, &meshExists);
+
+	//Name len
+	meshIt = CopyMem<uint>(meshIt, &nameLen);
+
+	//Mesh Name
+	meshIt = CopyMem<char>(meshIt, name._Myptr(), nameLen);
 
 	//Num vertices
 	meshIt = CopyMem<uint>(meshIt, &num_vertices);
@@ -651,32 +630,25 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 // ------------------------------- LOADING ------------------------------- 
 
 
-GameObject * ModuleImporter::LoadVgo(const char * _fileName, GameObject* parent, char* meshesFolder)
+GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName, GameObject* parent)
 {
-	const MetaInf* meta = App->resources->GetMetaData(_fileName, Component::C_GO, "RootNode");
+	const MetaInf* meta = App->resources->GetMetaData(fileName, Component::C_GO, vGoName);
 
-	std::string fileName (_fileName);
+	char path[1024];
+	sprintf(path, "Library/vGOs/%llu%s", meta->uid, GO_FORMAT);
 
 	char* file = nullptr;
-	std::string path("Library/vGOs/");
-	if (parent && meshesFolder)
+
+	if (parent == nullptr)
 	{
-		path += meshesFolder;
-		path += "/";
-	}
-	else
-	{
-		LOG("\n ------- [Began loading Vgo %s] ---------", fileName.data());
+		LOG("\n ------- [Began loading %s] ---------", fileName);
 	}
 
-	path += fileName;
-	path += GO_FORMAT;
+	LOG("Loading vgo %s", vGoName);
 
-	LOG("Loading vgo %s", path.data());
-
-	if (App->fs->Exists(path.data()))
+	if (App->fs->Exists(path))
 	{
-		int size = App->fs->Load(path.data(), &file);
+		int size = App->fs->Load(path, &file);
 		if (file != nullptr && size > 0)
 		{			
 			char* It = file;
@@ -686,14 +658,14 @@ GameObject * ModuleImporter::LoadVgo(const char * _fileName, GameObject* parent,
 			Transform* trans = (Transform*)ret->AddComponent(Component::Type::C_transform);
 
 			//Setting name
-			ret->SetName(fileName.data());
+			ret->SetName(meta->name.data());
 			//Setting parent
 			ret->parent = parent;
 
 			//Setting transform
 			float _transform[10];
 			uint bytes = sizeof(float) * 10;
-			memcpy(_transform, file, bytes);
+			memcpy(_transform, It, bytes);
 			It += bytes;
 
 			trans->SetLocalRot(_transform[0], _transform[1], _transform[2], _transform[3]);
@@ -717,11 +689,11 @@ GameObject * ModuleImporter::LoadVgo(const char * _fileName, GameObject* parent,
 			//Loading each mesh
 			for (uint n = 0; n < nMeshes; n++)
 			{
-				char meshName[256];
-				bytes = sizeof(char) * 256;
-				memcpy(&meshName, It, bytes);
+				uint64_t meshUID;
+				bytes = sizeof(uint64_t);
+				memcpy(&meshUID, It, bytes);
 				It += bytes;
-				strcat(meshName, MESH_FORMAT);
+				std::string meshName = App->resources->GetMetaData(fileName, Component::C_mesh, meshUID)->name;
 				ret->AddComponent(Component::Type::C_mesh, meshName);
 				ret->SetOriginalAABB();
 			}
@@ -744,47 +716,35 @@ GameObject * ModuleImporter::LoadVgo(const char * _fileName, GameObject* parent,
 
 			if (nChilds > 0)
 			{
-				//Length of each child string (in chars)
-				uint* sizeOfChilds = new uint[nChilds];
-				bytes = sizeof(uint) * nChilds;
-				memcpy(sizeOfChilds, It, bytes);
-				It += bytes;
-
-				std::vector<std::string> childs;
+				std::vector<uint64_t> childs;
 				//Loading each child name into a separate string
 				for (uint n = 0; n < nChilds; n++)
 				{
-					char* name = new char[sizeOfChilds[n]];
-					bytes = sizeof(char) * sizeOfChilds[n];
-					memcpy(name, It, bytes);
+					uint64_t childUID;
+					bytes = sizeof(unsigned long long);
+					memcpy(&childUID, It, bytes);
 					It += bytes;
 
-					childs.push_back(std::string(name));
-					delete[] name;
-				}
-				delete[] sizeOfChilds;
-
-
-				if (parent == nullptr)
-				{
-					meshesFolder = new char[fileName.length() + 1];
-					memcpy(meshesFolder, fileName.data(), sizeof(char) * (fileName.length() + 1));
+					childs.push_back(childUID);
 				}
 
-				std::vector<std::string>::iterator childNames = childs.begin();
-				while (childNames != childs.end())
+				std::vector<uint64_t>::iterator childsUID = childs.begin();
+				while (childsUID != childs.end())
 				{
-					std::string thisChild(*childNames);
-					GameObject* child = LoadVgo(thisChild.data(), ret, meshesFolder);
-					if (child)
+					const MetaInf* inf = App->resources->GetMetaData(fileName, Component::C_GO, *childsUID);
+					if (inf != nullptr)
 					{
-						ret->childs.push_back(child);
+						GameObject* child = LoadVgo(fileName, inf->name.data(), ret);
+						if (child)
+						{
+							ret->childs.push_back(child);
+						}
 					}
-					childNames++;
-				}
-				if (parent == nullptr)
-				{
-					RELEASE_ARRAY(meshesFolder);
+					else
+					{
+						LOG("Error loading child for %s", vGoName);
+					}
+					childsUID++;
 				}
 			}
 
@@ -794,7 +754,7 @@ GameObject * ModuleImporter::LoadVgo(const char * _fileName, GameObject* parent,
 		}
 		else
 		{
-			LOG("Something went wrong while loading %s", fileName.data());
+			LOG("Something went wrong while loading %s", fileName);
 		}
 	}
 	else
@@ -810,6 +770,8 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 	char* file = nullptr;
 	std::string filePath("Library/Meshes/");
 	R_mesh* newMesh = nullptr;
+
+	App->resources->GetMetaData()
 
 	filePath += path;
 
@@ -832,7 +794,17 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 			{
 				newMesh = new R_mesh();
 
-				newMesh->file = File(filePath.data());
+				uint nameLen;
+				bytes = sizeof(uint);
+				memcpy(&nameLen, It, bytes);
+				It += bytes;
+
+				char meshName[524];
+				bytes = sizeof(char) * nameLen;
+				memcpy(meshName, It, bytes);
+				It += bytes;
+
+				newMesh->name = meshName;
 
 				//Num vertices
 				bytes = sizeof(uint);
@@ -947,7 +919,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * path)
 			uint bytes = 0;
 			uint nTextures = 0;
 
-			mat->file = path;
+			mat->name = path;
 
 			//NumTextures
 			uint numTextures = 0;
@@ -1024,7 +996,7 @@ R_Texture* ModuleImporter::LoadTexture(const char* path)
 	if (ID != 0)
 	{
 		ret = new R_Texture();
-		ret->file = path;
+		ret->name = path;
 		ret->bufferID = ID;
 		return ret;
 	}

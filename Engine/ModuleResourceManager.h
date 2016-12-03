@@ -67,14 +67,9 @@ public:
 	void Refresh();
 
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
+	const MetaInf* GetMetaData(const char* file, Component::Type type, const uint64_t componentUID);
 private:
-	//void RefreshFolder(const char* path);
-
-	//Warning, this folder will be incomplete. It will have no parent or path
 	R_Folder ReadFolder(const char* path);
-
-	//void CreateFolderMeta(R_Folder& folder);
-	//R_Folder ReadFolderMeta(const char* path);
 public:
 	Resource* Peek(uint64_t uid) const;
 

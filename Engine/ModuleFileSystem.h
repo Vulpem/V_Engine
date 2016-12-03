@@ -27,6 +27,11 @@ struct Date
 		return false;
 	}
 
+	bool operator !=(const Date b)
+	{
+		return !(*this == b);
+	}
+
 };
 
 class ModuleFileSystem : public Module

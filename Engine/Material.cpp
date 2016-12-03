@@ -22,7 +22,7 @@ void Material::EditorContent()
 	{
 		ImGui::Separator();
 		char tmp[524];
-		sprintf(tmp, "Id: %i    %s",n , App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->file.data());
+		sprintf(tmp, "Id: %i    %s",n , App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->name.data());
 		if (ImGui::TreeNode(tmp))
 		{
 			ImTextureID image = (void*) App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->Read<R_Texture>()->bufferID;
@@ -43,7 +43,7 @@ void Material::SaveSpecifics(pugi::xml_node& myNode)
 	for (std::vector<uint64_t>::iterator it = ReadRes<R_Material>()->textures.begin(); it != ReadRes<R_Material>()->textures.end(); it++)
 	{
 		pugi::xml_node tex = myNode.append_child("Texture");		
-		tex.append_attribute("path") = App->resources->Peek(ReadRes<R_Material>()->textures.at(*it))->file.data();
+		tex.append_attribute("path") = App->resources->Peek(ReadRes<R_Material>()->textures.at(*it))->name.data();
 	}
 
 }

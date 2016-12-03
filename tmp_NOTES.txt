@@ -29,13 +29,9 @@ materialName
 uint
 nChilds
 
-uint * nChilds
-childsSize
+long long * nChilds
+childs UID
 
-foreach 
-{
-char child[n] * childsSize[n]
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +42,11 @@ char child[n] * childsSize[n]
 
 bool meshExists
 
+uint
+nameLen
+
+char * nameLen
+name
 
 uint numVertices
 

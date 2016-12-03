@@ -14,7 +14,7 @@
 
 ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name = "ModuleFileSystem";
+	moduleName = "ModuleFileSystem";
 
 	// need to be created before Awake so other modules can use it
 	char* base_path = SDL_GetBasePath();

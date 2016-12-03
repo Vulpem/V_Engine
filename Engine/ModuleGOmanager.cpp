@@ -23,7 +23,7 @@
 
 ModuleGoManager::ModuleGoManager(Application* app, bool start_enabled) : Module(app, start_enabled), quadTree(float3(WORLD_WIDTH /-2,WORLD_HEIGHT/-2,WORLD_DEPTH/-2), float3(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_DEPTH / 2))
 {
-	name = "ModuleGeometry";
+	moduleName = "ModuleGeometry";
 }
 
 ModuleGoManager::~ModuleGoManager()
@@ -213,7 +213,7 @@ GameObject* ModuleGoManager::CreateCamera(const char* name)
 
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
-	GameObject* sceneRoot = App->importer->LoadVgo(fileName);
+	GameObject* sceneRoot = App->importer->LoadVgo(fileName, "RootNode.vgo");
 	std::vector<GameObject*> ret;
 	if (sceneRoot && sceneRoot->childs.empty() == false)
 	{

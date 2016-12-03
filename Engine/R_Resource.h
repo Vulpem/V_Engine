@@ -20,7 +20,7 @@ public:
 	uint64_t uid = 0;
 
 	//Filename this resource extraced the data from
-	std::string file;
+	std::string name;
 
 	virtual Component::Type GetType() = 0;
 

@@ -14,7 +14,7 @@ private :
 	bool enabled;
 
 protected:
-	std::string name;
+	std::string moduleName;
 
 public:
 	Application* App;
@@ -90,7 +90,7 @@ public:
 
 	std::string GetName()
 	{
-		return name;
+		return moduleName;
 	}
 
 	virtual void OnCollision(PhysBody3D* body1, PhysBody3D* body2)

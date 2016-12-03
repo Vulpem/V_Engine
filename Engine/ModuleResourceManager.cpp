@@ -13,7 +13,7 @@
 
 ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
 {
-	name = "ModuleResourceManager";
+	moduleName = "ModuleResourceManager";
 }
 
 // Destructor
@@ -47,6 +47,8 @@ update_status ModuleResourceManager::PostUpdate()
 // Called before quitting
 bool ModuleResourceManager::CleanUp()
 {
+	SaveMetaData();
+
 	std::map<uint64_t, Resource*>::iterator it = resources.begin();
 	for (; it != resources.end(); it++)
 	{
@@ -93,6 +95,9 @@ void ModuleResourceManager::ReimportAll()
 {
 	ClearLibrary();
 
+	metaData.clear();
+	meta_lastMod.clear();
+
 	std::queue<R_Folder> pendant;
 	pendant.push(ReadFolder("Assets"));
 	while (pendant.empty() == false)
@@ -136,6 +141,9 @@ void ModuleResourceManager::ClearLibrary()
 
 void ModuleResourceManager::SaveMetaData()
 {
+	App->fs->DelDir("Library/Meta");
+	App->fs->CreateDir("Library/Meta");
+
 	uint n = 0;
 	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
 	for (; fileIt != metaData.end(); fileIt++)
@@ -183,6 +191,9 @@ void ModuleResourceManager::SaveMetaData()
 void ModuleResourceManager::LoadMetaData()
 {
 	LOG("Reloading Metadata from library");
+
+	metaData.clear();
+	meta_lastMod.clear();
 
 	std::vector<std::string> folders;
 	std::vector<std::string> files;
@@ -273,14 +284,27 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
+		bool wantToImport = false;
+		bool overwrite = false;
 		std::map<std::string, Date>::iterator it = meta_lastMod.find(filesToCheck.front());
-		if (it != meta_lastMod.end() && it->second == App->fs->ReadFileDate(filesToCheck.front().data()))
+		if (it != meta_lastMod.end())
 		{
-			
+			//The file exists in meta
+			if (it->second != App->fs->ReadFileDate(filesToCheck.front().data()))
+			{
+				overwrite = true;
+				wantToImport = true;
+			}
 		}
 		else
 		{
-			std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data());
+			//File wasn't found in the current metaData
+			wantToImport = true;
+		}
+
+		if (wantToImport)
+		{
+			std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data(), overwrite);
 			if (toAdd.empty() == false)
 			{
 				std::multimap<Component::Type, MetaInf> tmp;
@@ -295,8 +319,6 @@ void ModuleResourceManager::Refresh()
 		}
 		filesToCheck.pop();
 	}
-
-	//std::vector<MetaInf> toAdd = App->importer->Import(path.data());
 }
 
 const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const char * component)
@@ -308,6 +330,24 @@ const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::
 		while (it->first == type && it != f->second.end())
 		{
 			if (it->second.name.compare(component) == 0)
+			{
+				return &it->second;
+			}
+			it++;
+		}
+	}
+	return nullptr;
+}
+
+const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component::Type type, const uint64_t componentUID)
+{
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.find(file);
+	if (f != metaData.end())
+	{
+		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
+		while (it->first == type && it != f->second.end())
+		{
+			if (it->second.uid == componentUID)
 			{
 				return &it->second;
 			}
@@ -480,7 +520,7 @@ uint64_t ModuleResourceManager::LinkResource(std::string fileName, Component::Ty
 		if (ret != nullptr)
 		{
 			resources.insert(std::pair<uint64_t, Resource*>(ret->uid, ret));
-			tmpMap->second.insert(std::pair<std::string, uint64_t>(ret->file, ret->uid));
+			tmpMap->second.insert(std::pair<std::string, uint64_t>(ret->name, ret->uid));
 			ret->nReferences++;
 		}
 	}
@@ -541,24 +581,6 @@ void ModuleResourceManager::DeleteNow()
 				resources.erase(it);
 			}
 
-			//TODO
-			//When metadata is created, we won't erase from here anymore
-
-			/*bool found = false;
-			//Erasing its reference in the uid Lib
-			std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.begin();
-			for (; tmpMap != uidLib.end() && found == false; tmpMap++)
-			{
-				std::map<std::string, uint64_t>::iterator it = tmpMap->second.begin();
-				for (;it != tmpMap->second.end() && found == false; it++)
-				{
-					if (it->second == uid)
-					{
-						tmpMap->second.erase(it);
-						found = true;
-					}
-				}
-			}*/
 			tmp.pop_back();
 		}
 	}

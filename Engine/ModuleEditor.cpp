@@ -20,7 +20,7 @@
 
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	name = "ModuleEditor";
+	moduleName = "ModuleEditor";
 }
 
 // Destructor
@@ -486,7 +486,7 @@ void ModuleEditor::Editor()
 					lastType = (*it)->GetType();
 					ImGui::Separator();
 				}
-				sprintf(name, "%s", (*it)->file.data());
+				sprintf(name, "%s", (*it)->name.data());
 				if (ImGui::TreeNode(name))
 				{
 					ImGui::Text("N references: %u", (*it)->nReferences);

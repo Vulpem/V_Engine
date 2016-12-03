@@ -37,22 +37,21 @@ public:
 
 // ------------------------------- IMPORTING ------------------------------- 
 
-	//Import everything inside a folder and sub-folders
-	void ImportFromFolder(const char* path);
 
-	//Import a file, without specificating which type of file it is
-	std::vector<MetaInf> Import(const char* path);
+	//Import a file, without specificating which type of file it is.
+	//The "overWritting" bool will check the resource manager metadata overwrite existing objects instead of creating new ones
+	std::vector<MetaInf> Import(const char* path, bool overWritting = false);
 
 	//Import a specific 3D model and decompose it
-	std::vector<MetaInf> Import3dScene(const char* filePath);
+	std::vector<MetaInf> Import3dScene(const char* filePath, bool overWritting = false);
 	//Import any image to dds
-	std::vector<MetaInf> ImportImage(const char* filePath, uint64_t uid = 0);
+	std::vector<MetaInf> ImportImage(const char* filePath, uint64_t uid = 0, bool overWritting = false);
 
 private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
-	std::vector<MetaInf> ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene);
+	std::vector<MetaInf> ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, uint64_t uid = 0);
 	//Create a vmesh from a certain mesh. COntains all mesh info
-	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, uint& textureID);
+	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName, uint& textureID);
 	//Create a vmat from a material, with colors & texture names
 	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName);
 
@@ -64,7 +63,7 @@ public:
 
 
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
-	GameObject* LoadVgo(const char* fileName, GameObject* parent = nullptr, char* meshesFolder = nullptr);
+	GameObject* LoadVgo(const char* fileName, const char* vGoName, GameObject* parent = nullptr);
 
 	R_mesh* LoadMesh(const char* path);
 	R_Material* LoadMaterial(const char* path);

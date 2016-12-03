@@ -107,7 +107,7 @@ void mesh::EditorContent()
 	sprintf(tmp, "Wireframe##%i", id);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
-	ImGui::Text("Resource: %s", res->file.data());
+	ImGui::Text("Resource: %s", res->name.data());
 
 	ImGui::Text("Vertices in memory: %i", res->num_vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
@@ -132,6 +132,6 @@ void mesh::EditorContent()
 
 void mesh::SaveSpecifics(pugi::xml_node& myNode)
 {
-	myNode.append_attribute("MeshPath") = ReadRes<R_mesh>()->file.data();
+	myNode.append_attribute("MeshPath") = ReadRes<R_mesh>()->name.data();
 	myNode.append_attribute("TextureIndex") = texMaterialIndex;
 }
