@@ -25,6 +25,7 @@ ModuleResourceManager::~ModuleResourceManager()
 bool ModuleResourceManager::Start()
 {
 	CreateLibraryDirs();
+	LoadMetaData();
 
 	return true;
 }
@@ -134,15 +135,15 @@ void ModuleResourceManager::ClearLibrary()
 
 void ModuleResourceManager::SaveMetaData()
 {
+	uint n = 0;
 	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator fileIt = metaData.begin();
 	for (; fileIt != metaData.end(); fileIt++)
 	{
 		pugi::xml_document data;
 		pugi::xml_node root_node;
 
-		std::string fileName("Library/Meta/");
-		fileName += App->importer->FileName(fileIt->first.data());
-		fileName += META_FORMAT;
+		char fileName[524];
+		sprintf(fileName, "Library/Meta/%u%s", n, META_FORMAT);
 
 		root_node = data.append_child("File");
 
@@ -170,10 +171,79 @@ void ModuleResourceManager::SaveMetaData()
 		std::stringstream stream;
 		data.save(stream);
 		// we are done, so write data to disk
-		App->fs->Save(fileName.data(), stream.str().c_str(), stream.str().length());
-		LOG("Created: %s", fileName.data());
+		App->fs->Save(fileName, stream.str().c_str(), stream.str().length());
+		LOG("Created: %s", fileName);
 
 		data.reset();
+		n++;
+	}
+}
+
+void ModuleResourceManager::LoadMetaData()
+{
+	LOG("Reloading Metadata from library");
+
+	std::vector<std::string> folders;
+	std::vector<std::string> files;
+	App->fs->GetFilesIn("Library/Meta", &folders, &files);
+
+	for (std::vector<std::string>::iterator fileIt = files.begin(); fileIt != files.end(); fileIt++)
+	{
+		char* buffer;
+		std::string path("Library/Meta/");
+		path += fileIt->data();
+		uint size = App->fs->Load(path.data(), &buffer);
+
+		if (size > 0)
+		{
+			pugi::xml_document data;
+			pugi::xml_node root;
+
+			pugi::xml_parse_result result = data.load_buffer(buffer, size);
+			RELEASE(buffer);
+
+			if (result != NULL)
+			{
+				root = data.child("File");
+				if (root)
+				{
+					pugi::xml_node fileMeta = root.child("FileData");					
+
+					std::string name = fileMeta.attribute("name").as_string();
+
+					Date date;
+					date.year = fileMeta.attribute("year").as_uint();
+					date.month = fileMeta.attribute("month").as_uint();
+					date.day = fileMeta.attribute("day").as_uint();
+					date.hour = fileMeta.attribute("hour").as_uint();
+					date.min = fileMeta.attribute("min").as_uint();
+					date.sec = fileMeta.attribute("sec").as_uint();
+
+					meta_lastMod.insert(std::pair<std::string, Date>(name, date));
+
+					std::multimap<Component::Type, MetaInf> inf;
+
+					pugi::xml_node link = root.child("link");
+					while (link != nullptr)
+					{
+						MetaInf toAdd;
+						toAdd.name = link.attribute("name").as_string();
+						toAdd.type = (Component::Type)link.attribute("type").as_uint();
+						toAdd.uid = link.attribute("uid").as_ullong();
+
+						inf.insert(std::pair<Component::Type, MetaInf>(toAdd.type, toAdd));
+
+						link = link.next_sibling("link");
+					}
+
+					metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(name, inf));
+				}
+			}
+		}
+		else
+		{
+			LOG("Tried to read an unexisting folder meta.\n%s", path)
+		}
 	}
 }
 

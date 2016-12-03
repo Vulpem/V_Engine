@@ -70,6 +70,7 @@ bool ModuleEditor::Start()
 update_status ModuleEditor::PreUpdate()
 {
 	update_status ret = UPDATE_CONTINUE;
+
 	ImGui_ImplSdlGL3_NewFrame(App->window->GetWindow());
 
 	ImGuiIO IO = ImGui::GetIO();

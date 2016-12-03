@@ -437,7 +437,7 @@ std::string ModuleFileSystem::GetFileFormat(char* fullPath)
 	{
 		tmp--;
 		size--;
-		if (size <= 1)
+		if (size <= 0)
 		{
 			return std::string("");
 		}

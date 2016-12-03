@@ -62,6 +62,7 @@ public:
 	void ClearLibrary();
 
 	void SaveMetaData();
+	void LoadMetaData();
 
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
 private:
