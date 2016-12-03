@@ -4,6 +4,8 @@
 #include "Module.h"
 #include "Globals.h"
 
+#include "Component.h"
+
 #include "Math.h"
 #include <vector>
 #include <map>
@@ -17,6 +19,8 @@ class mesh;
 class R_mesh;
 class R_Material;
 class R_Texture;
+
+struct MetaInf;
 
 class ModuleImporter : public Module
 {
@@ -37,18 +41,18 @@ public:
 	void ImportFromFolder(const char* path);
 
 	//Import a file, without specificating which type of file it is
-	void Import(const char* path);
+	std::vector<MetaInf> Import(const char* path);
 
 	//Import a specific 3D model and decompose it
-	bool Import3dScene(const char* filePath);
+	std::vector<MetaInf> Import3dScene(const char* filePath);
 	//Import any image to dds
-	uint64_t ImportImage(const char* filePath, uint64_t uid = 0);
+	std::vector<MetaInf> ImportImage(const char* filePath, uint64_t uid = 0);
 
 private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
-	void ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, bool isChild = false, const char* RootName = nullptr);
+	std::vector<MetaInf> ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene);
 	//Create a vmesh from a certain mesh. COntains all mesh info
-	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir, uint& textureID);
+	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, uint& textureID);
 	//Create a vmat from a material, with colors & texture names
 	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName);
 

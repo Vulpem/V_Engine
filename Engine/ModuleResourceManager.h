@@ -10,6 +10,13 @@
 
 class Resource;
 
+struct MetaInf
+{
+	std::string name;
+	uint64_t uid;
+	Component::Type type;
+};
+
 struct R_Folder
 {
 	R_Folder(const char* name, R_Folder* parent);
@@ -41,20 +48,24 @@ private:
 
 	std::vector<uint64_t> toDelete;
 
-	R_Folder resBaseFolder;
+	std::map<std::string, std::vector<MetaInf>> metaData;
+
+	//R_Folder resBaseFolder;
 
 	Resource* LoadNewResource(std::string fileName);
 
 public:
-	void Refresh();
+	void ReimportAll();
+	void ClearLibrary();
+
 private:
-	void RefreshFolder(const char* path);
+	//void RefreshFolder(const char* path);
 
 	//Warning, this folder will be incomplete. It will have no parent or path
 	R_Folder ReadFolder(const char* path);
 
-	void CreateFolderMeta(R_Folder& folder);
-	R_Folder ReadFolderMeta(const char* path);
+	//void CreateFolderMeta(R_Folder& folder);
+	//R_Folder ReadFolderMeta(const char* path);
 public:
 	Resource* Peek(uint64_t uid) const;
 

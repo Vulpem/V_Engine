@@ -67,7 +67,6 @@ bool ModuleImporter::Start()
 	ilutRenderer(ILUT_OPENGL);
 
 	LOG("Importing assets");
-	ImportFromFolder("Assets");
 
 	return true;
 }
@@ -98,7 +97,7 @@ void ModuleImporter::ImportFromFolder(const char * path)
 		std::string toSend(path);
 		toSend += "/";
 		toSend += files[n].data();
-		Import(toSend.data());
+//		Import(toSend.data());
 	}
 	files.clear();
 	for (uint n = 0; n < folders.size(); n++)
@@ -111,16 +110,21 @@ void ModuleImporter::ImportFromFolder(const char * path)
 
 }
 
-void ModuleImporter::Import(const char * path)
+std::vector<MetaInf> ModuleImporter::Import(const char * path)
 {
-	if (Import3dScene(path) == false)
+	std::vector<MetaInf> ret;
+	ret = Import3dScene(path);
+
+	if (ret.empty())
 	{
-		ImportImage(path);
+		ret = ImportImage(path);
 	}
+	return ret;
 }
 
-bool ModuleImporter::Import3dScene(const char * filePath)
+std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath)
 {
+	std::vector<MetaInf> ret;
 	//Making sure the file recieved is supported by the assimp library
 	std::string fmt = FileFormat(filePath);
 	std::string supportedFormats;
@@ -132,7 +136,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 	}
 	if (supportedFormats.find(fmt) == std::string::npos)
 	{
-		return false;
+		return ret;
 	}
 
 	LOG("\n ------ [Started importing 3D Scene] ------ ");
@@ -145,7 +149,7 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 	{
 		if (scene->HasMeshes())
 		{
-			ImportGameObject(filePath, scene->mRootNode, scene);
+			ret = ImportGameObject(filePath, scene->mRootNode, scene);
 		}
 		if (scene)
 		{
@@ -158,26 +162,28 @@ bool ModuleImporter::Import3dScene(const char * filePath)
 	{
 		LOG("Error loading scene %s", filePath);
 	}
-	return true;
+	return ret;
 }
 
 
 
-uint64_t ModuleImporter::ImportImage(const char * filePath, uint64_t _uid)
+std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t _uid)
 {
+	std::vector<MetaInf> ret;
+
 	// Extracted from
 	//http://openil.sourceforge.net/features.php
 	std::string supportedFormats("bmp dcx dds hdr icns ico cur iff gif jpg jpe jpeg jp2 lbm png raw tif tga");
 
 	if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
 	{
-		return false;
+		return ret;
 	}
 
 	uint64_t uid = _uid;
 
 	LOG("\nStarted importing texture %s", filePath);
-	char* buffer;
+	char* buffer = nullptr;
 	uint size;
 
 	size = App->fs->Load(filePath, &buffer);
@@ -211,6 +217,13 @@ uint64_t ModuleImporter::ImportImage(const char * filePath, uint64_t _uid)
 					sprintf(toCreate, "Library/Textures/%llu%s", uid, TEXTURE_FORMAT);
 
 					App->fs->Save(toCreate, (const char*)data, newSize);
+
+					MetaInf tmp;
+					tmp.name = FileName(filePath);
+					tmp.type = Component::C_Texture;
+					tmp.uid = uid;
+					ret.push_back(tmp);
+
 					LOG("Succesfully imported!");
 				}
 				else
@@ -231,26 +244,22 @@ uint64_t ModuleImporter::ImportImage(const char * filePath, uint64_t _uid)
 		LOG("Couldn't open the file!");
 	}
 	RELEASE_ARRAY(buffer);
-	return uid;
+	return ret;
 }
 
 
 
-void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, bool isChild, const char* RootName)
+std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene)
 {
+	std::vector<MetaInf> ret;
+
+	uint64_t uid = GenerateUUID();
+
 	//Setting Name
 
 	char name[MAXLEN];
-	if (isChild)
-	{
-		//If it isn't the root node, the file name will be the object's name
-		memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
-	}
-	else
-	{
-		//If it's the root node, the file name will be the FBX's name
-		strcpy(name, FileName(path).data());
-	}
+	//If it isn't the root node, the file name will be the object's name
+	memcpy(name, NodetoLoad->mName.data, NodetoLoad->mName.length + 1);
 
 	LOG("Importing GameObject %s", name);
 
@@ -286,11 +295,6 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 	uint nMeshes = NodetoLoad->mNumMeshes;
 	for (uint n = 0; n <nMeshes; n++)
 	{
-		if (isChild == false)
-		{
-			RootName = name;
-		}
-
 		uint matIndex;
 
 		aiMesh* toLoad = scene->mMeshes[NodetoLoad->mMeshes[n]];
@@ -298,13 +302,24 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 		char meshName[256];
 		sprintf(meshName, "%s_%i", name, n);
 
-		meshes.push_back(ImportMesh(toLoad, scene, meshName, RootName, matIndex));
+		uint64_t meshUID = ImportMesh(toLoad, scene, meshName, matIndex);
+		MetaInf meshMeta;
+		meshMeta.name = meshName;
+		meshMeta.uid = meshUID;
+		meshMeta.type = Component::C_mesh;
+		ret.push_back(meshMeta);
+
+		meshes.push_back(meshUID);
 		materials.push_back(matIndex);
 	}
 	uint hasMaterial = 0;
 	if (materials.empty() == false)
 	{
-		ImportMaterial(scene, materials, name);
+		MetaInf matMeta;
+		matMeta.uid = ImportMaterial(scene, materials, name);
+		matMeta.name = name;
+		matMeta.type = Component::C_material;
+		ret.push_back(matMeta);
 		hasMaterial = 1;
 	}
 	transformIt = CopyMem<uint>(transformIt, &hasMaterial);
@@ -374,40 +389,36 @@ void ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad
 
 	// ---------------- Creating the save file and writting it -----------------------------------------
 
-	std::string toCreate("Library/vGOs/");
-	if (isChild)
-	{
-		toCreate += RootName;
-		toCreate += "/";
-	}
-	else
-	{
-		std::string dir("Library/vGOs/");
-		dir += name;
-		App->fs->CreateDir(dir.data());
-	}
+	char toCreate[524];
+	sprintf(toCreate, "Library/Meshes/%llu%s", uid, GO_FORMAT);
 
-	toCreate += name;
-	toCreate += GO_FORMAT;
-	App->fs->Save(toCreate.data(), realFile, realFileSize);
+	App->fs->Save(toCreate, realFile, realFileSize);
 
 	RELEASE_ARRAY(realFile);
+
+	MetaInf GoMeta;
+	GoMeta.name = name;
+	GoMeta.uid = uid;
+	GoMeta.type = Component::C_GO;
+	ret.push_back(GoMeta);
 
 	//Importing also all the childs
 	for (uint n = 0; n < NodetoLoad->mNumChildren; n++)
 	{
-		if (isChild)
+		std::vector<MetaInf> childsMeta;
+
+		childsMeta = ImportGameObject(path, NodetoLoad->mChildren[n], scene);
+
+		for (std::vector<MetaInf>::iterator it = childsMeta.begin(); it != childsMeta.end(); it++)
 		{
-			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, RootName);
-		}
-		else
-		{
-			ImportGameObject(path, NodetoLoad->mChildren[n], scene, true, name);
+			ret.push_back(*it);
 		}
 	}
+
+	return ret;
 }
 
-uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name, const char* dir ,uint& materialID)
+uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* name ,uint& materialID)
 {
 	//Importing vertex
 	uint num_vertices = toLoad->mNumVertices;

@@ -13,7 +13,8 @@ class Component
 public:
 	static const enum Type
 	{
-		C_transform = 1,
+		C_GO = 1,
+		C_transform,
 		C_mesh,
 		C_material,
 		C_Texture,

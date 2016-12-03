@@ -8,8 +8,10 @@
 
 #include "R_Resource.h"
 
+#include <queue>
 
-ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled), resBaseFolder("Assets", "Assets")
+
+ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
 {
 	name = "ModuleResourceManager";
 }
@@ -30,7 +32,7 @@ bool ModuleResourceManager::Start()
 	App->fs->CreateDir("Library/Meta");
 	App->fs->CreateDir("Assets/Scenes");
 
-	App->fs->AddPath("Library/");
+	ReimportAll();
 
 	return true;
 }
@@ -82,11 +84,50 @@ Resource * ModuleResourceManager::LoadNewResource(std::string fileName)
 	return nullptr;
 }
 
-void ModuleResourceManager::Refresh()
+void ModuleResourceManager::ReimportAll()
 {
-	RefreshFolder("Assets");
+	ClearLibrary();
+
+	std::queue<R_Folder> pendant;
+	pendant.push(ReadFolder("Assets"));
+	while (pendant.empty() == false)
+	{
+		for (std::vector<std::string>::iterator it = pendant.front().subFoldersPath.begin(); it != pendant.front().subFoldersPath.end(); it++)
+		{
+			pendant.push(ReadFolder(it->data()));
+		}
+
+		for (std::vector<std::string>::iterator it = pendant.front().files.begin(); it != pendant.front().files.end(); it++)
+		{
+			std::string path(pendant.front().path);
+			path += "/";
+			path += it->data();
+
+			std::vector<MetaInf> toAdd = App->importer->Import(path.data());
+			if (toAdd.empty() == false)
+			{
+				metaData.insert(std::pair<std::string, std::vector<MetaInf>>(path, toAdd));
+			}
+		}
+
+		pendant.pop();
+	}
 }
 
+void ModuleResourceManager::ClearLibrary()
+{
+	App->fs->DelDir("Library");
+
+	App->fs->CreateDir("Library");
+	App->fs->CreateDir("Library/Meshes");
+	App->fs->CreateDir("Library/Textures");
+	App->fs->CreateDir("Library/vGOs");
+	App->fs->CreateDir("Library/Materials");
+	App->fs->CreateDir("Library/Meta");
+	App->fs->CreateDir("Assets/Scenes");
+}
+
+/*
 void ModuleResourceManager::RefreshFolder(const char * path)
 {
 	R_Folder meta = ReadFolderMeta(path);
@@ -106,7 +147,7 @@ void ModuleResourceManager::RefreshFolder(const char * path)
 	}
 
 }
-
+*/
 R_Folder ModuleResourceManager::ReadFolder(const char * path)
 {
 	R_Folder ret(App->importer->FileName(path).data(), path);
@@ -117,7 +158,10 @@ R_Folder ModuleResourceManager::ReadFolder(const char * path)
 
 	for (std::vector<std::string>::iterator it = folders.begin(); it != folders.end(); it++)
 	{
-		ret.subFoldersPath.push_back(it->data());
+		std::string _path(path);
+		_path += "/";
+		_path += it->data();
+		ret.subFoldersPath.push_back(_path);
 	}
 	for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++)
 	{
@@ -127,7 +171,7 @@ R_Folder ModuleResourceManager::ReadFolder(const char * path)
 	return ret;
 }
 
-void ModuleResourceManager::CreateFolderMeta(R_Folder & folder)
+/*void ModuleResourceManager::CreateFolderMeta(R_Folder & folder)
 {
 	pugi::xml_document data;
 	pugi::xml_node root_node;
@@ -159,8 +203,8 @@ void ModuleResourceManager::CreateFolderMeta(R_Folder & folder)
 
 	data.reset();
 }
-
-R_Folder ModuleResourceManager::ReadFolderMeta(const char * path)
+*/
+/*R_Folder ModuleResourceManager::ReadFolderMeta(const char * path)
 {
 	char* buffer;
 	std::string _path = path;
@@ -200,7 +244,7 @@ R_Folder ModuleResourceManager::ReadFolderMeta(const char * path)
 	}
 	LOG("Tried to read an unexisting folder meta.\n%s", path)
 	return R_Folder("", "");
-}
+}*/
 
 Resource * ModuleResourceManager::Peek(uint64_t uid) const
 {

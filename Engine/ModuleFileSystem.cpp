@@ -107,6 +107,57 @@ bool ModuleFileSystem::CreateDir(const char * dir)
 	return false;
 }
 
+bool ModuleFileSystem::DelDir(const char * dir)
+{
+	if (IsDirectory(dir) == true)
+	{
+		std::vector<std::string> folders;
+		std::vector<std::string> files;
+		GetFilesIn(dir, &folders, &files);
+
+		for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++)
+		{
+			std::string filePath(dir);
+			filePath += "/";
+			filePath += *it;
+			DelFile(filePath.data());
+		}
+		for (std::vector<std::string>::iterator it = folders.begin(); it != folders.end(); it++)
+		{
+			std::string dirPath(dir);
+			dirPath += "/";
+			dirPath += *it;
+			DelDir(dirPath.data());
+		}
+		if (PHYSFS_delete(dir) == 0)
+		{
+			LOG("Error deleting directory %s.\n%s\n", dir, PHYSFS_getLastError());
+			return false;
+		}
+		LOG("Succesfully deleted directory %s", dir);
+		return true;
+	}
+	LOG("Could not delete %s\nIt does not exist or could not be found", dir);
+	return false;
+}
+
+bool ModuleFileSystem::DelFile(const char * file)
+{
+	if (Exists(file) == true)
+	{
+		if (PHYSFS_delete(file) != 0)
+		{
+			return true;
+		}
+		LOG("Error deleting file %s.\n%s\n", file, PHYSFS_getLastError());
+	}
+	else
+	{
+		LOG("Error deleting file %s.\n Could not be found or doesn't exist", file);
+	}
+	return false;
+}
+
 // Check if a file is a directory
 bool ModuleFileSystem::IsDirectory(const char* file) const
 {

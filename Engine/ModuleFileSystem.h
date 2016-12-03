@@ -29,6 +29,8 @@ public:
 	bool AddPath(const char* path_or_zip, const char* mount_point = nullptr);
 	bool Exists(const char* file) const;
 	bool CreateDir(const char* dir);
+	bool DelDir(const char* dir);
+	bool DelFile(const char* file);
 	bool IsDirectory(const char* file) const;
 	std::string GetWrittingDirectory();
 	void GetFilesIn(const char * directory, std::vector<std::string>* folders, std::vector<std::string>* files);
