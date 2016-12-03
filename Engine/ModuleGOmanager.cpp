@@ -213,7 +213,7 @@ GameObject* ModuleGoManager::CreateCamera(const char* name)
 
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
-	GameObject* sceneRoot = App->importer->LoadVgo(fileName, "RootNode.vgo");
+	GameObject* sceneRoot = App->importer->LoadVgo(fileName, "RootNode");
 	std::vector<GameObject*> ret;
 	if (sceneRoot && sceneRoot->childs.empty() == false)
 	{

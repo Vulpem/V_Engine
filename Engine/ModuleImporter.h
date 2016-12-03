@@ -51,9 +51,9 @@ private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
 	std::vector<MetaInf> ImportGameObject(const char* path, const aiNode* toLoad, const aiScene* scene, uint64_t uid = 0);
 	//Create a vmesh from a certain mesh. COntains all mesh info
-	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName, uint& textureID);
+	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName, uint& textureID, uint64_t uid = 0);
 	//Create a vmat from a material, with colors & texture names
-	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName);
+	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName, uint64_t uid = 0);
 
 public:
 

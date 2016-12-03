@@ -476,24 +476,26 @@ void ModuleEditor::Editor()
 		{
 			ImGui::Text("Loaded resources:");
 			const std::vector<Resource*> res = App->resources->ReadLoadedResources();
-			std::vector<Resource*>::const_iterator it = res.begin();
-			Component::Type lastType = Component::Type::C_None;
-			char name[256];
-			for (; it != res.end(); it++)
+			if (res.size() > 0)
 			{
-				if (lastType != (*it)->GetType())
+				std::vector<Resource*>::const_iterator it = res.begin();
+				Component::Type lastType = Component::Type::C_None;
+				char name[256];
+				for (; it != res.end(); it++)
 				{
-					lastType = (*it)->GetType();
-					ImGui::Separator();
+					if (lastType != (*it)->GetType())
+					{
+						lastType = (*it)->GetType();
+						ImGui::Separator();
+					}
+					sprintf(name, "%s", (*it)->name.data());
+					if (ImGui::TreeNode(name))
+					{
+						ImGui::Text("N references: %u", (*it)->nReferences);
+						ImGui::TreePop();
+					}
 				}
-				sprintf(name, "%s", (*it)->name.data());
-				if (ImGui::TreeNode(name))
-				{
-					ImGui::Text("N references: %u", (*it)->nReferences);
-					ImGui::TreePop();
-				} 
 			}
-
 		}
 
 		if (ImGui::CollapsingHeader("Timers##ReadingTimers"))

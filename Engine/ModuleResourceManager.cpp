@@ -61,21 +61,22 @@ bool ModuleResourceManager::CleanUp()
 	return true;
 }
 
-Resource * ModuleResourceManager::LoadNewResource(std::string fileName)
+Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component::Type type)
 {
-	std::string format(".");
-	format += App->importer->FileFormat(fileName.data());
-	if (format == MESH_FORMAT)
+	switch (type)
 	{
-		return (Resource*)App->importer->LoadMesh(fileName.data());
-	}	
-	if (format == MATERIAL_FORMAT)
-	{
-		return (Resource*)App->importer->LoadMaterial(fileName.data());
-	}
-	if (format == TEXTURE_FORMAT)
-	{
-		return (Resource*)App->importer->LoadTexture(fileName.data());
+	case (Component::C_mesh):
+		{
+			return (Resource*)App->importer->LoadMesh(resName.data());
+		}
+	case (Component::C_material):
+		{
+			return (Resource*)App->importer->LoadMaterial(resName.data());
+		}
+	case (Component::C_Texture):
+		{
+			return (Resource*)App->importer->LoadTexture(resName.data());
+		}
 	}
 	return nullptr;
 }
@@ -327,7 +328,7 @@ const MetaInf* ModuleResourceManager::GetMetaData(const char * file, Component::
 	if (f != metaData.end())
 	{
 		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
-		while (it->first == type && it != f->second.end())
+		while (it != f->second.end() && it->first == type)
 		{
 			if (it->second.name.compare(component) == 0)
 			{
@@ -345,7 +346,7 @@ const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component:
 	if (f != metaData.end())
 	{
 		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
-		while (it->first == type && it != f->second.end())
+		while (it != f->second.end() && it->first == type)
 		{
 			if (it->second.uid == componentUID)
 			{
@@ -353,6 +354,27 @@ const MetaInf * ModuleResourceManager::GetMetaData(const char * file, Component:
 			}
 			it++;
 		}
+	}
+	return nullptr;
+}
+
+//TODO 
+//Fix this, it's way too ineficient
+const MetaInf * ModuleResourceManager::GetMetaData(Component::Type type, const char * component)
+{
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.begin();
+	while (f != metaData.end())
+	{
+		std::multimap<Component::Type, MetaInf> ::iterator it = f->second.find(type);
+		while (it != f->second.end() && it->first == type)
+		{
+			if (it->second.name.compare(component) == 0)
+			{
+				return &it->second;
+			}
+			it++;
+		}
+		f++;
 	}
 	return nullptr;
 }
@@ -498,7 +520,7 @@ Resource * ModuleResourceManager::LinkResource(uint64_t uid)
 	return ret;
 }
 
-uint64_t ModuleResourceManager::LinkResource(std::string fileName, Component::Type type)
+uint64_t ModuleResourceManager::LinkResource(std::string resName, Component::Type type)
 {
 	Resource* ret = nullptr;
 	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
@@ -507,7 +529,7 @@ uint64_t ModuleResourceManager::LinkResource(std::string fileName, Component::Ty
 		uidLib.insert(std::pair<Component::Type, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
 		tmpMap = uidLib.find(type);
 	}
-	std::map<std::string, uint64_t> ::iterator it = tmpMap->second.find(fileName);
+	std::map<std::string, uint64_t> ::iterator it = tmpMap->second.find(resName);
 
 	if (it != tmpMap->second.end())
 	{
@@ -516,7 +538,7 @@ uint64_t ModuleResourceManager::LinkResource(std::string fileName, Component::Ty
 
 	if (ret == nullptr)
 	{
-		ret = LoadNewResource(fileName);
+		ret = LoadNewResource(resName, type);
 		if (ret != nullptr)
 		{
 			resources.insert(std::pair<uint64_t, Resource*>(ret->uid, ret));

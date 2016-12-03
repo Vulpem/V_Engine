@@ -2,10 +2,10 @@
 
 #include "Application.h"
 
-void ResourcedComponent::LinkResource(std::string fileName)
+void ResourcedComponent::LinkResource(std::string resName)
 {
 	UnLinkResource();
-	resource = App->resources->LinkResource(fileName, GetType());
+	resource = App->resources->LinkResource(resName, GetType());
 }
 
 void ResourcedComponent::UnLinkResource()

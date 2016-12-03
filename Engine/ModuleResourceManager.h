@@ -54,7 +54,7 @@ private:
 
 	//R_Folder resBaseFolder;
 
-	Resource* LoadNewResource(std::string fileName);
+	Resource* LoadNewResource(std::string fileName, Component::Type type);
 
 public:
 	void CreateLibraryDirs();
@@ -68,6 +68,10 @@ public:
 
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const char* component);
 	const MetaInf* GetMetaData(const char* file, Component::Type type, const uint64_t componentUID);
+
+	//TODO
+	//Improve this function, since it's slooooow to find stuff and iterates too much
+	const MetaInf* GetMetaData(Component::Type type, const char* component);
 private:
 	R_Folder ReadFolder(const char* path);
 public:

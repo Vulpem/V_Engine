@@ -197,7 +197,6 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t
 
 					MetaInf tmp;
 					tmp.name = FileName(filePath);
-					tmp.name += TEXTURE_FORMAT;
 					tmp.type = Component::C_Texture;
 					tmp.uid = uid;
 					ret.push_back(tmp);
@@ -281,7 +280,6 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		uint64_t meshUID = ImportMesh(toLoad, scene, vGoName.data(), matIndex);
 		MetaInf meshMeta;
 		meshMeta.name = meshName;
-		meshMeta.name += MESH_FORMAT;
 		meshMeta.uid = meshUID;
 		meshMeta.type = Component::C_mesh;
 		ret.push_back(meshMeta);
@@ -295,7 +293,6 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		MetaInf matMeta;
 		matMeta.uid = ImportMaterial(scene, materials, vGoName.data());
 		matMeta.name = vGoName;
-		matMeta.name += MATERIAL_FORMAT;
 		matMeta.type = Component::C_material;
 		ret.push_back(matMeta);
 		hasMaterial = 1;
@@ -367,7 +364,6 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 
 	MetaInf GoMeta;
 	GoMeta.name = vGoName;
-	GoMeta.name += GO_FORMAT;
 	GoMeta.uid = uid;
 	GoMeta.type = Component::C_GO;
 	ret.push_back(GoMeta);
@@ -389,12 +385,8 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	return ret;
 }
 
-uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName,uint& materialID)
+uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName,uint& materialID, uint64_t uid)
 {
-	std::string name(vGoName);
-	uint nameLen = name.length();
-
-
 	//Importing vertex
 	uint num_vertices = toLoad->mNumVertices;
 	float* vertices = new float[num_vertices * 3];
@@ -473,8 +465,8 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	}
 
 	uint meshSize =
-		//UUID				//Mesh size		//Mesh exists?  //Name length	//Name
-		sizeof (long long) + sizeof(uint) + sizeof(bool) + sizeof(uint) + sizeof(char) * nameLen +
+		//Mesh exists? 
+		sizeof(bool) +
 
 		//num_vertices				   vertices				num_normals   normals
 		sizeof(uint) + sizeof(float) * num_vertices * 3 + sizeof(uint) + sizeof(float) * numNormals * 3
@@ -490,18 +482,8 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	char* mesh = new char[meshSize];
 	char* meshIt = mesh;
 
-	//UUID
-	uint64_t uid = GenerateUUID();
-	meshIt = CopyMem<uint64_t>(meshIt, &uid);
-
 	//Does this mesh actually exist?
 	meshIt = CopyMem<bool>(meshIt, &meshExists);
-
-	//Name len
-	meshIt = CopyMem<uint>(meshIt, &nameLen);
-
-	//Mesh Name
-	meshIt = CopyMem<char>(meshIt, name._Myptr(), nameLen);
 
 	//Num vertices
 	meshIt = CopyMem<uint>(meshIt, &num_vertices);
@@ -543,6 +525,10 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 	RELEASE_ARRAY(textureCoords);
 	RELEASE_ARRAY(indices);
 
+	if (uid == 0)
+	{
+		uid = GenerateUUID();
+	}
 	char toCreate[524];
 	sprintf(toCreate, "Library/Meshes/%llu%s", uid, MESH_FORMAT);
 
@@ -550,10 +536,10 @@ uint64_t ModuleImporter::ImportMesh(aiMesh* toLoad, const aiScene* scene, const 
 
 	RELEASE_ARRAY(mesh);
 
-	return GenerateUUID();
+	return uid;
 }
 
-uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName)
+uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>& matsIndex, const char* matName, uint64_t uid)
 {
 	if (matsIndex.empty() == false)
 	{
@@ -599,8 +585,6 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 		char* realMat = new char[realSize];
 		char* realIt = realMat;
 
-		realIt = CopyMem<uint64_t>(realIt, &uid);
-
 		realIt = CopyMem<uint>(realIt, &nTextures);
 
 		for (int n = 0; n < matsIndex.size(); n++)
@@ -608,6 +592,11 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 			realIt = CopyMem<char>(realIt, materials[n], materialsSize[n]);
 		}
 		
+		if (uid == 0)
+		{
+			uid = GenerateUUID();
+		}
+
 		char toCreate[524];
 		sprintf(toCreate, "Library/Materials/%llu%s", uid, MATERIAL_FORMAT);
 
@@ -765,21 +754,22 @@ GameObject * ModuleImporter::LoadVgo(const char * fileName, const char* vGoName,
 	return nullptr;
 }
 
-R_mesh* ModuleImporter::LoadMesh(const char * path)
+R_mesh* ModuleImporter::LoadMesh(const char * resName)
 {
 	char* file = nullptr;
-	std::string filePath("Library/Meshes/");
+
+	const MetaInf* inf = App->resources->GetMetaData(Component::C_mesh, resName);
+
+	char filePath[526];
+	sprintf(filePath, "Library/Meshes/%llu%s", inf->uid, MESH_FORMAT);
 	R_mesh* newMesh = nullptr;
 
-	App->resources->GetMetaData()
 
-	filePath += path;
+	LOG("Loading mesh %s", filePath);
 
-	LOG("Loading mesh %s", filePath.data());
-
-	if (App->fs->Exists(filePath.data()))
+	if (App->fs->Exists(filePath))
 	{
-		int size = App->fs->Load(filePath.data(), &file);
+		int size = App->fs->Load(filePath, &file);
 		if (file != nullptr && size > 0)
 		{
 			char* It = file;
@@ -794,17 +784,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * path)
 			{
 				newMesh = new R_mesh();
 
-				uint nameLen;
-				bytes = sizeof(uint);
-				memcpy(&nameLen, It, bytes);
-				It += bytes;
-
-				char meshName[524];
-				bytes = sizeof(char) * nameLen;
-				memcpy(meshName, It, bytes);
-				It += bytes;
-
-				newMesh->name = meshName;
+				newMesh->name = resName;
 
 				//Num vertices
 				bytes = sizeof(uint);
