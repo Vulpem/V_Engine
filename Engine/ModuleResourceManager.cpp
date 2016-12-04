@@ -32,14 +32,23 @@ bool ModuleResourceManager::Start()
 }
 
 // Called every draw update
-update_status ModuleResourceManager::PreUpdate()
+update_status ModuleResourceManager::Update()
 {
-
+	if (autoRefresh)
+	{
+		refreshTimer += Time.dt;
+		if (refreshTimer > refreshDelay)
+		{
+			refreshTimer = 0.0f;
+			Refresh();
+		}
+	}
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleResourceManager::PostUpdate()
 {
+	ReloadNow();
 	DeleteNow();
 	return UPDATE_CONTINUE;
 }
@@ -328,9 +337,11 @@ void ModuleResourceManager::Refresh()
 				for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
 				{
 					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
+					toReload.push_back(m->uid);
 				}
 
 				metaToSave.push_back(filesToCheck.front());
+
 
 				//Erasing the old data, so we can insert the new one
 				std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = metaData.find(filesToCheck.front());
@@ -646,6 +657,35 @@ void ModuleResourceManager::DeleteNow()
 			{
 				RELEASE(it->second);
 				resources.erase(it);
+			}
+
+			tmp.pop_back();
+		}
+	}
+}
+
+void ModuleResourceManager::ReloadNow()
+{
+	if (toReload.empty() == false)
+	{
+		std::vector<uint64_t> tmp = toReload;
+		toReload.clear();
+
+		while (tmp.empty() == false)
+		{
+			uint64_t uid = tmp.back();
+
+			//Erasing the resource itself
+			std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
+			if (it != resources.end())
+			{
+				std::string name = it->second->name;
+				Component::Type type = it->second->GetType();
+				uint nRefs = it->second->nReferences;
+
+				RELEASE(it->second);
+				it->second = LoadNewResource(name, type);
+				it->second->nReferences = nRefs;
 			}
 
 			tmp.pop_back();

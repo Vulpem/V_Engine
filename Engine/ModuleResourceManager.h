@@ -39,11 +39,20 @@ public:
 	~ModuleResourceManager();
 
 	bool Start();
-	update_status PreUpdate();
+	update_status Update();
 	update_status PostUpdate();
 	bool CleanUp();
 
 private:
+	//Chooses either we want the files to refresh automatically or not
+	bool autoRefresh = true;
+
+	//Number of seconds between file refreshes
+	uint refreshDelay = 10;
+
+	//Very rudimentary timer to refresh the files automatically
+	float refreshTimer = 0.0f;
+
 	//Allows us to find any resource via its UID
 	std::map<uint64_t, Resource*> resources;
 
@@ -52,6 +61,9 @@ private:
 
 	//List of the resources we want to Unload
 	std::vector<uint64_t> toDelete;
+
+	//List of the resources we want to Reload
+	std::vector<uint64_t> toReload;
 
 	//metaData of all files
 	//The first map contains the name of the file the resource came from and a map of all the resources linked to that file
@@ -110,6 +122,9 @@ public:
 
 	//Delte the components that need to be deleted
 	void DeleteNow();
+
+	//Reload the components that need to be reloaded
+	void ReloadNow();
 
 	//Returns all loaded resources. Pretty slow, for debugging use only
 	const std::vector<Resource*> ReadLoadedResources() const;
