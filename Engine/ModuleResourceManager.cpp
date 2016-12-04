@@ -320,6 +320,7 @@ void ModuleResourceManager::Refresh()
 
 		if (wantToImport)
 		{
+			LOG("Reimporting %s", filesToCheck.front().data());
 			std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data(), overwrite);
 			if (toAdd.empty() == false)
 			{
@@ -328,12 +329,28 @@ void ModuleResourceManager::Refresh()
 				{
 					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
 				}
-				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
-				
+
 				metaToSave.push_back(filesToCheck.front());
 
+				//Erasing the old data, so we can insert the new one
+				std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = metaData.find(filesToCheck.front());
+				if (toPop != metaData.end())
+				{
+					metaData.erase(toPop);
+				}
+				std::map<std::string, Date>::iterator toPop2 = meta_lastMod.find(filesToCheck.front());
+				if (toPop2 != meta_lastMod.end())
+				{
+					meta_lastMod.erase(toPop2);
+				}
+
+				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
 				meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
 			}
+		}
+		else
+		{
+			LOG("Up to date: %s", filesToCheck.front().data());
 		}
 		filesToCheck.pop();
 	}

@@ -150,7 +150,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 
 
 
-std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t _uid, bool overWritting)
+std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
 
@@ -162,8 +162,6 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t
 	{
 		return ret;
 	}
-
-	uint64_t uid = _uid;
 
 	LOG("\nStarted importing texture %s", filePath);
 	char* buffer = nullptr;
@@ -191,6 +189,16 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t
 				ilEnable(IL_FILE_OVERWRITE);
 				if (ilSaveL(IL_DDS, data, newSize) > 0)
 				{
+					uint64_t uid = 0;
+					if (overWritting)
+					{
+						const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_Texture, FileName(filePath).data());
+						if (inf)
+						{
+							uid = inf->uid;
+						}
+					}
+
 					// Save to buffer with the ilSaveIL function
 					if (uid == 0)
 					{
@@ -283,7 +291,16 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 		char meshName[1024];
 		sprintf(meshName, "%s%s_%i",vGoName.data(), toLoad->mName.data, n);
 
-		uint64_t meshUID = ImportMesh(toLoad, scene, vGoName.data(), matIndex);
+		uint64_t meshUid = 0;
+		if (overWritting)
+		{
+			const MetaInf* inf = App->resources->GetMetaData(path, Component::C_mesh, meshName);
+			if (inf)
+			{
+				meshUid = inf->uid;
+			}
+		}
+		uint64_t meshUID = ImportMesh(toLoad, scene, vGoName.data(), matIndex, meshUid);
 		MetaInf meshMeta;
 		meshMeta.name = meshName;
 		meshMeta.uid = meshUID;
@@ -296,8 +313,18 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	uint hasMaterial = 0;
 	if (materials.empty() == false)
 	{
+		uint64_t matUid = 0;
+		if (overWritting)
+		{
+			const MetaInf* inf = App->resources->GetMetaData(path, Component::C_mesh, vGoName.data());
+			if (inf)
+			{
+				matUid = inf->uid;
+			}
+		}
+
 		MetaInf matMeta;
-		matMeta.uid = ImportMaterial(scene, materials, vGoName.data());
+		matMeta.uid = ImportMaterial(scene, materials, vGoName.data(), matUid);
 		matMeta.name = vGoName;
 		matMeta.type = Component::C_material;
 		ret.push_back(matMeta);

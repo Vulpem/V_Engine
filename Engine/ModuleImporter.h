@@ -45,7 +45,7 @@ public:
 	//Import a specific 3D model and decompose it
 	std::vector<MetaInf> Import3dScene(const char* filePath, bool overWritting = false);
 	//Import any image to dds
-	std::vector<MetaInf> ImportImage(const char* filePath, uint64_t uid = 0, bool overWritting = false);
+	std::vector<MetaInf> ImportImage(const char* filePath, bool overWritting = false);
 
 private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
