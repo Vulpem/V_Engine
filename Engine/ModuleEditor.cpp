@@ -405,7 +405,6 @@ void ModuleEditor::PlayButtons()
 			Time.PlayMode = false;
 			Time.Pause = false;
 			Time.gdt = 0.0f;
-			App->GO->ClearScene();
 			App->GO->LoadScene("temp");
 		}
 	}

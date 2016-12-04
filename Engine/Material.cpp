@@ -72,7 +72,15 @@ int Material::GetTexture(uint n)
 	{
 		if (n >= 0 && n < ReadRes<R_Material>()->textures.size())
 		{
-			return App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->Read<R_Texture>()->bufferID;
+			R_Material* mat = ReadRes<R_Material>();
+			if (mat)
+			{
+				R_Texture* tex = App->resources->Peek(mat->textures.at(n))->Read<R_Texture>();
+				if (tex)
+				{
+					return tex->bufferID;
+				}
+			}
 		}
 	}
 	return -1;

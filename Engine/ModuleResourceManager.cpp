@@ -667,8 +667,11 @@ void ModuleResourceManager::DeleteNow()
 			std::map<uint64_t, Resource*>::iterator it = resources.find(uid);
 			if (it != resources.end())
 			{
-				RELEASE(it->second);
-				resources.erase(it);
+				if (it->second->nReferences <= 0)
+				{
+					RELEASE(it->second);
+					resources.erase(it);
+				}
 			}
 
 			tmp.pop_back();

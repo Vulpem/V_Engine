@@ -137,25 +137,33 @@ update_status ModuleGoManager::PostUpdate()
 		}
 	}
 	TIMER_READ_MS("Components PostUpdate");
-	DeleteGOs();
 
 	TIMER_RESET_STORED("Cam culling longest");
 	TIMER_RESET_STORED("GO render longest");
 
-	if (wantToSaveScene)
+	bool worked = false;
+
+	if (wantToSaveScene&& worked == false)
 	{
+		worked = true;
 		TIMER_START_PERF("Saving Scene");
 		SaveSceneNow();
 		wantToSaveScene = false;
 		TIMER_READ_MS("Saving Scene");
 	}
-	if (wantToClearScene)
+
+	if (wantToClearScene && worked == false)
 	{
+		worked = true;
 		ClearSceneNow();
 		wantToClearScene = false;
 	}
-	if (wantToLoadScene)
+
+	DeleteGOs();
+
+	if (wantToLoadScene&& worked == false)
 	{
+		worked = true;
 		TIMER_START_PERF("Loading Scene");
 		LoadSceneNow();
 		wantToLoadScene = false;
@@ -255,26 +263,15 @@ void ModuleGoManager::ClearSceneNow()
 {
 	if (root->childs.empty() == false)
 	{
-		std::vector<GameObject*> toSave;
-		while (root->childs.empty() == false)
+		std::vector<GameObject*>::iterator it = root->childs.begin();
+		for (; it != root->childs.end(); it++)
 		{
-			GameObject* tmp = root->childs.back();
-			if (tmp->HiddenFromOutliner())
+			if ((*it)->HiddenFromOutliner() == false)
 			{
-				toSave.push_back(root->childs.back());
-				root->childs.pop_back();
-			}
-			else
-			{
-				delete tmp;
+				toDelete.push(*it);
 			}
 		}
-		root->childs.clear();
-		for (std::vector<GameObject*>::iterator it = toSave.begin(); it != toSave.end(); it++)
-		{
-			root->childs.push_back(*it);
-		}
-		LOG("Scene cleared");
+			LOG("Scene cleared");
 	}
 }
 

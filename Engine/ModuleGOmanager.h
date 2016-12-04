@@ -38,7 +38,7 @@ public:
 	bool DeleteGameObject(GameObject* toErase);
 
 	void SaveScene(char* name) { wantToSaveScene = true; sceneName = name; }
-	void LoadScene(char* name) { wantToLoadScene = true; sceneName = name;	}
+	void LoadScene(char* name) { wantToLoadScene = true; sceneName = name;	wantToClearScene = true; }
 	void ClearScene() { wantToClearScene = true; }
 
 private:
