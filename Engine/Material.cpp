@@ -35,38 +35,30 @@ void Material::EditorContent()
 
 void Material::SaveSpecifics(pugi::xml_node& myNode)
 {
+	Resource* res = App->resources->Peek(resource);
+	myNode.append_attribute("res") = res->name.data();
 	pugi::xml_node color_n = myNode.append_child("Color");
 	color_n.append_attribute("R") = ReadRes<R_Material>()->color[0];
 	color_n.append_attribute("G") = ReadRes<R_Material>()->color[1];
 	color_n.append_attribute("B") = ReadRes<R_Material>()->color[2];
 	color_n.append_attribute("A") = ReadRes<R_Material>()->color[3];
-	for (std::vector<uint64_t>::iterator it = ReadRes<R_Material>()->textures.begin(); it != ReadRes<R_Material>()->textures.end(); it++)
-	{
-		pugi::xml_node tex = myNode.append_child("Texture");		
-		tex.append_attribute("path") = App->resources->Peek(ReadRes<R_Material>()->textures.at(*it))->name.data();
-	}
-
 }
 
 void Material::LoadSpecifics(pugi::xml_node & myNode)
 {
-	for (pugi::xml_node tex = myNode.child("Texture"); tex != nullptr; tex = tex.next_sibling())
-	{
-		std::string path = tex.attribute("path").as_string();
-		uint64_t toAdd = App->resources->LinkResource(path, Component::C_Texture);
-		if (toAdd != 0)
-		{
-			ReadRes<R_Material>()->textures.push_back(toAdd);
-		}
-	}
+	std::string resName = myNode.attribute("res").as_string();
+	resource = App->resources->LinkResource(resName.data(),GetType());
 
 	pugi::xml_node col = myNode.child("Color");
 
-	ReadRes<R_Material>()->color[0] = col.attribute("R").as_float();
-	ReadRes<R_Material>()->color[1] = col.attribute("G").as_float();
-	ReadRes<R_Material>()->color[2] = col.attribute("B").as_float();
-	ReadRes<R_Material>()->color[3] = col.attribute("A").as_float();
-
+	R_Material* res = ReadRes<R_Material>();
+	if (res)
+	{
+		res->color[0] = col.attribute("R").as_float();
+		res->color[1] = col.attribute("G").as_float();
+		res->color[2] = col.attribute("B").as_float();
+		res->color[3] = col.attribute("A").as_float();
+	}
 }
 
 uint Material::NofTextures()

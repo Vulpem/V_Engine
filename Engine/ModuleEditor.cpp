@@ -715,6 +715,7 @@ bool ModuleEditor::SaveLoadPopups()
 	ImGui::SetNextWindowSize(ImVec2(300, 120));
 	if (ImGui::BeginPopupModal("New scene"))
 	{
+		selectedGameObject = nullptr;
 		bool close = false;
 		ImGui::Text("Save current scene?");
 		if (ImGui::Button("Yes##saveCurrentButton"))
@@ -765,12 +766,12 @@ bool ModuleEditor::SaveLoadPopups()
 	ImGui::SetNextWindowSize(ImVec2(300, 120));
 	if (ImGui::BeginPopupModal("Load Scene"))
 	{
+		selectedGameObject = nullptr;
 		ImGui::Text("Scene name:");
 		ImGui::InputText("##saveSceneInputText", sceneName, 256);
 		bool close = false;
 		if (ImGui::Button("Load##loadButton") && sceneName[0] != '\0')
 		{
-			strcat(sceneName, SCENE_FORMAT);
 			App->GO->LoadScene(sceneName);
 			close = true;
 		}

@@ -188,6 +188,9 @@ bool ModuleGoManager::CleanUp()
 	return true;
 }
 
+
+//Creating/deleting GOs
+
 GameObject * ModuleGoManager::CreateEmpty(const char* name)
 {
 	GameObject* empty = new GameObject();
@@ -245,6 +248,9 @@ bool ModuleGoManager::DeleteGameObject(GameObject* toErase)
 	
 }
 
+
+//Scene management
+
 void ModuleGoManager::ClearSceneNow()
 {
 	if (root->childs.empty() == false)
@@ -283,10 +289,12 @@ void ModuleGoManager::SaveSceneNow()
 
 	root_node.append_attribute("SceneName") = sceneName.data();
 
+	//Saving GameObjects
 	root->Save(root_node.append_child("GameObjects"));
 
 	Components_node = root_node.append_child("Components");
 
+	//Saving components
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
@@ -296,13 +304,14 @@ void ModuleGoManager::SaveSceneNow()
 		}
 	}
 
-	sceneName += SCENE_FORMAT;
+	char path[524];
+	sprintf(path, "Assets/Scenes/%s%s", sceneName.data(), SCENE_FORMAT);
 
 	std::stringstream stream;
 	data.save(stream);
 	// we are done, so write data to disk
-	App->fs->Save(sceneName.data(), stream.str().c_str(), stream.str().length());
-	LOG("Scene saved: %s", sceneName.data());
+	App->fs->Save(path, stream.str().c_str(), stream.str().length());
+	LOG("Scene saved: %s", path);
 
 	data.reset();
 }
@@ -311,14 +320,12 @@ void ModuleGoManager::LoadSceneNow()
 {
 	std::map<uint64_t, GameObject*> UIDlib;
 
-	//If the recieved scene had no format, we'll add it
-	if (App->importer->FileFormat(sceneName.data()).length() == 0)
-	{
-		sceneName += SCENE_FORMAT;
-	}
+	char scenePath[526];
+	sprintf(scenePath, "Assets/Scenes/%s%s", sceneName.data(), SCENE_FORMAT);
+
 
 	char* buffer;
-	uint size = App->fs->Load(sceneName.data(), &buffer);
+	uint size = App->fs->Load(scenePath, &buffer);
 
 	if (size > 0)
 	{
@@ -342,6 +349,12 @@ void ModuleGoManager::LoadSceneNow()
 
 					GameObject* toAdd = new GameObject();
 					toAdd->SetName(go_name.data());
+
+					bool isStatic = GOs.attribute("Static").as_bool();
+					toAdd->SetStatic(isStatic);
+
+					bool isActive = GOs.attribute("Active").as_bool();
+					toAdd->SetActive(isActive);
 
 					std::map<uint64_t, GameObject*>::iterator parent = UIDlib.find(parentUID);
 					if (parent != UIDlib.end())
@@ -372,26 +385,10 @@ void ModuleGoManager::LoadSceneNow()
 						std::map<uint64_t, GameObject*>::iterator go = UIDlib.find(GO);
 						if (go != UIDlib.end())
 						{
-							switch (type)
+							Component* c = go->second->AddComponent(type, "", true);
+							if (c != nullptr)
 							{
-							case (Component::C_mesh):
-							{
-								pugi::xml_node meshNode = comp.child("Specific");
-								std::string path = meshNode.attribute("MeshPath").as_string();
-								mesh* m = (mesh*)go->second->AddComponent(Component::Type::C_mesh, path);
-								m->texMaterialIndex = meshNode.attribute("TextureIndex").as_int();
-								go->second->SetOriginalAABB();
-								break;
-							}
-							default:
-							{
-								Component* c = go->second->AddComponent(type);
-								if (c != nullptr)
-								{
-									c->LoadSpecifics(comp.child("Specific"));
-								}
-								break;
-							}
+								c->LoadSpecifics(comp.child("Specific"));
 							}
 						}
 					}
@@ -412,6 +409,8 @@ void ModuleGoManager::LoadSceneNow()
 	}
 
 }
+
+
 
 void ModuleGoManager::SetStatic(bool Static, GameObject * GO)
 {
@@ -463,6 +462,8 @@ void ModuleGoManager::SetChildsStatic(bool Static, GameObject * GO)
 		}
 	}
 }
+
+
 
 bool ModuleGoManager::RayCast(const LineSegment & ray, GameObject** OUT_gameobject, float3 * OUT_position, float3* OUT_normal, bool onlyMeshes)
 {
@@ -645,17 +646,20 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 		if ((*it)->HasComponent(Component::Type::C_mesh))
 		{
 			std::vector<mesh*> meshes = (*it)->GetComponent<mesh>();
-			for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
+			if (meshes.empty() == false)
 			{
-				TIMER_START("Mesh slowest");
-				Mesh_RenderInfo info = GetMeshData(*mesh);
-				if (port.useOnlyWires)
+				for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 				{
-					info.filled = false;
-					info.wired = true;
+					TIMER_START("Mesh slowest");
+					Mesh_RenderInfo info = GetMeshData(*mesh);
+					if (port.useOnlyWires)
+					{
+						info.filled = false;
+						info.wired = true;
+					}
+					App->renderer3D->DrawMesh(info);
+					TIMER_READ_MS_MAX("Mesh slowest");
 				}
-				App->renderer3D->DrawMesh(info);
-				TIMER_READ_MS_MAX("Mesh slowest");
 			}
 		}
 	}

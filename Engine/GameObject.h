@@ -76,7 +76,7 @@ public:
 	void SetName(const char* newName);
 	const char* GetName();
 
-	Component* AddComponent(Component::Type type, std::string res = std::string(""));
+	Component* AddComponent(Component::Type type, std::string res = std::string(""), bool forceCreation = false);
 	bool HasComponent(Component::Type type);
 	uint AmountOfComponent(Component::Type type);
 	Transform* GetTransform();

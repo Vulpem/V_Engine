@@ -313,62 +313,65 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
-		totalFiles++;
-		bool wantToImport = false;
-		bool overwrite = false;
-		std::map<std::string, Date>::iterator it = meta_lastMod.find(filesToCheck.front());
-		if (it != meta_lastMod.end())
+		if (App->importer->FileFormat(filesToCheck.front().data()).compare(SCENE_FORMAT) == 0)
 		{
-			//The file exists in meta
-			if (it->second != App->fs->ReadFileDate(filesToCheck.front().data()))
+			totalFiles++;
+			bool wantToImport = false;
+			bool overwrite = false;
+			std::map<std::string, Date>::iterator it = meta_lastMod.find(filesToCheck.front());
+			if (it != meta_lastMod.end())
 			{
-				overwrite = true;
+				//The file exists in meta
+				if (it->second != App->fs->ReadFileDate(filesToCheck.front().data()))
+				{
+					overwrite = true;
+					wantToImport = true;
+					filesToReimport++;
+				}
+			}
+			else
+			{
+				filesToImport++;
+				//File wasn't found in the current metaData
 				wantToImport = true;
-				filesToReimport++;
 			}
-		}
-		else
-		{
-			filesToImport++;
-			//File wasn't found in the current metaData
-			wantToImport = true;
-		}
 
-		if (wantToImport)
-		{
-			LOG("Reimporting %s", filesToCheck.front().data());
-			std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data(), overwrite);
-			if (toAdd.empty() == false)
+			if (wantToImport)
 			{
-				std::multimap<Component::Type, MetaInf> tmp;
-				for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
+				LOG("Reimporting %s", filesToCheck.front().data());
+				std::vector<MetaInf> toAdd = App->importer->Import(filesToCheck.front().data(), overwrite);
+				if (toAdd.empty() == false)
 				{
-					tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
-					toReload.push_back(m->uid);
+					std::multimap<Component::Type, MetaInf> tmp;
+					for (std::vector<MetaInf>::iterator m = toAdd.begin(); m != toAdd.end(); m++)
+					{
+						tmp.insert(std::pair<Component::Type, MetaInf>(m->type, *m));
+						toReload.push_back(m->uid);
+					}
+
+					metaToSave.push_back(filesToCheck.front());
+
+
+					//Erasing the old data, so we can insert the new one
+					std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = metaData.find(filesToCheck.front());
+					if (toPop != metaData.end())
+					{
+						metaData.erase(toPop);
+					}
+					std::map<std::string, Date>::iterator toPop2 = meta_lastMod.find(filesToCheck.front());
+					if (toPop2 != meta_lastMod.end())
+					{
+						meta_lastMod.erase(toPop2);
+					}
+
+					metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
+					meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
 				}
-
-				metaToSave.push_back(filesToCheck.front());
-
-
-				//Erasing the old data, so we can insert the new one
-				std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator toPop = metaData.find(filesToCheck.front());
-				if (toPop != metaData.end())
-				{
-					metaData.erase(toPop);
-				}
-				std::map<std::string, Date>::iterator toPop2 = meta_lastMod.find(filesToCheck.front());
-				if (toPop2 != meta_lastMod.end())
-				{
-					meta_lastMod.erase(toPop2);
-				}
-
-				metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
-				meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
 			}
-		}
-		else
-		{
-			//LOG("Up to date: %s", filesToCheck.front().data());
+			else
+			{
+				//LOG("Up to date: %s", filesToCheck.front().data());
+			}
 		}
 		filesToCheck.pop();
 	}

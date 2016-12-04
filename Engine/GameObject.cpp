@@ -344,7 +344,7 @@ const char * GameObject::GetName()
 	return name;
 }
 
-Component* GameObject::AddComponent(Component::Type type, std::string res)
+Component* GameObject::AddComponent(Component::Type type, std::string res, bool forceCreation)
 {
 	Component* toAdd = nullptr;
 	switch (type)
@@ -360,10 +360,7 @@ Component* GameObject::AddComponent(Component::Type type, std::string res)
 	}
 	case Component::Type::C_mesh:
 	{
-		if (res.length() > 1)
-		{
-			toAdd = new mesh(res ,this, components.size());
-		} 
+		toAdd = new mesh(res ,this, components.size());
 		break;
 	}
 	case Component::Type::C_material:
@@ -386,7 +383,7 @@ Component* GameObject::AddComponent(Component::Type type, std::string res)
 
 	if (toAdd != nullptr)
 	{
-		if (toAdd->MissingComponent() == false)
+		if (toAdd->MissingComponent() == false || forceCreation)
 		{
 			HasComponents[toAdd->GetType()] += 1;
 			components.push_back(toAdd);
@@ -422,6 +419,8 @@ void GameObject::Save(pugi::xml_node& node)
 	if (hiddenOnOutliner == false)
 	{
 		pugi::xml_node GO = node.append_child("GO");
+		GO.append_attribute("Active") = active;
+		GO.append_attribute("Static") = Static;
 		GO.append_attribute("name") = name;
 		if (parent != nullptr)
 		{

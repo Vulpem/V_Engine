@@ -211,7 +211,6 @@ void Camera::SaveSpecifics(pugi::xml_node& myNode)
 	frust.append_attribute("UpZ") = frustum.up.z;
 	frust.append_attribute("HasCulling") = hasCulling;
 	frust.append_attribute("otherFOV") = otherFOV.x;
-
 }
 
 void Camera::LoadSpecifics(pugi::xml_node & myNode)

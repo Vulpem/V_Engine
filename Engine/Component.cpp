@@ -61,7 +61,15 @@ void Component::DrawOnEditor()
 
 	if(open && enabled)
 	{
-		EditorContent();
+		if (MissingComponent() == false)
+		{
+			EditorContent();
+		}
+		else
+		{
+			ImGui::Text("Something went terribly wrong.");
+			ImGui::Text("¡This component is missing its resource!");			
+		}
 	}
 }
 
@@ -86,7 +94,7 @@ void Component::Save(pugi::xml_node& myNode)
 	node.append_attribute("type") = type;
 	node.append_attribute("id") = id;
 	node.append_attribute("GO") = object->GetUID();
-	node.append_attribute("enabled") = enabled;
+	node.append_attribute("enabled") = IsEnabled();
 
 	SaveSpecifics(myNode.append_child("Specific"));
 }

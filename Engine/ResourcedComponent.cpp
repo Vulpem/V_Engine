@@ -2,6 +2,7 @@
 
 #include "Application.h"
 
+
 void ResourcedComponent::LinkResource(std::string resName)
 {
 	UnLinkResource();
