@@ -126,7 +126,13 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 	{
 		if (scene->HasMeshes())
 		{
-			ret = ImportGameObject(filePath, scene->mRootNode, scene);
+			uint64_t uid = 0;
+			if (overWritting == true)
+			{
+				const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_GO, "RootNode");
+				if (inf) { uid = inf->uid; }
+			}
+			ret = ImportGameObject(filePath, scene->mRootNode, scene, uid);
 		}
 		if (scene)
 		{
@@ -226,7 +232,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, uint64_t
 
 
 
-std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, uint64_t uid)
+std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, uint64_t uid, bool overWritting)
 {
 	std::vector<MetaInf> ret;
 
@@ -312,7 +318,21 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	//Deciding the uid for each child
 	for (uint n = 0; n < nChilds; n++)
 	{
-		childs[n] = GenerateUUID();
+		childs[n] = 0;
+		if (overWritting == true)
+		{
+			const MetaInf* inf = App->resources->GetMetaData(path, Component::C_GO, NodetoLoad->mChildren[n]->mName.data);
+			if (inf != nullptr)
+			{
+				childs[n] = inf->uid;
+			}
+		}
+
+		if(childs[n] == 0)
+		{
+			childs[n] = GenerateUUID();
+		}
+		
 	}
 
 	char* file_childs = new char[childFileSize];
@@ -373,7 +393,7 @@ std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const ai
 	{
 		std::vector<MetaInf> childsMeta;
 
-		childsMeta = ImportGameObject(path, NodetoLoad->mChildren[n], scene, childs[n]);
+		childsMeta = ImportGameObject(path, NodetoLoad->mChildren[n], scene, childs[n], overWritting);
 
 		for (std::vector<MetaInf>::iterator it = childsMeta.begin(); it != childsMeta.end(); it++)
 		{
