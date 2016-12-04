@@ -296,14 +296,27 @@ update_status ModuleEditor::MenuBar()
 		}
 		if (ImGui::BeginMenu("Import"))
 		{
-			if (ImGui::MenuItem("Reimport All Assets"))
+			ImGui::Checkbox("Auto Refresh", &App->resources->autoRefresh);
+			if (App->resources->autoRefresh)
 			{
-				App->resources->ReimportAll();
+				ImGui::Text("Auto Refresh delay(seconds):");
+				ImGui::DragInt("##autoRefreshDelay", &App->resources->refreshDelay, 1.0f, 1, 600);
 			}
+			ImGui::Separator();
 			if (ImGui::MenuItem("Refresh Assets"))
 			{
 				App->resources->Refresh();
 			}
+
+			ImGui::NewLine();
+			ImGui::NewLine();
+			ImGui::Separator();
+			if (ImGui::MenuItem("Reimport All Assets"))
+			{
+				App->resources->ReimportAll();
+			}
+			ImGui::Separator();
+			ImGui::Text("It may take some time.\nAlso, it may cause\nsome problems if\nthere are already\nassets loaded.\nRecommended to use refresh\nwhen possible");
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("View"))

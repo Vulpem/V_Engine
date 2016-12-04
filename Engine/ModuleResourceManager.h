@@ -43,13 +43,12 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
-private:
 	//Chooses either we want the files to refresh automatically or not
 	bool autoRefresh = true;
 
 	//Number of seconds between file refreshes
-	uint refreshDelay = 10;
-
+	int refreshDelay = 10;
+private:
 	//Very rudimentary timer to refresh the files automatically
 	float refreshTimer = 0.0f;
 
