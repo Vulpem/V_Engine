@@ -654,11 +654,15 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 	std::vector<Resource*> ret;
 
 	std::map<Component::Type, std::map<std::string, uint64_t>>::const_iterator tmpMap = uidLib.cbegin();
+	//Iterating all maps of components from uidLib. This maps allow us to find the UID of each component through it's type and name
+	//There's a different map for each type of component, so they're ordered
 	for (; tmpMap != uidLib.end(); tmpMap++)
 	{
+		//Iterating inside each map
 		std::map<std::string, uint64_t>::const_iterator it = tmpMap->second.cbegin();
 		for (; it != tmpMap->second.end(); it++)
 		{
+			//Once we have the uid we want to push, we find the corresponding resource
 			std::map<uint64_t, Resource*>::const_iterator res = resources.find(it->second);
 			if (res != resources.cend())
 			{

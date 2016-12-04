@@ -491,6 +491,25 @@ void ModuleEditor::Editor()
 					{
 						lastType = (*it)->GetType();
 						ImGui::Separator();
+						switch (lastType)
+						{
+						case (Component::C_GO):
+						{
+							ImGui::Text("GameObjects:"); break;
+						}
+						case (Component::C_material):
+						{
+							ImGui::Text("Materials:"); break;
+						}
+						case (Component::C_mesh):
+						{
+							ImGui::Text("Meshes:"); break;
+						}
+						case (Component::C_Texture):
+						{
+							ImGui::Text("Textures:"); break;
+						}
+						}
 					}
 					sprintf(name, "%s", (*it)->name.data());
 					if (ImGui::TreeNode(name))

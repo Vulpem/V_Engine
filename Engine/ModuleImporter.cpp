@@ -828,7 +828,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 
 				if (_meshExists == true)
 				{
-					newMesh = new R_mesh();
+					newMesh = new R_mesh(inf->uid);
 
 					newMesh->name = resName;
 
@@ -946,7 +946,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 			if (file != nullptr && size > 0)
 			{
 				char* It = file;
-				mat = new R_Material();
+				mat = new R_Material(inf->uid);
 
 				uint bytes = 0;
 				uint nTextures = 0;
@@ -1024,7 +1024,7 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 
 		if (ID != 0)
 		{
-			ret = new R_Texture();
+			ret = new R_Texture(inf->uid);
 			ret->name = inf->name;
 			ret->bufferID = ID;
 			return ret;
