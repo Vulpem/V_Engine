@@ -17,11 +17,6 @@ for it to create all the needed files to handle the information.
 The first execution, since it's importing all the files in the assets folder, will take the longest to import.  
 
 
-##TODOS
-
-When introducing the resource manager, the Save and Load features broke. It's being fixed, please, be patient.  
-Therefore, the "Play", "Pause" and "Stop" buttons will cause the game to crash, since it tries to save and load the scene current state.  
-
 
 Keybindings:  
 
@@ -55,6 +50,7 @@ imported other files, try to add it back and refresh.
  
 -There's a known bug when selecting certain objects with volume 0, such as planes. Sometimes they won't select, and sometimes they'll be selected even if they're behind other objects. We're working on it.  
 
+-There's a known crash that will occur occasionally when deleting all the objects in a scene(included when loading a new scene from scratch).
 
 ## LICENSE
 
