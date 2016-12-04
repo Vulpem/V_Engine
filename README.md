@@ -13,48 +13,47 @@ Drag and drop any 3d file into the engine viewport to load it. Note that only fi
 
 
 There still isn't a UI or any output when the engine is importing files, so it may appear frozen. Just wait, it may take a moment
-for it to create all the needed files to handle the information.
-The first execution, since it's importing all the files in the assets folder, will take the longest to import.
+for it to create all the needed files to handle the information.  
+The first execution, since it's importing all the files in the assets folder, will take the longest to import.  
 
 
 ##TODOS
 
-When introducing the resource manager, the Save and Load features broke. It's being fixed, please, be patient.
-Therefore, the "Play", "Pause" and "Stop" buttons will cause the game to crash, since it tries to save and load the scene current state.
+When introducing the resource manager, the Save and Load features broke. It's being fixed, please, be patient.  
+Therefore, the "Play", "Pause" and "Stop" buttons will cause the game to crash, since it tries to save and load the scene current state.  
 
 
-Keybindings:
+Keybindings:  
 
-Camera movement
-	click and hold right mouse button over any viewport to rotate the camera.
-	Note that the default orthogonal views won't rotate.
-	The keys will move the "active viewport", the last one that was interacted with.
+Camera movement  
+	click and hold right mouse button over any viewport to rotate the camera.  
+	Note that the default orthogonal views won't rotate.  
+	The keys will move the "active viewport", the last one that was interacted with.  
 
-	W forward
-	S backward
-	A Left
-	D Right
-	Q Down
-	E Up
-	Shift (Hold) Increase camera movement speed
+	W forward  
+	S backward  
+	A Left  
+	D Right  
+	Q Down  
+	E Up  
+	Shift (Hold) Increase camera movement speed  
 	
-Change Viewports:
-	Space Switch between a single viewport or 4 of them.
-	-Even though you can bind any camera to any viewport through the Camera menu, it is recommended to be careful when changing them.
-		Deleting a camera linked to an active viewport will cause the engine to crash.
+Change Viewports:  
+	Space Switch between a single viewport or 4 of them.  
+	-Even though you can bind any camera to any viewport through the Camera menu, it is recommended to be careful when changing them.  
+		Deleting a camera linked to an active viewport will cause the engine to crash.  
 
 
 
-Notes:
--Avoid messing(modifying) with the library files unless you know what you're doing.
+Notes:  
+-Avoid messing(modifying) with the library files unless you know what you're doing.  
 
--There's a known crash that will occur occasionally when importing certain images that the engine can't handle.
+-There's a known crash that will occur occasionally when importing certain images that the engine can't handle.  
 Since it will try to import them on every execution, it is recommended to remove the image from the assets folder. After it's
-imported other files, try to add it back and refresh.
-	If the problem persists, give up on the file and, preferably, erase all the files and folders inside "Library". A fix will be released. Hopefully.
+imported other files, try to add it back and refresh.  
+	If the problem persists, give up on the file and, preferably, erase all the files and folders inside "Library". A fix will be released. Hopefully.  
  
--There's a known bug when selecting certain objects with volume 0, such as planes. Sometimes they won't select, and sometimes they'll be selected
-even if they're behind other objects. We're working on it.
+-There's a known bug when selecting certain objects with volume 0, such as planes. Sometimes they won't select, and sometimes they'll be selected even if they're behind other objects. We're working on it.  
 
 
 ## LICENSE
