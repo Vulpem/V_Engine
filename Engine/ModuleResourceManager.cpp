@@ -565,20 +565,24 @@ uint64_t ModuleResourceManager::LinkResource(std::string resName, Component::Typ
 {
 	Resource* ret = nullptr;
 	std::map<Component::Type, std::map<std::string, uint64_t>>::iterator tmpMap = uidLib.find(type);
+	//If previosuly there hasn't been loaded any resource with the same type as the requested one, we'll create the new map for this type of components
 	if (tmpMap == uidLib.end())
 	{
 		uidLib.insert(std::pair<Component::Type, std::map<std::string, uint64_t>>(type, std::map<std::string, uint64_t>()));
 		tmpMap = uidLib.find(type);
 	}
+	//We try to find the resource, to see if it's already loaded
 	std::map<std::string, uint64_t> ::iterator it = tmpMap->second.find(resName);
 
 	if (it != tmpMap->second.end())
 	{
+		//If it is, we just link it. If the resource exists but isn't loaded, ret will be nullptr, so we'll load it anyway
 		ret = LinkResource(it->second);
 	}
 
 	if (ret == nullptr)
 	{
+		//If it isn't, we load the resource and we insert it to the resource library
 		ret = LoadNewResource(resName, type);
 		if (ret != nullptr)
 		{
