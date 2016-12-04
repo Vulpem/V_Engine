@@ -287,6 +287,10 @@ void ModuleResourceManager::Refresh()
 	std::queue<R_Folder> pendantFolders;
 	std::queue<std::string> filesToCheck;
 
+	uint totalFiles = 0;
+	uint filesToImport = 0;
+	uint filesToReimport = 0;
+
 	pendantFolders.push(ReadFolder("Assets"));
 	while (pendantFolders.empty() == false)
 	{
@@ -309,6 +313,7 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
+		totalFiles++;
 		bool wantToImport = false;
 		bool overwrite = false;
 		std::map<std::string, Date>::iterator it = meta_lastMod.find(filesToCheck.front());
@@ -319,10 +324,12 @@ void ModuleResourceManager::Refresh()
 			{
 				overwrite = true;
 				wantToImport = true;
+				filesToReimport++;
 			}
 		}
 		else
 		{
+			filesToImport++;
 			//File wasn't found in the current metaData
 			wantToImport = true;
 		}
@@ -361,10 +368,12 @@ void ModuleResourceManager::Refresh()
 		}
 		else
 		{
-			LOG("Up to date: %s", filesToCheck.front().data());
+			//LOG("Up to date: %s", filesToCheck.front().data());
 		}
 		filesToCheck.pop();
 	}
+
+	LOG("Refreshed\n%u files were up to date.\n%u files were actualized.\n%u new files found.", totalFiles - filesToImport - filesToReimport, filesToReimport, filesToImport);
 
 	while(metaToSave.size() > 0)
 	{

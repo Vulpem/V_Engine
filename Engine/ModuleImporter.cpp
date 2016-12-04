@@ -1018,7 +1018,7 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 		char fullPath[526];
 		sprintf(fullPath, "%sLibrary/Textures/%llu%s", NormalizePath(App->fs->GetWrittingDirectory().data()).data(), inf->uid, TEXTURE_FORMAT);
 
-		LOG("Loading Texture %s", inf->name);
+		LOG("Loading Texture %s", inf->name.data());
 
 		uint ID = ilutGLLoadImage(fullPath);
 
