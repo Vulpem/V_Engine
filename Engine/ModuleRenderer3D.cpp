@@ -359,6 +359,22 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo)
 		RenderMeshWired(meshInfo);
 	}
 
+	//Setting alpha&&blend
+	switch (meshInfo.alphaType)
+	{
+	case (AlphaTestTypes::ALPHA_BLEND):
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, meshInfo.blendType);
+	}
+	case (AlphaTestTypes::ALPHA_DISCARD):
+	{
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, meshInfo.alphaTest);
+		break;
+	}
+	}
+
 	if (meshInfo.textureCoordsBuffer > 0)
 	{
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -383,6 +399,9 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo)
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glDisable(GL_ALPHA_TEST);
+	glDisable(GL_BLEND);
 
 	glPopMatrix();
 }

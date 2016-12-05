@@ -16,7 +16,56 @@ Material::Material(std::string res, GameObject* linkedTo, int id) : ResourcedCom
 
 void Material::EditorContent()
 {
-	ImGui::ColorEdit3("Color", ReadRes<R_Material>()->color);
+	ImGui::Text("Blend type:");
+	int alphaType = GetAlphaType();
+	int prevAlphaType = alphaType;
+	ImGui::RadioButton("Opaque", &alphaType, AlphaTestTypes::ALPHA_OPAQUE); ImGui::SameLine();
+	ImGui::RadioButton("Discard", &alphaType, AlphaTestTypes::ALPHA_DISCARD); ImGui::SameLine();
+	ImGui::RadioButton("Blend", &alphaType, AlphaTestTypes::ALPHA_BLEND);
+	if (alphaType != prevAlphaType)
+	{
+		SetAlphaType((AlphaTestTypes)alphaType);
+	}
+
+	if (alphaType != AlphaTestTypes::ALPHA_OPAQUE)
+	{
+		ImGui::Text("AlphaTest:");
+		float tmp = GetAlphaTest();
+		if (ImGui::DragFloat("##MaterialAlphaTest", &tmp, 0.01f, 0.0f, 1.0f))
+		{
+			SetAlphaTest(tmp);
+		}
+		if (alphaType == AlphaTestTypes::ALPHA_BLEND)
+		{
+			if (ImGui::CollapsingHeader("Alpha Blend Types"))
+			{
+				int blendType = GetBlendType();
+				int lastBlendType = blendType;
+				ImGui::RadioButton("Zero##BlendTypes", &blendType, GL_ZERO);
+				ImGui::RadioButton("One##BlendTypes", &blendType, GL_ONE);
+				ImGui::RadioButton("Src_Color##BlendTypes", &blendType, GL_SRC_COLOR);
+				ImGui::RadioButton("One_Minus_Src_Color##BlendTypes", &blendType, GL_ONE_MINUS_SRC_COLOR);
+				ImGui::RadioButton("Dst_Color##BlendTypes", &blendType, GL_DST_COLOR);
+				ImGui::RadioButton("One_Minus_Dst_Color##BlendTypes", &blendType, GL_ONE_MINUS_DST_COLOR);
+				ImGui::RadioButton("Src_Alpha##BlendTypes", &blendType, GL_SRC_ALPHA);
+				ImGui::RadioButton("One_Minus_Src_Alpha##BlendTypes", &blendType, GL_ONE_MINUS_SRC_ALPHA);
+				ImGui::RadioButton("Dst_Alpha##BlendTypes", &blendType, GL_DST_ALPHA);
+				ImGui::RadioButton("One_Minus_Dst_Alpha##BlendTypes", &blendType, GL_ONE_MINUS_DST_ALPHA);
+				ImGui::RadioButton("Constant_Color##BlendTypes", &blendType, GL_CONSTANT_COLOR);
+				ImGui::RadioButton("One_Minus_Constant_Color##BlendTypes", &blendType, GL_ONE_MINUS_CONSTANT_COLOR);
+				ImGui::RadioButton("Constant_Alpha##BlendTypes", &blendType, GL_CONSTANT_ALPHA);
+				ImGui::RadioButton("One_Minus_Constant_Alpha##BlendTypes", &blendType, GL_ONE_MINUS_CONSTANT_ALPHA);
+				if (blendType != lastBlendType)
+				{
+					SetBlendType(blendType);
+				}
+			}
+		}
+	}
+
+	ImGui::NewLine();
+	ImGui::Separator();
+	ImGui::ColorEdit4("Color", ReadRes<R_Material>()->color);
 
 	for (uint n = 0; n < ReadRes<R_Material>()->textures.size(); n++)
 	{
@@ -97,4 +146,34 @@ void Material::SetColor(float r, float g, float b, float a)
 math::float4 Material::GetColor()
 {
 	return math::float4(ReadRes<R_Material>()->color);
+}
+
+AlphaTestTypes Material::GetAlphaType()
+{
+	return ReadRes<R_Material>()->alphaType;
+}
+
+void Material::SetAlphaType(AlphaTestTypes type)
+{
+	ReadRes<R_Material>()->alphaType = type;
+}
+
+float Material::GetAlphaTest()
+{
+	return ReadRes<R_Material>()->alphaTest;
+}
+
+void Material::SetAlphaTest(float alphaTest)
+{
+	ReadRes<R_Material>()->alphaTest = alphaTest;
+}
+
+int Material::GetBlendType()
+{
+	return ReadRes<R_Material>()->blendType;
+}
+
+void Material::SetBlendType(int blendType)
+{
+	ReadRes<R_Material>()->blendType = blendType;
 }

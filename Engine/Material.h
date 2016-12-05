@@ -2,6 +2,7 @@
 #define __MATERIAL__
 
 #include "ResourcedComponent.h"
+#include "Mesh_RenderInfo.h"
 
 class Material :public ResourcedComponent
 {
@@ -20,6 +21,15 @@ public:
 	math::float4 GetColor();
 
 	static Type GetType() { return Type::C_material; }
+
+	AlphaTestTypes GetAlphaType();
+	void SetAlphaType(AlphaTestTypes type);
+
+	float GetAlphaTest();
+	void SetAlphaTest(float alphaTest);
+
+	int GetBlendType();
+	void SetBlendType(int blendType);
 };
 
 #endif

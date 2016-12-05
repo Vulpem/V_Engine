@@ -557,10 +557,13 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 		Material* mat = getFrom->object->GetComponent<Material>().front();
 		ret.meshColor = mat->GetColor();
 		ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
+		ret.alphaType = mat->GetAlphaType();
+		ret.alphaTest = mat->GetAlphaTest();
+		ret.blendType = mat->GetBlendType();
 	}
 	else
 	{
-		ret.meshColor = float4(0.6f, 0.6f, 0.6f, 1.0f);
+		ret.meshColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	return ret;
 }

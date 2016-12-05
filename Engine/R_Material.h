@@ -4,12 +4,13 @@
 #include "R_Resource.h"
 #include "R_Texture.h"
 #include "ModuleResourceManager.h"
+#include "Mesh_RenderInfo.h"
 
 class R_Material : public Resource
 {
 public:
-	R_Material() :Resource() { }
-	R_Material(uint64_t UID) : Resource(UID) {}
+	R_Material() :Resource() { alphaTest = 0.2f; }
+	R_Material(uint64_t UID) : Resource(UID) { alphaTest = 0.2f; }
 
 	~R_Material()
 	{
@@ -27,6 +28,10 @@ public:
 	float color[5] = { 1.0f, 1.0f, 1.0f,1.0f };
 
 	std::vector<uint64_t> textures;
+
+	AlphaTestTypes alphaType = AlphaTestTypes::ALPHA_OPAQUE;
+	int blendType = GL_ONE_MINUS_SRC_ALPHA;
+	float alphaTest;
 
 };
 
