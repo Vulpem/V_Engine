@@ -20,7 +20,7 @@ void Material::EditorContent()
 	int alphaType = GetAlphaType();
 	int prevAlphaType = alphaType;
 	ImGui::RadioButton("Opaque", &alphaType, AlphaTestTypes::ALPHA_OPAQUE); ImGui::SameLine();
-	ImGui::RadioButton("Discard", &alphaType, AlphaTestTypes::ALPHA_DISCARD); ImGui::SameLine();
+	ImGui::RadioButton("AlphaTest", &alphaType, AlphaTestTypes::ALPHA_DISCARD); ImGui::SameLine();
 	ImGui::RadioButton("Blend", &alphaType, AlphaTestTypes::ALPHA_BLEND);
 	if (alphaType != prevAlphaType)
 	{
