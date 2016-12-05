@@ -26,11 +26,13 @@ public:
 	void OnScreenResize(int width, int heigth);
 	void UpdateProjectionMatrix(Camera* cam);
 
+	void RenderBlendObjects();
+
 	void DrawLine(float3 a, float3 b, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawBox(float3* corners, float4 color = float4(1.0f, 1.0f, 0.6f, 1.0f));
 	void DrawLocator(float4x4 transform = float4x4::identity, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
 	void DrawLocator(float3 position, float4 color = float4(0.1f, 0.58f, 0.2f, 1.0f));
-	void DrawMesh(Mesh_RenderInfo& meshInfo);
+	void DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends = false);
 
 	viewPort* HoveringViewPort();
 	float2 ViewPortToScreen(const float2& pos_in_ViewPort, viewPort** OUT_port = NULL);
@@ -50,6 +52,8 @@ public:
 	Light lights[MAX_LIGHTS];
 
 private:
+	std::vector<Mesh_RenderInfo> alphaObjects;
+
 	SDL_GLContext context;
 
 	//Only for read access

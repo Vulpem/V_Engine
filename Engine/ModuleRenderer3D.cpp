@@ -200,6 +200,7 @@ update_status ModuleRenderer3D::PostUpdate()
 			{
 				SetViewPort(*port);
 				App->Render(*port);
+				RenderBlendObjects();
 			}
 			TIMER_READ_MS_MAX("ViewPorts slowest");
 		}
@@ -240,6 +241,16 @@ void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 	glLoadIdentity();
 	glLoadMatrixf(cam->GetProjectionMatrix().ptr());
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void ModuleRenderer3D::RenderBlendObjects()
+{
+	std::vector<Mesh_RenderInfo>::iterator it = alphaObjects.begin();
+	for (; it != alphaObjects.end(); it++)
+	{
+		DrawMesh(*it, true);
+	}
+	alphaObjects.clear();
 }
 
 void ModuleRenderer3D::DrawLine(float3 a, float3 b, float4 color)
@@ -327,8 +338,13 @@ void ModuleRenderer3D::DrawLocator(float3 position, float4 color)
 	App->renderer3D->DrawLocator((float4x4::FromTRS(position, float4x4::identity, float3(1, 1, 1))).Transposed(), color);
 }
 
-void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo)
+void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 {
+	if (meshInfo.blendType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
+	{
+		alphaObjects.push_back(meshInfo);
+		return;
+	}
 	glPushMatrix();
 	glMultMatrixf(meshInfo.transform.ptr());
 
