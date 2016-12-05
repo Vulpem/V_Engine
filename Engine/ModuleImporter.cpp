@@ -132,7 +132,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 				const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_GO, "RootNode");
 				if (inf) { uid = inf->uid; }
 			}
-			ret = ImportGameObject(filePath, scene->mRootNode, scene, uid);
+			ret = ImportGameObject(filePath, scene->mRootNode, scene, uid, overWritting);
 		}
 		if (scene)
 		{
@@ -144,6 +144,7 @@ std::vector<MetaInf> ModuleImporter::Import3dScene(const char * filePath, bool o
 	else
 	{
 		LOG("Error loading scene %s", filePath);
+		LOG("%s", aiGetErrorString());
 	}
 	return ret;
 }

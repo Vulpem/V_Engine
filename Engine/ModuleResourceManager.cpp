@@ -313,8 +313,6 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
-		if (App->importer->FileFormat(filesToCheck.front().data()).compare(SCENE_FORMAT) == 0)
-		{
 			totalFiles++;
 			bool wantToImport = false;
 			bool overwrite = false;
@@ -372,7 +370,6 @@ void ModuleResourceManager::Refresh()
 			{
 				//LOG("Up to date: %s", filesToCheck.front().data());
 			}
-		}
 		filesToCheck.pop();
 	}
 
