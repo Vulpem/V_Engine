@@ -313,6 +313,9 @@ void ModuleResourceManager::Refresh()
 
 	while (filesToCheck.empty() == false)
 	{
+		std::string tmp("." + App->importer->FileFormat(filesToCheck.front().data()));
+		if (tmp != SCENE_FORMAT)
+		{
 			totalFiles++;
 			bool wantToImport = false;
 			bool overwrite = false;
@@ -370,6 +373,7 @@ void ModuleResourceManager::Refresh()
 			{
 				//LOG("Up to date: %s", filesToCheck.front().data());
 			}
+		}
 		filesToCheck.pop();
 	}
 
