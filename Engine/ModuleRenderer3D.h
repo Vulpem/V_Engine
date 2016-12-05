@@ -4,6 +4,7 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Light.h"
+#include <map>
 
 #define MAX_LIGHTS 8
 
@@ -52,7 +53,8 @@ public:
 	Light lights[MAX_LIGHTS];
 
 private:
-	std::vector<Mesh_RenderInfo> alphaObjects;
+	std::map<float, Mesh_RenderInfo> alphaObjects;
+	viewPort* currentViewPort = nullptr;
 
 	SDL_GLContext context;
 

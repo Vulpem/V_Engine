@@ -5,6 +5,9 @@
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
 
+#include "GameObject.h"
+#include "Transform.h"
+
 #include "Camera.h"
 #include "imGUI\imgui.h"
 
@@ -245,10 +248,10 @@ void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 
 void ModuleRenderer3D::RenderBlendObjects()
 {
-	std::vector<Mesh_RenderInfo>::iterator it = alphaObjects.begin();
-	for (; it != alphaObjects.end(); it++)
+	std::map<float, Mesh_RenderInfo>::reverse_iterator it = alphaObjects.rbegin();
+	for (; it != alphaObjects.rend(); it++)
 	{
-		DrawMesh(*it, true);
+		DrawMesh(it->second, true);
 	}
 	alphaObjects.clear();
 }
@@ -340,9 +343,14 @@ void ModuleRenderer3D::DrawLocator(float3 position, float4 color)
 
 void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 {
-	if (meshInfo.blendType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
+	if (meshInfo.alphaType == AlphaTestTypes::ALPHA_BLEND && renderBlends == false)
 	{
-		alphaObjects.push_back(meshInfo);
+		//TMP / TODO
+		//This is pretty inaccurate and probably not optimized. But, hey, it works. Sometimes. Maybe.
+		float3 objectPos = meshInfo.transform.Transposed().TranslatePart();
+		float distanceToObject = currentViewPort->camera->object->GetTransform()->GetGlobalPos().Distance(objectPos);
+
+		alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
 		return;
 	}
 	glPushMatrix();
@@ -491,6 +499,7 @@ bool ModuleRenderer3D::DeleteViewPort(uint ID)
 
 void ModuleRenderer3D::SetViewPort(viewPort& port)
 {
+	currentViewPort = &port;
 	port.SetCameraMatrix();
 	glViewport(port.pos.x, App->window->GetWindowSize().y - (port.size.y + port.pos.y), port.size.x, port.size.y);
 	UpdateProjectionMatrix(port.camera);
