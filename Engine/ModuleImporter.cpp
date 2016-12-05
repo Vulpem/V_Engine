@@ -185,7 +185,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 
 			if (newSize > 0)
 			{
-				data = new ILubyte[size]; // allocate data buffer
+				data = new ILubyte[newSize]; // allocate data buffer
 
 				ilEnable(IL_FILE_OVERWRITE);
 				if (ilSaveL(IL_DDS, data, newSize) > 0)
@@ -939,7 +939,7 @@ R_Material* ModuleImporter::LoadMaterial(const char * resName)
 		char filePath[526];
 		sprintf(filePath, "Library/Materials/%llu%s", inf->uid, MATERIAL_FORMAT);
 
-		LOG("Loading material %s", inf->name);
+		LOG("Loading material %s", inf->name.data());
 
 		if (App->fs->Exists(filePath))
 		{
