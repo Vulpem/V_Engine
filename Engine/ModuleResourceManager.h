@@ -127,6 +127,8 @@ public:
 
 	//Returns all loaded resources. Pretty slow, for debugging use only
 	const std::vector<Resource*> ReadLoadedResources() const;
+
+	const std::vector<std::string> GetAvaliableResources(Component::Type type = Component::Type::C_None);
 };
 
 #endif

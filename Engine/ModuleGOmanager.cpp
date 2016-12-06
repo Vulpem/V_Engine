@@ -136,6 +136,19 @@ update_status ModuleGoManager::PostUpdate()
 			comp->second->PostUpdate();
 		}
 	}
+
+	comp = components.begin();
+	for (; comp != components.end(); comp++)
+	{
+		if (comp->second->object->IsActive())
+		{
+			if (comp->second->TryDeleteNow())
+			{
+				break;
+			}
+		}
+	}
+
 	TIMER_READ_MS("Components PostUpdate");
 
 	TIMER_RESET_STORED("Cam culling longest");
@@ -143,7 +156,7 @@ update_status ModuleGoManager::PostUpdate()
 
 	bool worked = false;
 
-	if (wantToSaveScene&& worked == false)
+	if (wantToSaveScene && worked == false)
 	{
 		worked = true;
 		TIMER_START_PERF("Saving Scene");
@@ -555,11 +568,14 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 	if (getFrom->object->HasComponent(Component::Type::C_material))
 	{
 		Material* mat = getFrom->object->GetComponent<Material>().front();
-		ret.meshColor = mat->GetColor();
-		ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
-		ret.alphaType = mat->GetAlphaType();
-		ret.alphaTest = mat->GetAlphaTest();
-		ret.blendType = mat->GetBlendType();
+		if (mat->toDelete == false)
+		{
+			ret.meshColor = mat->GetColor();
+			ret.textureBuffer = mat->GetTexture(getFrom->texMaterialIndex);
+			ret.alphaType = mat->GetAlphaType();
+			ret.alphaTest = mat->GetAlphaTest();
+			ret.blendType = mat->GetBlendType();
+		}
 	}
 	else
 	{
@@ -650,15 +666,18 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			{
 				for (std::vector<mesh*>::iterator mesh = meshes.begin(); mesh != meshes.end(); mesh++)
 				{
-					TIMER_START("Mesh slowest");
-					Mesh_RenderInfo info = GetMeshData(*mesh);
-					if (port.useOnlyWires)
+					if ((*mesh)->IsEnabled() && (*mesh)->toDelete == false)
 					{
-						info.filled = false;
-						info.wired = true;
+						TIMER_START("Mesh slowest");
+						Mesh_RenderInfo info = GetMeshData(*mesh);
+						if (port.useOnlyWires)
+						{
+							info.filled = false;
+							info.wired = true;
+						}
+						App->renderer3D->DrawMesh(info);
+						TIMER_READ_MS_MAX("Mesh slowest");
 					}
-					App->renderer3D->DrawMesh(info);
-					TIMER_READ_MS_MAX("Mesh slowest");
 				}
 			}
 		}

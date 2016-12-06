@@ -104,7 +104,7 @@ void mesh::EditorContent()
 {
 	const R_mesh* res = ReadRes<R_mesh>();
 	char tmp[48];
-	sprintf(tmp, "Wireframe##%i", id);
+	sprintf(tmp, "Wireframe##%llu", uid);
 	ImGui::Checkbox(tmp, &wires);
 	ImGui::NewLine();
 	ImGui::Text("Resource: %s", res->name.data());
@@ -126,7 +126,7 @@ void mesh::EditorContent()
 	ImGui::Text("Buffer: %i", res->id_textureCoords);
 	ImGui::Separator();
 	ImGui::Text("Texture index material:");
-	sprintf(tmp, "##MaterialID%i", id);
+	sprintf(tmp, "##MaterialID%llu", uid);
 	ImGui::InputInt(tmp, &texMaterialIndex);
 }
 

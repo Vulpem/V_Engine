@@ -77,11 +77,15 @@ public:
 	const char* GetName();
 
 	Component* AddComponent(Component::Type type, std::string res = std::string(""), bool forceCreation = false);
+
 	bool HasComponent(Component::Type type);
 	uint AmountOfComponent(Component::Type type);
 	Transform* GetTransform();
 
 	void Save(pugi::xml_node& node);
+
+	//For system use, do not call please
+	void RemoveComponent(Component* comp);
 
 #pragma region GetComponents
 	//GetComponent function

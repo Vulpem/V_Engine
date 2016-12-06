@@ -57,15 +57,20 @@ protected:
 public:
 	const uint64_t GetUID() { return uid; }
 
+	void Delete();
+
+	//For system use, do not call
+	bool TryDeleteNow();
+
 	std::string name;
+
+	bool toDelete = false;
 
 	GameObject* object;
 protected:
-	int id = -1;
 	uint64_t uid;
 private:
 	bool enabled = true;
-
 };
 
 #endif

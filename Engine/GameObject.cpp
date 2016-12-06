@@ -107,7 +107,35 @@ void GameObject::DrawOnEditor()
 {
 	if (ImGui::BeginPopup("Add Component"))
 	{
-		if (ImGui::Button("Camera##add"))
+		if (ImGui::BeginMenu("Mesh##add"))
+		{
+			std::vector<std::string> meshRes = App->resources->GetAvaliableResources(Component::Type::C_mesh);
+			std::vector<std::string>::iterator it = meshRes.begin();
+			for (; it != meshRes.end(); it++)
+			{
+				if (ImGui::MenuItem(it->data()))
+				{
+					AddComponent(Component::Type::C_mesh, *it);
+					break;
+				}
+			}
+			ImGui::EndMenu();
+		}
+		/*if (ImGui::BeginMenu("Material##add"))
+		{
+			std::vector<std::string> meshRes = App->resources->GetAvaliableResources(Component::Type::C_material);
+			std::vector<std::string>::iterator it = meshRes.begin();
+			for (; it != meshRes.end(); it++)
+			{
+				if (ImGui::MenuItem(it->data()))
+				{
+					AddComponent(Component::Type::C_material, *it);
+					break;
+				}
+			}
+			ImGui::EndMenu();
+		}*/
+		if (ImGui::MenuItem("Camera##add"))
 		{
 			AddComponent(Component::Type::C_camera);
 		}
@@ -305,23 +333,23 @@ void GameObject::SetActive(bool state, bool justPublic)
 	}
 	publicActive = state;
 
-		std::vector<GameObject*>::iterator childIt = childs.begin();
-		while (childIt != childs.end())
-		{
-			(*childIt)->SetActive(state, true);
-			childIt++;
-		}
+std::vector<GameObject*>::iterator childIt = childs.begin();
+while (childIt != childs.end())
+{
+	(*childIt)->SetActive(state, true);
+	childIt++;
+}
 
-	if (justPublic)
-	{		
-		return;
-	}
-	active = state;
+if (justPublic)
+{
+	return;
+}
+active = state;
 
-	if(state == true && parent)
-	{
-		parent->SetActive(true);
-	}
+if (state == true && parent)
+{
+	parent->SetActive(true);
+}
 }
 
 bool GameObject::IsActive()
@@ -330,7 +358,7 @@ bool GameObject::IsActive()
 	{
 		return false;
 	}
-	return publicActive; 
+	return publicActive;
 }
 
 
@@ -353,14 +381,14 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 	{
 		if (HasComponent(Component::C_transform) == false)
 		{
-			toAdd = new Transform(this, components.size()); 
+			toAdd = new Transform(this, components.size());
 			transform = (Transform*)toAdd;
 		}
 		break;
 	}
 	case Component::Type::C_mesh:
 	{
-		toAdd = new mesh(res ,this, components.size());
+		toAdd = new mesh(res, this, components.size());
 		break;
 	}
 	case Component::Type::C_material:
@@ -388,6 +416,10 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 			HasComponents[toAdd->GetType()] += 1;
 			components.push_back(toAdd);
 			App->GO->components.insert(std::pair<Component::Type, Component*>(toAdd->GetType(), toAdd));
+			if (toAdd->GetType() == Component::Type::C_mesh)
+			{
+				SetOriginalAABB();
+			}
 		}
 		else
 		{
@@ -443,6 +475,30 @@ void GameObject::Save(pugi::xml_node& node)
 		for (std::vector<GameObject*>::iterator it = childs.begin(); it != childs.end(); it++)
 		{
 			(*it)->Save(node);
+		}
+	}
+}
+
+void GameObject::RemoveComponent(Component * comp)
+{
+	std::vector<Component*>::iterator it = components.begin();
+	for (; it != components.end(); it++)
+	{
+		if ((*it) == comp)
+		{
+			std::map<Component::Type, Component*>::iterator mapIt = App->GO->components.find((*it)->GetType());
+			for (; mapIt != App->GO->components.end() && mapIt->first == (*it)->GetType(); mapIt++)
+			{
+				if (mapIt->second == comp)
+				{
+					App->GO->components.erase(mapIt);
+					break;
+				}
+			}
+			HasComponents[(*it)->GetType()] -= 1;
+			RELEASE(*it);
+			components.erase(it);
+			return;
 		}
 	}
 }

@@ -734,6 +734,31 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 	return ret;
 }
 
+const std::vector<std::string> ModuleResourceManager::GetAvaliableResources(Component::Type type)
+{
+	std::vector<std::string> ret;
+
+	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.begin();
+	for (;f != metaData.end();f++)
+	{
+		std::multimap<Component::Type, MetaInf> ::iterator it;
+		if (type != Component::Type::C_None)
+		{
+			it = f->second.find(type);
+		}
+		else
+		{
+			it = f->second.begin();
+		}
+
+		for (;it != f->second.end() && (it->first == type || type == Component::Type::C_None); it++)
+		{
+			ret.push_back(it->second.name);
+		}
+	}
+	return ret;
+}
+
 R_Folder::R_Folder(const char* name, R_Folder* parent) : name(name)
 {
 	if (parent != nullptr)

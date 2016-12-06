@@ -9,7 +9,6 @@
 Component::Component(GameObject* linkedTo, int _id, Component::Type type): name("Empty component"), type(type)
 {
 	object = linkedTo;
-	id = _id;
 	uid = GenerateUUID();
 }
 
@@ -39,14 +38,23 @@ void Component::Disable()
 void Component::DrawOnEditor()
 {
 	bool active = enabled;
-	char _id[56];
-	sprintf(_id, "##checkbox%i", id);
+	char _id[256];
+	sprintf(_id, "##checkbox%llu", uid);
 	ImGui::Checkbox(_id, &active);
-	ImGui::SameLine();
+
+	if (GetType() != Component::C_transform)
+	{
+		ImGui::SameLine(ImGui::GetWindowWidth() - 50);
+		sprintf(_id, "X##RemoveComponent%llu", uid);
+		if (ImGui::Button(_id, ImVec2(25, 20)))
+		{
+			Delete();
+		}
+	}
+
+	ImGui::SameLine(30);
 	bool open = ImGui::CollapsingHeader(name.data());
-	
-	ImGui::SameLine(ImGui::GetWindowWidth() - 60);
-	ImGui::Text("ID: %i", id);
+
 	if (active != enabled)
 	{
 		if (active)
@@ -92,9 +100,23 @@ void Component::Save(pugi::xml_node& myNode)
 	node.append_attribute("name") = tmpName;
 	node.append_attribute("UID") = uid;
 	node.append_attribute("type") = type;
-	node.append_attribute("id") = id;
 	node.append_attribute("GO") = object->GetUID();
 	node.append_attribute("enabled") = IsEnabled();
 
 	SaveSpecifics(myNode.append_child("Specific"));
+}
+
+void Component::Delete()
+{
+	toDelete = true;
+}
+
+bool Component::TryDeleteNow()
+{
+	if (toDelete)
+	{
+		object->RemoveComponent(this);
+		return true;
+	}
+	return false;
 }
