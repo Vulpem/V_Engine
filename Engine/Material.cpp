@@ -92,6 +92,22 @@ void Material::EditorContent()
 	{
 		ImGui::Separator();
 		char tmp[524];
+		sprintf(tmp, "X##%u", n);
+		if (ImGui::Button(tmp))
+		{
+			std::vector<uint64>::iterator it = ReadRes<R_Material>()->textures.begin();
+			for (int m = 0; it != ReadRes<R_Material>()->textures.end(); it++)
+			{
+				if (m == n)
+				{
+					App->resources->UnlinkResource(ReadRes<R_Material>()->textures[m]);
+					ReadRes<R_Material>()->textures.erase(it);
+					break;
+				}
+				m++;
+			}
+		}
+		ImGui::SameLine();
 		sprintf(tmp, "Id: %i    %s",n , App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->name.data());
 		if (ImGui::TreeNode(tmp))
 		{
@@ -99,7 +115,7 @@ void Material::EditorContent()
 			ImGui::Image(image, ImVec2(270,270));
 
 			ImGui::TreePop();
-		}		
+		}				
 	}
 }
 
