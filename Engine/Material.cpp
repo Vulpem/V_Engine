@@ -16,6 +16,27 @@ Material::Material(std::string res, GameObject* linkedTo, int id) : ResourcedCom
 
 void Material::EditorContent()
 {
+#pragma region AddTexturePopup
+	if (ImGui::BeginPopup("Add New Texture"))
+	{
+		std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_Texture);
+		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
+		for (; fileIt != meshRes.end(); fileIt++)
+		{
+			if (ImGui::MenuItem(fileIt->first.data()))
+			{
+				ReadRes<R_Material>()->textures.push_back(App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
+				break;
+			}
+		}
+		ImGui::EndPopup();
+	}
+#pragma endregion
+
+	if (ImGui::Button("Add new texture##AddTextureButton"))
+	{
+		ImGui::OpenPopup("Add New Texture");
+	}
 	ImGui::Text("Blend type:");
 	int alphaType = GetAlphaType();
 	int prevAlphaType = alphaType;

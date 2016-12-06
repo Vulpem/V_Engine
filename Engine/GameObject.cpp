@@ -109,32 +109,55 @@ void GameObject::DrawOnEditor()
 	{
 		if (ImGui::BeginMenu("Mesh##add"))
 		{
-			std::vector<std::string> meshRes = App->resources->GetAvaliableResources(Component::Type::C_mesh);
-			std::vector<std::string>::iterator it = meshRes.begin();
-			for (; it != meshRes.end(); it++)
+			std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_mesh);
+			std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
+			for (; fileIt != meshRes.end(); fileIt++)
 			{
-				if (ImGui::MenuItem(it->data()))
+				if (ImGui::BeginMenu(fileIt->first.data()))
 				{
-					AddComponent(Component::Type::C_mesh, *it);
-					break;
+					std::vector<std::string>::iterator it = fileIt->second.begin();
+					for (; it != fileIt->second.end(); it++)
+					{
+						if (ImGui::MenuItem(it->data()))
+						{
+							AddComponent(Component::Type::C_mesh, *it);
+							break;
+						}
+					}
+					ImGui::EndMenu();
 				}
 			}
 			ImGui::EndMenu();
 		}
-		/*if (ImGui::BeginMenu("Material##add"))
+		if (ImGui::BeginMenu("Material##add"))
 		{
-			std::vector<std::string> meshRes = App->resources->GetAvaliableResources(Component::Type::C_material);
-			std::vector<std::string>::iterator it = meshRes.begin();
-			for (; it != meshRes.end(); it++)
+			if (HasComponent(Component::Type::C_material))
 			{
-				if (ImGui::MenuItem(it->data()))
+				ImGui::Text("Already has a material!");
+			}
+			else
+			{
+				std::vector<std::pair<std::string, std::vector<std::string>>> meshRes = App->resources->GetAvaliableResources(Component::Type::C_material);
+				std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = meshRes.begin();
+				for (; fileIt != meshRes.end(); fileIt++)
 				{
-					AddComponent(Component::Type::C_material, *it);
-					break;
+					if (ImGui::BeginMenu(fileIt->first.data()))
+					{
+						std::vector<std::string>::iterator it = fileIt->second.begin();
+						for (; it != fileIt->second.end(); it++)
+						{
+							if (ImGui::MenuItem(it->data()))
+							{
+								AddComponent(Component::Type::C_material, *it);
+								break;
+							}
+						}
+						ImGui::EndMenu();
+					}
 				}
 			}
 			ImGui::EndMenu();
-		}*/
+		}
 		if (ImGui::MenuItem("Camera##add"))
 		{
 			AddComponent(Component::Type::C_camera);

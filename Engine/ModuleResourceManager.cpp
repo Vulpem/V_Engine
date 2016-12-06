@@ -734,13 +734,14 @@ const std::vector<Resource*> ModuleResourceManager::ReadLoadedResources() const
 	return ret;
 }
 
-const std::vector<std::string> ModuleResourceManager::GetAvaliableResources(Component::Type type)
+std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceManager::GetAvaliableResources(Component::Type type)
 {
-	std::vector<std::string> ret;
+	std::vector<std::pair<std::string, std::vector<std::string>>> ret;
 
 	std::map<std::string, std::multimap<Component::Type, MetaInf>>::iterator f = metaData.begin();
 	for (;f != metaData.end();f++)
 	{
+		std::vector<std::string> thisFile;
 		std::multimap<Component::Type, MetaInf> ::iterator it;
 		if (type != Component::Type::C_None)
 		{
@@ -753,7 +754,11 @@ const std::vector<std::string> ModuleResourceManager::GetAvaliableResources(Comp
 
 		for (;it != f->second.end() && (it->first == type || type == Component::Type::C_None); it++)
 		{
-			ret.push_back(it->second.name);
+			thisFile.push_back(it->second.name);
+		}
+		if (thisFile.empty() == false)
+		{
+			ret.push_back(std::pair<std::string, std::vector<std::string>>(f->first, thisFile));
 		}
 	}
 	return ret;

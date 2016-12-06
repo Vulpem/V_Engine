@@ -112,7 +112,7 @@ public:
 
 	//Link a resource to a new Resourced Component. Use only once per reference
 	Resource* LinkResource(uint64_t uid) ;
-	uint64_t LinkResource(std::string fileName, Component::Type type);
+	uint64_t LinkResource(std::string resName, Component::Type type);
 
 	//Unlink a resource from a Resourced Component. Use only once per reference
 	void UnlinkResource(Resource* res);
@@ -128,7 +128,11 @@ public:
 	//Returns all loaded resources. Pretty slow, for debugging use only
 	const std::vector<Resource*> ReadLoadedResources() const;
 
-	const std::vector<std::string> GetAvaliableResources(Component::Type type = Component::Type::C_None);
+	//Return explanation
+	//Returns a vector of pairs:
+	// -first is the file name
+	// -Second is the vector of resources from that file
+	std::vector<std::pair<std::string, std::vector<std::string>>> GetAvaliableResources(Component::Type type = Component::Type::C_None);
 };
 
 #endif
