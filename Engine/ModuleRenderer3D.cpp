@@ -21,8 +21,6 @@
 #pragma comment (lib, "Glew/libx86/glew32.lib") /* link Microsoft OpenGL lib   */
 
 
-
-
 ModuleRenderer3D::ModuleRenderer3D(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	moduleName = "ModuleRenderer3D";
@@ -248,7 +246,7 @@ void ModuleRenderer3D::UpdateProjectionMatrix(Camera* cam)
 
 void ModuleRenderer3D::RenderBlendObjects()
 {
-	std::map<float, Mesh_RenderInfo>::reverse_iterator it = alphaObjects.rbegin();
+	std::multimap<float, Mesh_RenderInfo>::reverse_iterator it = alphaObjects.rbegin();
 	for (; it != alphaObjects.rend(); it++)
 	{
 		DrawMesh(it->second, true);

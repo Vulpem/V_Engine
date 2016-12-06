@@ -53,7 +53,7 @@ public:
 	Light lights[MAX_LIGHTS];
 
 private:
-	std::map<float, Mesh_RenderInfo> alphaObjects;
+	std::multimap<float, Mesh_RenderInfo> alphaObjects;
 	viewPort* currentViewPort = nullptr;
 
 	SDL_GLContext context;
