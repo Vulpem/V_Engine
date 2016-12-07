@@ -11,10 +11,10 @@
 
 //------------------------- MESH --------------------------------------------------------------------------------
 
-mesh::mesh(std::string resource, GameObject* linkedTo, int id): ResourcedComponent(resource, linkedTo, id, C_mesh)
+mesh::mesh(std::string resource, GameObject* linkedTo): ResourcedComponent(resource, linkedTo, C_mesh)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Mesh##%i", id);
+	sprintf(tmp, "Mesh##%i", uid);
 	name = tmp;
 
 	texMaterialIndex = object->AmountOfComponent(Component::Type::C_mesh);

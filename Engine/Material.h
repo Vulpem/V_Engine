@@ -7,7 +7,9 @@
 class Material :public ResourcedComponent
 {
 public:
-	Material(std::string res, GameObject* linkedTo, int id);
+	Material(std::string res, GameObject* linkedTo);
+
+	void PreUpdate();
 
 	void EditorContent();
 
@@ -30,6 +32,10 @@ public:
 
 	int GetBlendType();
 	void SetBlendType(int blendType);
+
+	std::vector<uint> texturesToRemove;
+
+	void RemoveTexturesNow();
 };
 
 #endif

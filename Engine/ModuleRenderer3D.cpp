@@ -399,12 +399,14 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.textureCoordsBuffer > 0)
 	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		//Setting texture coords
-		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.textureCoordsBuffer);
-		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
-		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
+		if (meshInfo.textureBuffer > 0)
+		{
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			//Setting texture coords
+			glBindBuffer(GL_ARRAY_BUFFER, meshInfo.textureCoordsBuffer);
+			glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+			glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
+		}
 	}
 
 	if (meshInfo.filled)

@@ -10,7 +10,7 @@ class math::Quat;
 class Transform : public Component
 {
 public:
-	Transform(GameObject* linkedTo, int id);
+	Transform(GameObject* linkedTo);
 	~Transform();
 
 	bool allowRotation = true;

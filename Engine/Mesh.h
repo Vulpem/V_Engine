@@ -8,7 +8,7 @@ struct Mesh_RenderInfo;
 class mesh : public  ResourcedComponent
 {
 public:
-	mesh(std::string resource, GameObject* linkedTo, int id);
+	mesh(std::string resource, GameObject* linkedTo);
 
 public:
 	int texMaterialIndex = -1;

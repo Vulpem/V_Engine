@@ -19,12 +19,13 @@ public:
 		C_material,
 		C_Texture,
 		C_camera,
+		C_Billboard,
 
 		//Keep this "C_None" always last
 		C_None
 	};
 
-	Component(GameObject* linkedTo, int id, Component::Type type);
+	Component(GameObject* linkedTo, Component::Type type);
 	virtual ~Component();
 	
 	virtual void Enable();

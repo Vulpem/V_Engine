@@ -6,7 +6,7 @@
 
 #include "ImGui\imgui.h"
 
-Component::Component(GameObject* linkedTo, int _id, Component::Type type): name("Empty component"), type(type)
+Component::Component(GameObject* linkedTo, Component::Type type): name("Empty component"), type(type)
 {
 	object = linkedTo;
 	uid = GenerateUUID();

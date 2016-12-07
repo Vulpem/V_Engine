@@ -162,6 +162,13 @@ void GameObject::DrawOnEditor()
 		{
 			AddComponent(Component::Type::C_camera);
 		}
+		if (HasComponent(Component::Type::C_Billboard) == false)
+		{
+			if (ImGui::MenuItem("Billboard##add"))
+			{
+				AddComponent(Component::Type::C_Billboard);
+			}
+		}
 		ImGui::EndPopup();
 	}
 
@@ -404,21 +411,21 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 	{
 		if (HasComponent(Component::C_transform) == false)
 		{
-			toAdd = new Transform(this, components.size());
+			toAdd = new Transform(this);
 			transform = (Transform*)toAdd;
 		}
 		break;
 	}
 	case Component::Type::C_mesh:
 	{
-		toAdd = new mesh(res, this, components.size());
+		toAdd = new mesh(res, this);
 		break;
 	}
 	case Component::Type::C_material:
 	{
 		if (HasComponent(Component::C_material) == false)
 		{
-			toAdd = new Material(res, this, components.size());
+			toAdd = new Material(res, this);
 		}
 		break;
 	}
@@ -426,7 +433,15 @@ Component* GameObject::AddComponent(Component::Type type, std::string res, bool 
 	{
 		if (HasComponent(Component::Type::C_transform))
 		{
-			toAdd = new Camera(this, components.size());
+			toAdd = new Camera(this);
+		}
+		break;
+	}
+	case Component::Type::C_Billboard:
+	{
+		if (HasComponent(Component::C_Billboard) == false)
+		{
+			toAdd = new Billboard(this);
 		}
 		break;
 	}

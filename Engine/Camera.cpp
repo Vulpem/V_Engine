@@ -13,10 +13,10 @@
 
 //------------------------- Camera --------------------------------------------------------------------------------
 
-Camera::Camera(GameObject* linkedTo, int id):Component(linkedTo, id, C_camera)
+Camera::Camera(GameObject* linkedTo):Component(linkedTo, C_camera)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Camera##%i", id);
+	sprintf(tmp, "Camera##%i", uid);
 	name = tmp;
 
 	positionOffset = float3::zero;

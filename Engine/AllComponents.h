@@ -7,5 +7,6 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include "Camera.h"
+#include "Billboard.h"
 
 #endif

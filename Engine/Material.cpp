@@ -7,11 +7,16 @@
 
 #include "imGUI\imgui.h"
 
-Material::Material(std::string res, GameObject* linkedTo, int id) : ResourcedComponent(res, linkedTo, id, C_material)
+Material::Material(std::string res, GameObject* linkedTo) : ResourcedComponent(res, linkedTo, C_material)
 {
 	char tmp[NAME_MAX_LEN];
-	sprintf(tmp, "Material##%i", id);
+	sprintf(tmp, "Material##%i", uid);
 	name = tmp;
+}
+
+void Material::PreUpdate()
+{
+	RemoveTexturesNow();
 }
 
 void Material::EditorContent()
@@ -98,17 +103,7 @@ void Material::EditorContent()
 			sprintf(tmp, "X##%u", n);
 			if (ImGui::Button(tmp))
 			{
-				std::vector<uint64>::iterator it = matRes->textures.begin();
-				for (int m = 0; it != matRes->textures.end(); it++)
-				{
-					if (m == n)
-					{
-						App->resources->UnlinkResource(matRes->textures[m]);
-						matRes->textures.erase(it);
-						return;
-					}
-					m++;
-				}
+				texturesToRemove.push_back(n);
 			}
 			Resource* resText = App->resources->Peek(matRes->textures.at(n));
 			if (resText != nullptr)
@@ -162,7 +157,7 @@ uint Material::NofTextures()
 
 int Material::GetTexture(uint n)
 {
-	if (IsEnabled())
+	if (IsEnabled() && texturesToRemove.empty() == true)
 	{
 		if (n >= 0 && n < ReadRes<R_Material>()->textures.size())
 		{
@@ -177,7 +172,7 @@ int Material::GetTexture(uint n)
 			}
 		}
 	}
-	return -1;
+	return 0;
 }
 
 void Material::SetColor(float r, float g, float b, float a)
@@ -221,4 +216,30 @@ int Material::GetBlendType()
 void Material::SetBlendType(int blendType)
 {
 	ReadRes<R_Material>()->blendType = blendType;
+}
+
+void Material::RemoveTexturesNow()
+{
+	if (texturesToRemove.empty() == false)
+	{
+		R_Material* matRes = ReadRes<R_Material>();
+		if (matRes != nullptr)
+		{
+			for (int n = 0; n < texturesToRemove.size(); n++)
+			{
+				std::vector<uint64>::iterator it = matRes->textures.begin();
+				for (int m = 0; it != matRes->textures.end(); it++)
+				{
+					if (m == texturesToRemove[n])
+					{
+						App->resources->UnlinkResource(matRes->textures[m]);
+						matRes->textures.erase(it);
+						break;
+					}
+					m++;
+				}
+			}
+		}
+		texturesToRemove.clear();
+	}
 }

@@ -13,7 +13,7 @@ enum FrustumCollision
 class Camera : public  Component
 {
 public:
-	Camera(GameObject* linkedTo, int id);
+	Camera(GameObject* linkedTo);
 	~Camera();
 
 	void PreUpdate();

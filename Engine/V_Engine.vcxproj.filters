@@ -417,6 +417,9 @@
     <ClInclude Include="ResourcedComponent.h">
       <Filter>Sources\GameObjects\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Billboard.h">
+      <Filter>Sources\GameObjects\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
@@ -621,6 +624,9 @@
       <Filter>Sources\GameObjects\Components</Filter>
     </ClCompile>
     <ClCompile Include="ResourcedComponent.cpp">
+      <Filter>Sources\GameObjects\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Billboard.cpp">
       <Filter>Sources\GameObjects\Components</Filter>
     </ClCompile>
   </ItemGroup>
