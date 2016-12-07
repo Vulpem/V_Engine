@@ -592,6 +592,11 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 			if (comp->second->object->IsActive())
 			{
 				comp->second->Draw();
+				if (comp->second->object->HasComponent(Component::Type::C_Billboard))
+				{
+					Transform* camTransform = port.camera->object->GetTransform();
+					comp->second->object->GetComponent<Billboard>().front()->UpdateNow(camTransform->GetGlobalPos(), camTransform->Up());
+				}
 			}
 		}
 		TIMER_START("Cam culling longest");
@@ -663,15 +668,6 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 					if ((*mesh)->IsEnabled() && (*mesh)->toDelete == false)
 					{
 						TIMER_START("Mesh slowest");
-						if ((*mesh)->object->HasComponent(Component::Type::C_Billboard))
-						{
-							Billboard* bill = (*mesh)->object->GetComponent<Billboard>().front();
-							if (bill)
-							{
-								bill->UpdateNow(port.camera->object->GetTransform()->GetGlobalPos(), port.camera->object->GetTransform()->Up());
-							}
-						}
-
 						Mesh_RenderInfo info = GetMeshData(*mesh);
 						if (port.useOnlyWires)
 						{
