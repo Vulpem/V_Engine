@@ -84,38 +84,49 @@ void Material::EditorContent()
 		}
 	}
 
+	R_Material* matRes = ReadRes<R_Material>();
+
 	ImGui::NewLine();
 	ImGui::Separator();
-	ImGui::ColorEdit4("Color", ReadRes<R_Material>()->color);
-
-	for (uint n = 0; n < ReadRes<R_Material>()->textures.size(); n++)
+	ImGui::ColorEdit4("Color", matRes->color);
+	if (matRes->textures.empty() == false)
 	{
-		ImGui::Separator();
-		char tmp[524];
-		sprintf(tmp, "X##%u", n);
-		if (ImGui::Button(tmp))
+		for (uint n = 0; n < matRes->textures.size(); n++)
 		{
-			std::vector<uint64>::iterator it = ReadRes<R_Material>()->textures.begin();
-			for (int m = 0; it != ReadRes<R_Material>()->textures.end(); it++)
+			ImGui::Separator();
+			char tmp[524];
+			sprintf(tmp, "X##%u", n);
+			if (ImGui::Button(tmp))
 			{
-				if (m == n)
+				std::vector<uint64>::iterator it = matRes->textures.begin();
+				for (int m = 0; it != matRes->textures.end(); it++)
 				{
-					App->resources->UnlinkResource(ReadRes<R_Material>()->textures[m]);
-					ReadRes<R_Material>()->textures.erase(it);
-					break;
+					if (m == n)
+					{
+						App->resources->UnlinkResource(matRes->textures[m]);
+						matRes->textures.erase(it);
+						break;
+					}
+					m++;
 				}
-				m++;
+			}
+			if (matRes->textures.empty() == false)
+			{
+				Resource* res = App->resources->Peek(matRes->textures.at(n));
+				if (res != nullptr)
+				{
+					ImGui::SameLine();
+					sprintf(tmp, "Id: %i    %s", n, res->name.data());
+					if (ImGui::TreeNode(tmp))
+					{
+						ImTextureID image = (void*)App->resources->Peek(matRes->textures.at(n))->Read<R_Texture>()->bufferID;
+						ImGui::Image(image, ImVec2(270, 270));
+
+						ImGui::TreePop();
+					}
+				}
 			}
 		}
-		ImGui::SameLine();
-		sprintf(tmp, "Id: %i    %s",n , App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->name.data());
-		if (ImGui::TreeNode(tmp))
-		{
-			ImTextureID image = (void*) App->resources->Peek(ReadRes<R_Material>()->textures.at(n))->Read<R_Texture>()->bufferID;
-			ImGui::Image(image, ImVec2(270,270));
-
-			ImGui::TreePop();
-		}				
 	}
 }
 

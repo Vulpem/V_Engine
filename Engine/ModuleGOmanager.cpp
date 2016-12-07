@@ -55,7 +55,13 @@ update_status ModuleGoManager::PreUpdate()
 	std::multimap<Component::Type, Component*>::iterator comp = components.begin();
 	for (; comp != components.end(); comp++)
 	{
-		if (comp->second->object->IsActive())
+		std::multimap<Component::Type, Component*>::iterator nextIt = comp;
+		nextIt--;
+		if (comp->second->TryDeleteNow())
+		{
+			comp = nextIt;
+		}
+		else if (comp->second->object->IsActive())
 		{
 			comp->second->PreUpdate();
 		}
@@ -134,18 +140,6 @@ update_status ModuleGoManager::PostUpdate()
 		if (comp->second->object->IsActive())
 		{
 			comp->second->PostUpdate();
-		}
-	}
-
-	comp = components.begin();
-	for (; comp != components.end(); comp++)
-	{
-		if (comp->second->object->IsActive())
-		{
-			if (comp->second->TryDeleteNow())
-			{
-				break;
-			}
 		}
 	}
 
