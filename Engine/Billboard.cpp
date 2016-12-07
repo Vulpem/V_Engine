@@ -20,7 +20,7 @@ void Billboard::UpdateNow(const float3& point, const float3& _up)
 		Transform* trans = object->GetTransform();
 		float3 front = point - trans->GetGlobalPos();
 
-		float4x4 tmp = float4x4::LookAt(localForward, front, localUp, _up);
+		float4x4 tmp = float4x4::LookAt(localForward.Normalized(), front, localUp.Normalized(), _up);
 		trans->SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
 	}
 	else
