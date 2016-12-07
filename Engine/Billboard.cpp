@@ -13,18 +13,15 @@ Billboard::Billboard(GameObject* linkedTo) : Component(linkedTo, C_Billboard)
 	name = tmp;
 }
 
-void Billboard::UpdateNow(const float3& point, const float3& up)
+void Billboard::UpdateNow(const float3& point, const float3& _up)
 {
-	if (up.IsZero() == false)
+	if (_up.IsZero() == false)
 	{
-		/*Transform* trans = object->GetTransform();
+		Transform* trans = object->GetTransform();
+		float3 front = point - trans->GetGlobalPos();
 
-		float3 dir = point - trans->GetGlobalPos();
-
-
-		float4x4 tmp = float4x4::LookAt(GetGlobalPos(), Spot, float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0));
-		SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
-		UpdateEditorValues();*/
+		float4x4 tmp = float4x4::LookAt(localForward, front, localUp, _up);
+		trans->SetGlobalRot(tmp.ToEulerXYZ() * RADTODEG);
 	}
 	else
 	{
@@ -34,8 +31,10 @@ void Billboard::UpdateNow(const float3& point, const float3& up)
 
 void Billboard::EditorContent()
 {
-	ImGui::Text("I'm a billboard!");
-	ImGui::Text("Nice to meet you!");
+	ImGui::Text("Local Up");
+	ImGui::DragFloat3("##DragLocalUp", localUp.ptr(), 0.05f, -1, 1);
+	ImGui::Text("Local Forward");
+	ImGui::DragFloat3("##DragLocalFront", localForward.ptr(), 0.05f, -1, 1);
 }
 
 void Billboard::SaveSpecifics(pugi::xml_node& myNode)

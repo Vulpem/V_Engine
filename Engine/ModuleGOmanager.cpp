@@ -668,7 +668,7 @@ void ModuleGoManager::RenderGOs(const viewPort & port, const std::vector<GameObj
 							Billboard* bill = (*mesh)->object->GetComponent<Billboard>().front();
 							if (bill)
 							{
-								bill->UpdateNow(port.camera->object->GetTransform()->GetGlobalPos());
+								bill->UpdateNow(port.camera->object->GetTransform()->GetGlobalPos(), port.camera->object->GetTransform()->Up());
 							}
 						}
 
