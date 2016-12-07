@@ -105,25 +105,22 @@ void Material::EditorContent()
 					{
 						App->resources->UnlinkResource(matRes->textures[m]);
 						matRes->textures.erase(it);
-						break;
+						return;
 					}
 					m++;
 				}
 			}
-			if (matRes->textures.empty() == false)
+			Resource* resText = App->resources->Peek(matRes->textures.at(n));
+			if (resText != nullptr)
 			{
-				Resource* res = App->resources->Peek(matRes->textures.at(n));
-				if (res != nullptr)
+				ImGui::SameLine();
+				sprintf(tmp, "Id: %i    %s", n, resText->name.data());
+				if (ImGui::TreeNode(tmp))
 				{
-					ImGui::SameLine();
-					sprintf(tmp, "Id: %i    %s", n, res->name.data());
-					if (ImGui::TreeNode(tmp))
-					{
-						ImTextureID image = (void*)App->resources->Peek(matRes->textures.at(n))->Read<R_Texture>()->bufferID;
-						ImGui::Image(image, ImVec2(270, 270));
+					ImTextureID image = (void*)App->resources->Peek(matRes->textures.at(n))->Read<R_Texture>()->bufferID;
+					ImGui::Image(image, ImVec2(270, 270));
 
-						ImGui::TreePop();
-					}
+					ImGui::TreePop();
 				}
 			}
 		}
