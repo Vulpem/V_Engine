@@ -55,6 +55,6 @@ extern GlobalTime Time;
 //USED WHEN GENERATING THE QUAD TREE SIZE
 #define WORLD_WIDTH 1400
 #define WORLD_DEPTH 1400
-#define WORLD_HEIGHT 30
+#define WORLD_HEIGHT 600
 
 #endif

@@ -328,8 +328,6 @@ update_status ModuleEditor::MenuBar()
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
 			ImGui::Checkbox("InGame Plane", &showPlane);
 			ImGui::Checkbox("QuadTree", &App->GO->drawQuadTree);
-			ImGui::Checkbox("Reference Axis", &showAxis);
-
 			if (ImGui::Checkbox("Render Normals", &renderNormals))
 			{
 				SelectGameObject(selectedGameObject);

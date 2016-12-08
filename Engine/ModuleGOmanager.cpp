@@ -229,6 +229,13 @@ GameObject* ModuleGoManager::CreateCamera(const char* name)
 	return camera;
 }
 
+GameObject * ModuleGoManager::DuplicateGO(GameObject * toCopy)
+{
+	GameObject* ret = new GameObject();
+
+	return nullptr;
+}
+
 std::vector<GameObject*> ModuleGoManager::LoadGO(const char* fileName)
 {
 	GameObject* sceneRoot = App->importer->LoadVgo(fileName, "RootNode");

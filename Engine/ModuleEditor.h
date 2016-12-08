@@ -57,7 +57,6 @@ public:
 	bool IsOpenTestWindow = false;
 
 	bool showPlane = true;
-	bool showAxis = true;
 	bool renderNormals = false;
 
 	//TMP
