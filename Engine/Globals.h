@@ -22,6 +22,14 @@ void log(const char file[], int line, const char* format, ...);
 #define MESH_FORMAT ".vmesh"
 #define MATERIAL_FORMAT ".vmat"
 
+//#define SHADER_VERTEX_FORMAT ".vsv"
+//#define SHADER_FRAGMENT_FORMAT ".vsf"
+
+#define SHADER_VERTEX_FORMAT ".vertex"
+#define SHADER_FRAGMENT_FORMAT ".fragment"
+
+#define SHADER_PROGRAM_FORMAT ".vsp"
+
 #define META_FORMAT ".vmeta"
 
 typedef unsigned __int32 uint32;

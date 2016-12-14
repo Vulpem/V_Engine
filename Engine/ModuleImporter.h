@@ -19,6 +19,9 @@ class mesh;
 class R_mesh;
 class R_Material;
 class R_Texture;
+class R_ShaderProgram;
+
+enum ShaderTypes;
 
 struct MetaInf;
 
@@ -46,6 +49,8 @@ public:
 	std::vector<MetaInf> Import3dScene(const char* filePath, bool overWritting = false);
 	//Import any image to dds
 	std::vector<MetaInf> ImportImage(const char* filePath, bool overWritting = false);
+	//Compile any amount of shaders and store the resulting program in a binary precompiled file
+	std::vector<MetaInf> ImportShader(std::vector<std::string> files, std::vector<ShaderTypes> types, bool overWritting = false);
 
 private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial
@@ -54,7 +59,6 @@ private:
 	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName, uint& textureID, uint64_t uid = 0);
 	//Create a vmat from a material, with colors & texture names
 	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName, uint64_t uid = 0);
-
 public:
 
 	std::map<std::vector<uint>, uint64_t> tmp_loadedMaterials;
@@ -68,6 +72,7 @@ public:
 	R_mesh* LoadMesh(const char* resName);
 	R_Material* LoadMaterial(const char* resName);
 	R_Texture* LoadTexture(const char* resName);
+	R_ShaderProgram* LoadShader(const char* resName);
 
 
 

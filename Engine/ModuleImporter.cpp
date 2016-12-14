@@ -240,6 +240,42 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 }
 
 
+//https://www.opengl.org/wiki/Shader_Compilation#Shader_object_compilation
+std::vector<MetaInf> ModuleImporter::ImportShader(std::vector<std::string> files, std::vector<ShaderTypes> types, bool overWritting)
+{
+	std::vector<MetaInf> ret;
+
+	if (files.empty() || types.empty())
+	{
+		return ret;
+	}
+
+	std::string supportedFormats("bmp dcx dds hdr icns ico cur iff gif jpg jpe jpeg jp2 lbm png raw tif tga");
+	supportedFormats += std::string(SHADER_FRAGMENT_FORMAT).substr(1);
+	supportedFormats += " ";
+	supportedFormats += std::string(SHADER_VERTEX_FORMAT).substr(1);
+
+	for (int n = 0; n < files.size() && n < types.size(); n++)
+	{
+		if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
+		{
+			return ret;
+		}
+
+		LOG("\nStarted importing texture %s", filePath);
+		char* buffer = nullptr;
+		uint size;
+
+		size = App->fs->Load(filePath, &buffer);
+		if (size > 0)
+		{
+
+		}
+	}
+	return ret;
+}
+
+
 
 std::vector<MetaInf> ModuleImporter::ImportGameObject(const char* path, const aiNode* NodetoLoad, const aiScene* scene, uint64_t uid, bool overWritting)
 {
@@ -1046,6 +1082,30 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 	{
 		LOG("Couldn't find in resources texture %s", resName)
 	}
+}
+
+R_ShaderProgram * ModuleImporter::LoadShader(const char * resName)
+{
+	char* file = nullptr;
+	R_ShaderProgram* ret = nullptr;
+	const MetaInf* inf = App->resources->GetMetaData(Component::C_Shader, resName);
+	if (inf != nullptr)
+	{
+		char filePath[526];
+		sprintf(filePath, "Library/Meshes/%llu%s", inf->uid, MESH_FORMAT);
+
+		LOG("Loading shader %s", inf->name.data());
+
+		if (App->fs->Exists(filePath))
+		{
+			int size = App->fs->Load(filePath, &file);
+			if (file != nullptr && size > 0)
+			{
+
+			}
+		}
+	}
+	return ret;
 }
 
 

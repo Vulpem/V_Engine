@@ -191,6 +191,7 @@
     <ClInclude Include="R_Material.h" />
     <ClInclude Include="R_mesh.h" />
     <ClInclude Include="R_Resource.h" />
+    <ClInclude Include="R_Shader.h" />
     <ClInclude Include="R_Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Timers.h" />

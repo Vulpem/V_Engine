@@ -86,6 +86,10 @@ Resource * ModuleResourceManager::LoadNewResource(std::string resName, Component
 		{
 			return (Resource*)App->importer->LoadTexture(resName.data());
 		}
+	case (Component::C_Shader):
+	{
+		return (Resource*)App->importer->LoadShader(resName.data());
+	}
 	}
 	return nullptr;
 }

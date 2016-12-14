@@ -420,6 +420,9 @@
     <ClInclude Include="Billboard.h">
       <Filter>Sources\GameObjects\Components</Filter>
     </ClInclude>
+    <ClInclude Include="R_Shader.h">
+      <Filter>Sources\ResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModuleAudio.cpp">
