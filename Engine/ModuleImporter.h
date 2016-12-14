@@ -50,7 +50,7 @@ public:
 	//Import any image to dds
 	std::vector<MetaInf> ImportImage(const char* filePath, bool overWritting = false);
 	//Compile any amount of shaders and store the resulting program in a binary precompiled file
-	std::vector<MetaInf> ImportShader(std::vector<std::string> files, std::vector<ShaderTypes> types, bool overWritting = false);
+	std::vector<MetaInf> ImportShader(const char * filePath, bool overWritting = false);
 
 private:
 	//Import a specific GO. Create a vGO with transform and hierarchy, and call ImportMesh && ImportMaterial

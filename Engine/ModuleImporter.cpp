@@ -96,6 +96,10 @@ std::vector<MetaInf> ModuleImporter::Import(const char * path, bool overWritting
 	{
 		ret = ImportImage(path, overWritting);
 	}
+	if (ret.empty())
+	{
+		ret = ImportShader(path, overWritting);
+	}
 	return ret;
 }
 
@@ -241,32 +245,30 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 
 
 //https://www.opengl.org/wiki/Shader_Compilation#Shader_object_compilation
-std::vector<MetaInf> ModuleImporter::ImportShader(std::vector<std::string> files, std::vector<ShaderTypes> types, bool overWritting)
+std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
 
-	if (files.empty() || types.empty())
+	std::string supportedFormats;
+	supportedFormats += std::string(SHADER_FRAGMENT_FORMAT).substr(1);
+	supportedFormats += " ";
+	supportedFormats += std::string(SHADER_VERTEX_FORMAT).substr(1);
+	if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
 	{
 		return ret;
 	}
 
-	std::string supportedFormats("bmp dcx dds hdr icns ico cur iff gif jpg jpe jpeg jp2 lbm png raw tif tga");
-	supportedFormats += std::string(SHADER_FRAGMENT_FORMAT).substr(1);
-	supportedFormats += " ";
-	supportedFormats += std::string(SHADER_VERTEX_FORMAT).substr(1);
+	std::string path(filePath);
 
 	for (int n = 0; n < files.size() && n < types.size(); n++)
 	{
-		if (supportedFormats.find(FileFormat(filePath)) == std::string::npos)
-		{
-			return ret;
-		}
+		
 
-		LOG("\nStarted importing texture %s", filePath);
+		LOG("\nStarted importing texture %s", files[n].data());
 		char* buffer = nullptr;
 		uint size;
 
-		size = App->fs->Load(filePath, &buffer);
+		size = App->fs->Load(files[n].data(), &buffer);
 		if (size > 0)
 		{
 
