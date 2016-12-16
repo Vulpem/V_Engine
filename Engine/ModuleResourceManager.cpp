@@ -10,6 +10,8 @@
 
 #include <queue>
 
+#include "OpenGL.h"
+
 
 ModuleResourceManager::ModuleResourceManager(Application* app, bool start_enabled) : Module(app, start_enabled)//, resBaseFolder("Assets", "Assets")
 {
@@ -27,6 +29,41 @@ bool ModuleResourceManager::Start()
 	CreateLibraryDirs();
 	LoadMetaData();
 	Refresh();
+
+
+
+	defaultVertexBuf = std::string(
+		"#version 330 core\n"
+		"in vec3 position;\n"
+		"in vec3 color;\n"
+		"in vec2 texCoord;\n"
+		"out vec3 ourColor;\n"
+		"out vec2 TexCoord;\n"
+		"uniform mat4 model_matrix;\n"
+		"uniform mat4 view_matrix;\n"
+		"uniform mat4 projection_matrix;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0f);\n"
+		"	ourColor = color;\n"
+		"	TexCoord = texCoord;\n"
+		"}\n"
+	);
+
+	defaultFragmentBuf = std::string(
+		"#version 330 core\n"
+		"in vec3 ourColor;\n"
+		"in vec2 TexCoord;\n"
+		//"out vec4 color;\n"
+		"uniform sampler2D ourTexture;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"gl_FragColor = texture(ourTexture, TexCoord);\n"
+		"}\n"
+	);
+	GenerateDefaultShader();
 
 	return true;
 }
@@ -766,6 +803,68 @@ std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceMana
 		}
 	}
 	return ret;
+}
+
+void ModuleResourceManager::GenerateDefaultShader()
+{
+	bool error = false;
+
+	const char* src = defaultVertexBuf.c_str();
+	GLuint vertexShader;	
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &src, NULL);
+	glCompileShader(vertexShader);
+	GLint success;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (success == 0)
+	{
+		error = true;
+		GLchar infoLog[512];
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		LOG("Shader compilation error: %s", infoLog);
+	}
+
+	src = defaultFragmentBuf.c_str();
+	GLuint fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &src, NULL);
+	glCompileShader(fragmentShader);
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (success == 0)
+	{
+		error = true;
+		GLchar infoLog[512];
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		LOG("Shader compilation error: %s", infoLog);
+	}
+
+	GLuint shaderProgram;
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	if (success == 0)
+	{
+		error = true;
+		GLchar infoLog[512];
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		LOG("Shader link error: %s", infoLog);
+	}
+
+	if (shaderProgram != 0 && error == false)
+	{
+		if (defaultShader != 0)
+		{
+			glDeleteProgram(defaultShader);
+		}
+		defaultShader = shaderProgram;
+	}	
+
+	glDetachShader(shaderProgram, vertexShader);
+	glDetachShader(shaderProgram, fragmentShader);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
 }
 
 R_Folder::R_Folder(const char* name, R_Folder* parent) : name(name)

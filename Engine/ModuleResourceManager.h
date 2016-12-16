@@ -133,6 +133,17 @@ public:
 	// -first is the file name
 	// -Second is the vector of resources from that file
 	std::vector<std::pair<std::string, std::vector<std::string>>> GetAvaliableResources(Component::Type type = Component::Type::C_None);
+
+
+	// --------------------------------- Shaders stuff ----------------------------------
+
+	void GenerateDefaultShader();
+	std::string defaultVertexBuf;
+	std::string defaultFragmentBuf;
+	uint GetDefaultShader() { return defaultShader; }
+
+	private:	
+	uint defaultShader = 0;
 };
 
 #endif

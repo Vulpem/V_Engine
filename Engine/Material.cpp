@@ -218,6 +218,11 @@ void Material::SetBlendType(int blendType)
 	ReadRes<R_Material>()->blendType = blendType;
 }
 
+int Material::GetShader()
+{
+	return ReadRes<R_Material>()->shaderProgram;
+}
+
 void Material::RemoveTexturesNow()
 {
 	if (texturesToRemove.empty() == false)

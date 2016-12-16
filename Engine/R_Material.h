@@ -14,6 +14,11 @@ public:
 
 	~R_Material()
 	{
+		if (shaderProgram != 0)
+		{
+			glDeleteProgram(shaderProgram);
+		}
+
 		if (textures.empty() == false)
 		{
 			for (std::vector<uint64_t>::iterator it = textures.begin(); it != textures.end(); it++)
@@ -28,6 +33,8 @@ public:
 	float color[5] = { 1.0f, 1.0f, 1.0f,1.0f };
 
 	std::vector<uint64_t> textures;
+
+	GLuint shaderProgram = 0;
 
 	AlphaTestTypes alphaType = AlphaTestTypes::ALPHA_OPAQUE;
 	int blendType = GL_ONE_MINUS_SRC_ALPHA;

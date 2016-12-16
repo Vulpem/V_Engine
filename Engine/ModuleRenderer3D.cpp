@@ -351,8 +351,6 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		alphaObjects.insert(std::pair<float, Mesh_RenderInfo>(distanceToObject, meshInfo));
 		return;
 	}
-	glPushMatrix();
-	glMultMatrixf(meshInfo.transform.ptr());
 
 	if (meshInfo.renderNormals)
 	{
@@ -368,13 +366,13 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	//Setting index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
 
-	if (meshInfo.normalsBuffer > 0)
+	/*if (meshInfo.normalsBuffer > 0)
 	{
 		glEnableClientState(GL_NORMAL_ARRAY);
 		//Setting Normals
 		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.normalsBuffer);
 		glNormalPointer(GL_FLOAT, 0, NULL);
-	}
+	}*/
 
 	if (meshInfo.wired)
 	{
@@ -396,8 +394,8 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		break;
 	}
 	}
-
-	if (meshInfo.textureCoordsBuffer > 0)
+	
+	/*if (meshInfo.textureCoordsBuffer > 0)
 	{
 		if (meshInfo.textureBuffer > 0)
 		{
@@ -407,7 +405,25 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 			glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 			glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
 		}
-	}
+	}*/
+
+	glUseProgram(meshInfo.shader);
+
+	// ------ Setting matrix -------------------------
+
+	GLint modelLoc = glGetUniformLocation(meshInfo.shader, "model_matrix");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, meshInfo.transform.ptr());
+
+	GLint viewLoc = glGetUniformLocation(meshInfo.shader, "view_matrix");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, currentViewPort->camera->GetViewMatrix().ptr());
+
+	GLint projectionLoc = glGetUniformLocation(meshInfo.shader, "projection_matrix");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, currentViewPort->camera->GetProjectionMatrix().ptr());
+	
+	// ------ Setting data format -------------------------
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
 
 	if (meshInfo.filled)
 	{
@@ -426,6 +442,8 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_BLEND);
+
+	glUseProgram(0);
 
 	glPopMatrix();
 }
@@ -549,7 +567,7 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 void ModuleRenderer3D::RenderMeshFilled(const Mesh_RenderInfo& data)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glColor4fv(data.meshColor.ptr());
+	//glColor4fv(data.meshColor.ptr());
 	glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
 }
 

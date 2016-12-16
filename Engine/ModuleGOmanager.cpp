@@ -576,11 +576,17 @@ Mesh_RenderInfo ModuleGoManager::GetMeshData(mesh * getFrom)
 			ret.alphaType = mat->GetAlphaType();
 			ret.alphaTest = mat->GetAlphaTest();
 			ret.blendType = mat->GetBlendType();
+			ret.shader = mat->GetShader();
 		}
 	}
 	else
 	{
 		ret.meshColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	if (ret.shader == 0)
+	{
+		ret.shader = App->resources->GetDefaultShader();
 	}
 	return ret;
 }

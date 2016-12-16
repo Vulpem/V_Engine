@@ -248,7 +248,7 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
-
+	/*
 	std::string supportedFormats;
 	supportedFormats += std::string(SHADER_FRAGMENT_FORMAT).substr(1);
 	supportedFormats += " ";
@@ -273,7 +273,7 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 		{
 
 		}
-	}
+	}*/
 	return ret;
 }
 
@@ -1090,7 +1090,7 @@ R_ShaderProgram * ModuleImporter::LoadShader(const char * resName)
 {
 	char* file = nullptr;
 	R_ShaderProgram* ret = nullptr;
-	const MetaInf* inf = App->resources->GetMetaData(Component::C_Shader, resName);
+	/*const MetaInf* inf = App->resources->GetMetaData(Component::C_Shader, resName);
 	if (inf != nullptr)
 	{
 		char filePath[526];
@@ -1106,7 +1106,7 @@ R_ShaderProgram * ModuleImporter::LoadShader(const char * resName)
 
 			}
 		}
-	}
+	}*/
 	return ret;
 }
 

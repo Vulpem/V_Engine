@@ -33,6 +33,8 @@ public:
 	int GetBlendType();
 	void SetBlendType(int blendType);
 
+	int GetShader();
+
 	std::vector<uint> texturesToRemove;
 
 	void RemoveTexturesNow();

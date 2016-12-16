@@ -33,6 +33,8 @@ struct Mesh_RenderInfo
 	int blendType = 0;
 	float alphaTest = 0.2f;
 
+	uint shader = 0;
+
 	float4x4 transform;
 };
 
