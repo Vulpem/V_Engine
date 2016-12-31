@@ -83,7 +83,8 @@ private:
 	math::float3 changeGeometryPos;
 
 	bool openShaderEditor = false;
-	std::string shadersResult;
+public:
+	
 
 	GameObject* selectedGameObject = nullptr;
 	float selectedPos[3] = { 0,0,0 };

@@ -380,7 +380,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.dataBuffer);
 
-	// ------ Setting matrix -------------------------
+	// ------ Setting uniforms -------------------------
 
 	GLint modelLoc = glGetUniformLocation(meshInfo.shader, "model_matrix");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, meshInfo.transform.ptr());
@@ -390,6 +390,11 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	GLint projectionLoc = glGetUniformLocation(meshInfo.shader, "projection_matrix");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, currentViewPort->camera->GetProjectionMatrix().ptr());
+
+	GLint colorLoc = glGetUniformLocation(meshInfo.shader, "material_color");
+
+	GLint hasTextLoc = glGetUniformLocation(meshInfo.shader, "has_texture");
+	glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0));
 	
 	// ------ Setting data format -------------------------
 
@@ -404,6 +409,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.wired)
 	{
+		glUniform4fv(colorLoc, 1, meshInfo.wiresColor.ptr());
 		RenderMeshWired(meshInfo);
 	}
 
@@ -414,6 +420,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	if (meshInfo.filled)
 	{
+		glUniform4fv(colorLoc, 1, meshInfo.meshColor.ptr());
 		RenderMeshFilled(meshInfo);
 	}
 

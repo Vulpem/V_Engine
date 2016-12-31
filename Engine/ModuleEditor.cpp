@@ -811,7 +811,7 @@ void ModuleEditor::DefaultShadersEditorPopUp()
 		{
 			bool recompile = false;
 			uint len = MAX(App->resources->defaultFragmentBuf.length(), App->resources->defaultVertexBuf.length());
-			len += 10;
+			len += 500;
 			char* buf = new char[len];
 
 			if (ImGui::CollapsingHeader("Vertex shader"))
@@ -836,13 +836,13 @@ void ModuleEditor::DefaultShadersEditorPopUp()
 
 			if (recompile)
 			{
-				shadersResult = App->resources->GenerateDefaultShader();
+				App->resources->GenerateDefaultShader();
 			}
 
-			if (shadersResult.length() > 1)
+			if (App->resources->shadersResult.length() > 1)
 			{
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "There were errors while compiling the default shaders:");
-				ImGui::TextWrapped(shadersResult.data());
+				ImGui::TextWrapped(App->resources->shadersResult.data());
 			}
 			RELEASE_ARRAY(buf);
 			ImGui::End();

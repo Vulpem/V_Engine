@@ -34,34 +34,45 @@ bool ModuleResourceManager::Start()
 
 	defaultVertexBuf = std::string(
 		"#version 330 core\n"
-		"in vec3 position;\n"
-		"in vec3 color;\n"
-		"in vec2 texCoord;\n"
-		"out vec3 ourColor;\n"
+		"\n"
+		"layout (location = 0) in vec3 position;\n"
+		"layout (location = 1) in vec3 normal;\n"
+		"layout (location = 2) in vec2 texCoord;\n"
+		"\n"
+		"out vec4 ourColor;\n"
 		"out vec2 TexCoord;\n"
+		"\n"
 		"uniform mat4 model_matrix;\n"
 		"uniform mat4 view_matrix;\n"
 		"uniform mat4 projection_matrix;\n"
+		"uniform vec4 material_color;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
 		"	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0f);\n"
-		"	ourColor = color;\n"
+		"	ourColor = material_color;\n"
 		"	TexCoord = texCoord;\n"
 		"}\n"
 	);
 
 	defaultFragmentBuf = std::string(
 		"#version 330 core\n"
-		"in vec3 ourColor;\n"
+		"\n"
+		"in vec4 ourColor;\n"
 		"in vec2 TexCoord;\n"
+		"\n"
 		"out vec4 color;\n"
+		"\n"
 		"uniform sampler2D ourTexture;\n"
+		"uniform int has_texture;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
-		"color = texture(ourTexture, TexCoord);\n"
-		//"color = vec4(ourColor, 255);\n"
+		"if(has_texture != 0) {\n"
+		"color = ourColor * texture(ourTexture, TexCoord);\n"
+		"} else {\n"
+		"color = ourColor; \n"
+		"}\n"
 		"}\n"
 	);
 	GenerateDefaultShader();
@@ -806,7 +817,7 @@ std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceMana
 	return ret;
 }
 
-std::string ModuleResourceManager::GenerateDefaultShader()
+bool ModuleResourceManager::GenerateDefaultShader()
 {
 	std::string ret;
 	bool error = false;
@@ -877,7 +888,9 @@ std::string ModuleResourceManager::GenerateDefaultShader()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	return ret;
+	shadersResult = ret;
+
+	return !error;
 }
 
 R_Folder::R_Folder(const char* name, R_Folder* parent) : name(name)
