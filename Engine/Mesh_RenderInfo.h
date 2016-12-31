@@ -3,6 +3,8 @@
 
 #include "Math.h"
 
+class R_mesh;
+
 enum AlphaTestTypes
 {
 	ALPHA_OPAQUE = 0,
@@ -12,10 +14,15 @@ enum AlphaTestTypes
 
 struct Mesh_RenderInfo
 {
+	const R_mesh* origin = nullptr;
+
 	bool wired = false;
 	bool filled = false;
 	bool doubleSidedFaces = false;
 	bool renderNormals = false;
+
+	bool hasNormals = false;
+	bool hasUVs = false;
 
 	float4 meshColor = float4::zero;
 	float4 wiresColor = float4::zero;
@@ -24,10 +31,8 @@ struct Mesh_RenderInfo
 	unsigned int num_vertices = 0;
 
 	unsigned int indicesBuffer = 0;
-	unsigned int vertexBuffer = 0;
+	unsigned int dataBuffer = 0;
 	unsigned int textureBuffer = 0;
-	unsigned int textureCoordsBuffer = 0;
-	unsigned int normalsBuffer = 0;
 
 	AlphaTestTypes alphaType = AlphaTestTypes::ALPHA_OPAQUE;
 	int blendType = 0;

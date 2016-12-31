@@ -17,18 +17,10 @@ public:
 		{
 			glDeleteBuffers(1, &id_indices);
 		}
-		if (id_normals != 0)
+		if (id_data != 0)
 		{
-			glDeleteBuffers(1, &id_normals);
-		}
-		if (id_textureCoords != 0)
-		{
-			glDeleteBuffers(1, &id_textureCoords);
-		}
-		if (id_vertices != 0)
-		{
-			glDeleteBuffers(1, &id_vertices);
-		}
+			glDeleteBuffers(1, &id_data);
+		}		
 
 		RELEASE_ARRAY(vertices);
 		RELEASE_ARRAY(indices);
@@ -37,20 +29,18 @@ public:
 
 	Component::Type GetType() { return Component::Type::C_mesh; }
 
-	float3* vertices = nullptr;
-	uint id_vertices = 0;
-	uint num_vertices = 0;
-
 	uint* indices = nullptr;
 	uint id_indices = 0;
 	uint num_indices = 0;
 
+	uint num_vertices = 0;
+	float3* vertices = nullptr;	
 	float3* normals = nullptr;
-	uint id_normals = 0;
-	uint num_normals;
 
-	uint id_textureCoords = 0;
-	uint num_textureCoords = 0;
+	uint id_data = 0;
+
+	bool hasNormals = false;
+	bool hasUVs = false;
 
 	int defaultMaterialIndex = -1;
 

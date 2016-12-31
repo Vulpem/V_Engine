@@ -57,10 +57,10 @@ Mesh_RenderInfo mesh::GetMeshInfo()
 		ret.num_indices = res->num_indices;
 		ret.num_vertices = res->num_vertices;
 
-		ret.vertexBuffer = res->id_vertices;
-		ret.normalsBuffer = res->id_normals;
-		ret.textureCoordsBuffer = res->id_textureCoords;
+		ret.dataBuffer = res->id_data;
 		ret.indicesBuffer = res->id_indices;
+
+		ret.origin = res;
 	}
 	return ret;
 }
@@ -109,21 +109,21 @@ void mesh::EditorContent()
 	ImGui::NewLine();
 	ImGui::Text("Resource: %s", res->name.data());
 
-	ImGui::Text("Vertices in memory: %i", res->num_vertices);
-	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", res->id_vertices);
-
 	ImGui::Text("Indices in memory: %i", res->num_indices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
 	ImGui::Text("Buffer: %i", res->id_indices);
 
-	ImGui::Text("Normals in memory: %i", res->num_normals);
+	ImGui::Text("Vertices in memory: %i", res->num_vertices);
 	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", res->id_normals);
-
-	ImGui::Text("UV_Coords in memory: %i", res->num_textureCoords);
-	ImGui::SameLine(ImGui::GetWindowSize().x - 90);
-	ImGui::Text("Buffer: %i", res->id_textureCoords);
+	
+	if (res->hasNormals)
+	{
+		ImGui::Text("Has normals");
+	}
+	if (res->hasUVs)
+	{
+		ImGui::Text("Has UVs");
+	}
 	ImGui::Separator();
 	ImGui::Text("Texture index material:");
 	sprintf(tmp, "##MaterialID%llu", uid);

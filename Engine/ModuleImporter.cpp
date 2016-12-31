@@ -880,56 +880,76 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 					newMesh->vertices = new float3[newMesh->num_vertices];
 					bytes = sizeof(float3) * newMesh->num_vertices;
 					memcpy(newMesh->vertices, It, bytes);
-					It += bytes;
-
-					//Generating vertices buffer
-					glGenBuffers(1, (GLuint*) &(newMesh->id_vertices));
-					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_vertices);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * 3, newMesh->vertices, GL_STATIC_DRAW);
-					//endof Generating vertices buffer
+					It += bytes;	
 
 
 					//Num normals
+					uint numNormals = 0;
 					bytes = sizeof(uint);
-					memcpy(&newMesh->num_normals, It, bytes);
+					memcpy(&numNormals, It, bytes);
 					It += bytes;
 
-					if (newMesh->num_normals > 0)
+					if (numNormals > 0)
 					{
 						//Normals
-						newMesh->normals = new float3[newMesh->num_normals];
-						bytes = sizeof(float3) * newMesh->num_normals;
+						newMesh->normals = new float3[numNormals];
+						bytes = sizeof(float3) * numNormals;
 						memcpy(newMesh->normals, It, bytes);
 						It += bytes;
-
-						//Generating normals buffer
-						glGenBuffers(1, (GLuint*) &(newMesh->id_normals));
-						glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_normals);
-						glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_normals * 3, newMesh->normals, GL_STATIC_DRAW);
-						//endOf Generating normals buffer
+						newMesh->hasNormals = true;
 					}
 
 					//Num texture coords
+					uint numTextureCoords = 0;
 					bytes = sizeof(uint);
-					memcpy(&newMesh->num_textureCoords, It, bytes);
+					memcpy(&numTextureCoords, It, bytes);
 					It += bytes;
 
-					if (newMesh->num_textureCoords > 0)
+					float2* textureCoords = nullptr;
+					if (numTextureCoords > 0)
 					{
 						//Texture coords
-						float* textureCoords = new float[newMesh->num_vertices * 2];
-						bytes = sizeof(float) * newMesh->num_normals * 2;
+						textureCoords = new float2[numTextureCoords];
+						bytes = sizeof(float2) * numTextureCoords;
 						memcpy(textureCoords, It, bytes);
 						It += bytes;
-
-						//Generating UVs buffer
-						glGenBuffers(1, (GLuint*) &(newMesh->id_textureCoords));
-						glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_textureCoords);
-						glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_textureCoords * 2, textureCoords, GL_STATIC_DRAW);
-						//endOF Generatinv UVs buffer
-						RELEASE_ARRAY(textureCoords);
+						newMesh->hasUVs = true;
 					}
 
+					float* data = new float[(3 + 3 + 2) * newMesh->num_vertices];
+					float* data_it = data;
+					for (uint n = 0; n < newMesh->num_vertices; n++)
+					{
+						memcpy(data_it, &newMesh->vertices[n], sizeof(float3));
+						data_it += 3;
+						
+						float3 normal = float3::zero;
+						if (newMesh->hasNormals)
+						{
+							normal = newMesh->normals[n];
+						}
+						memcpy(data_it, &normal, sizeof(float3));
+						data_it += 3;
+
+						float2 uv = float2::zero;
+						if (newMesh->hasUVs)
+						{
+							uv = textureCoords[n];
+						}
+						memcpy(data_it, &uv, sizeof(float2));
+						data_it += 2;
+					}
+
+					//Generating data buffer
+					glGenBuffers(1, (GLuint*) &(newMesh->id_data));
+					glBindBuffer(GL_ARRAY_BUFFER, newMesh->id_data);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(float) * newMesh->num_vertices * (3 + 3 + 2), data, GL_STATIC_DRAW);
+					//endof Generating vertices buffer
+
+					RELEASE_ARRAY(textureCoords);
+					RELEASE_ARRAY(data);
+
+#pragma region Loading indices
 					//Num indices
 					bytes = sizeof(uint);
 					memcpy(&newMesh->num_indices, It, bytes);
@@ -946,7 +966,7 @@ R_mesh* ModuleImporter::LoadMesh(const char * resName)
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newMesh->id_indices);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * newMesh->num_indices, newMesh->indices, GL_STATIC_DRAW);
 					//endOf generating indices buffer
-
+#pragma endregion
 
 					//AABB maxPoint
 					bytes = sizeof(float3);

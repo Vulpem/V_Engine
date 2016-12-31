@@ -16,6 +16,8 @@
 #include "Mesh_RenderInfo.h"
 #include "ViewPort.h"
 
+#include "R_mesh.h"
+
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
 #pragma comment (lib, "Glew/libx86/glew32.lib") /* link Microsoft OpenGL lib   */
@@ -359,20 +361,13 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	//Setting vertex
-	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.vertexBuffer);
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
-
 	//Setting index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
 
-	/*if (meshInfo.normalsBuffer > 0)
+	if (true)
 	{
 		glEnableClientState(GL_NORMAL_ARRAY);
-		//Setting Normals
-		glBindBuffer(GL_ARRAY_BUFFER, meshInfo.normalsBuffer);
-		glNormalPointer(GL_FLOAT, 0, NULL);
-	}*/
+	}
 
 	if (meshInfo.wired)
 	{
@@ -395,19 +390,15 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	}
 	}
 	
-	/*if (meshInfo.textureCoordsBuffer > 0)
-	{
 		if (meshInfo.textureBuffer > 0)
 		{
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 			//Setting texture coords
-			glBindBuffer(GL_ARRAY_BUFFER, meshInfo.textureCoordsBuffer);
-			glTexCoordPointer(2, GL_FLOAT, 0, NULL);
 			glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
 		}
-	}*/
 
 	glUseProgram(meshInfo.shader);
+	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.dataBuffer);
 
 	// ------ Setting matrix -------------------------
 
@@ -422,8 +413,14 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	
 	// ------ Setting data format -------------------------
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 
 	if (meshInfo.filled)
 	{
@@ -567,33 +564,20 @@ void ModuleRenderer3D::RenderMeshWired(const Mesh_RenderInfo& data)
 void ModuleRenderer3D::RenderMeshFilled(const Mesh_RenderInfo& data)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glColor4fv(data.meshColor.ptr());
+	glColor4fv(data.meshColor.ptr());
 	glDrawElements(GL_TRIANGLES, data.num_indices, GL_UNSIGNED_INT, NULL);
 }
 
 void ModuleRenderer3D::RenderNormals(const Mesh_RenderInfo & data)
 {
-	if (data.normalsBuffer > 0)
+	if (data.origin->hasNormals)
 	{
-		float* normals = new float[data.num_vertices * 3];
-		glBindBuffer(GL_ARRAY_BUFFER, data.normalsBuffer);
-		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.num_vertices * 3, normals);
-
-		float* vertices = new float[data.num_vertices * 3];
-		glBindBuffer(GL_ARRAY_BUFFER, data.vertexBuffer);
-		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.num_vertices * 3, vertices);
-
 		for (uint n = 0; n < data.num_vertices; n++)
 		{
 			DrawLine(
-				float3(vertices[n * 3], vertices[n * 3 + 1], vertices[n * 3 + 2]),
-				float3(vertices[n * 3] + normals[n * 3], vertices[n * 3 + 1] + normals[n * 3 + 1], vertices[n * 3 + 2] + normals[n * 3 + 2]),
+				float3(data.origin->vertices[n]),
+				float3(data.origin->vertices[n] + data.origin->normals[n]),
 				float4(0.54f, 0.0f, 0.54f, 1.0f));
 		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		RELEASE_ARRAY(normals);
-		RELEASE_ARRAY(vertices);
 	}
 }
