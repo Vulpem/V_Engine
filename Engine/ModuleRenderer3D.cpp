@@ -359,21 +359,6 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		RenderNormals(meshInfo);
 	}
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	//Setting index
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
-
-	if (true)
-	{
-		glEnableClientState(GL_NORMAL_ARRAY);
-	}
-
-	if (meshInfo.wired)
-	{
-		RenderMeshWired(meshInfo);
-	}
-
 	//Setting alpha&&blend
 	switch (meshInfo.alphaType)
 	{
@@ -389,15 +374,10 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		break;
 	}
 	}
-	
-		if (meshInfo.textureBuffer > 0)
-		{
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			//Setting texture coords
-			glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
-		}
 
 	glUseProgram(meshInfo.shader);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshInfo.indicesBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, meshInfo.dataBuffer);
 
 	// ------ Setting matrix -------------------------
@@ -422,6 +402,16 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
+	if (meshInfo.wired)
+	{
+		RenderMeshWired(meshInfo);
+	}
+
+	if (meshInfo.textureBuffer > 0)
+	{
+		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
+	}
+
 	if (meshInfo.filled)
 	{
 		RenderMeshFilled(meshInfo);
@@ -431,11 +421,6 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
 
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_BLEND);
