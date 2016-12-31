@@ -426,8 +426,6 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glDisable(GL_BLEND);
 
 	glUseProgram(0);
-
-	glPopMatrix();
 }
 
 viewPort* ModuleRenderer3D::HoveringViewPort()
