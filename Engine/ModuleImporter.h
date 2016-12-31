@@ -59,13 +59,10 @@ private:
 	uint64_t ImportMesh(aiMesh* toLoad, const aiScene* scene, const char* vGoName, uint& textureID, uint64_t uid = 0);
 	//Create a vmat from a material, with colors & texture names
 	uint64_t ImportMaterial(const aiScene* scene, std::vector<uint>& matsIndex, const char* matName, uint64_t uid = 0);
-public:
-
-	std::map<std::vector<uint>, uint64_t> tmp_loadedMaterials;
 
 // ------------------------------- LOADING ------------------------------- 
 
-
+public:
 	//The parent variable is for internal use, this is a recursive called function. Please, leave it at NULL, as well as meshesFolder
 	GameObject* LoadVgo(const char* fileName, const char* vGoName, GameObject* parent = nullptr);
 

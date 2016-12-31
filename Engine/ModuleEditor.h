@@ -48,6 +48,7 @@ private:
 	void SwitchViewPorts();
 	void ViewPortUI(const viewPort& port);
 	bool SaveLoadPopups();
+	void DefaultShadersEditorPopUp();
 
 	void SelectByViewPort();
 
@@ -80,6 +81,9 @@ private:
 	char testConsoleInput[256];
 	std::string importResult;
 	math::float3 changeGeometryPos;
+
+	bool openShaderEditor = false;
+	std::string shadersResult;
 
 	GameObject* selectedGameObject = nullptr;
 	float selectedPos[3] = { 0,0,0 };

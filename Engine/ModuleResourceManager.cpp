@@ -55,12 +55,13 @@ bool ModuleResourceManager::Start()
 		"#version 330 core\n"
 		"in vec3 ourColor;\n"
 		"in vec2 TexCoord;\n"
-		//"out vec4 color;\n"
+		"out vec4 color;\n"
 		"uniform sampler2D ourTexture;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
-		"gl_FragColor = texture(ourTexture, TexCoord);\n"
+		"color = texture(ourTexture, TexCoord);\n"
+		//"color = vec4(ourColor, 255);\n"
 		"}\n"
 	);
 	GenerateDefaultShader();
@@ -805,8 +806,9 @@ std::vector<std::pair<std::string, std::vector<std::string>>> ModuleResourceMana
 	return ret;
 }
 
-void ModuleResourceManager::GenerateDefaultShader()
+std::string ModuleResourceManager::GenerateDefaultShader()
 {
+	std::string ret;
 	bool error = false;
 
 	const char* src = defaultVertexBuf.c_str();
@@ -821,6 +823,9 @@ void ModuleResourceManager::GenerateDefaultShader()
 		error = true;
 		GLchar infoLog[512];
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		ret += "\n------ Vertex shader ------\n";
+		ret += infoLog;
+		ret += '\n';
 		LOG("Shader compilation error: %s", infoLog);
 	}
 
@@ -835,6 +840,9 @@ void ModuleResourceManager::GenerateDefaultShader()
 		error = true;
 		GLchar infoLog[512];
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		ret += "\n------ Fragment shader ------\n";
+		ret += infoLog;
+		ret += '\n';
 		LOG("Shader compilation error: %s", infoLog);
 	}
 
@@ -849,6 +857,9 @@ void ModuleResourceManager::GenerateDefaultShader()
 		error = true;
 		GLchar infoLog[512];
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		ret += "\n------ Shader Program ------\n";
+		ret += infoLog;
+		ret += '\n';
 		LOG("Shader link error: %s", infoLog);
 	}
 
@@ -865,6 +876,8 @@ void ModuleResourceManager::GenerateDefaultShader()
 	glDetachShader(shaderProgram, fragmentShader);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	return ret;
 }
 
 R_Folder::R_Folder(const char* name, R_Folder* parent) : name(name)

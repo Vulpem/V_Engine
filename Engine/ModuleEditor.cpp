@@ -268,6 +268,7 @@ void ModuleEditor::SelectGameObject(GameObject* node)
 update_status ModuleEditor::MenuBar()
 {
 	update_status ret = UPDATE_CONTINUE;
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -319,12 +320,14 @@ update_status ModuleEditor::MenuBar()
 			ImGui::Text("It may take some time.\nAlso, it may cause\nsome problems if\nthere are already\nassets loaded.\nRecommended to use refresh\nwhen possible");
 			ImGui::EndMenu();
 		}
+
 		if (ImGui::BeginMenu("View"))
 		{
 			if (ImGui::Checkbox("Multiple Views", &multipleViews))
 			{
 				SwitchViewPorts();
 			}
+			ImGui::Checkbox("Edit default shaders", &openShaderEditor);
 			ImGui::Checkbox("ImGui TestBox", &IsOpenTestWindow);
 			ImGui::Checkbox("InGame Plane", &showPlane);
 			ImGui::Checkbox("QuadTree", &App->GO->drawQuadTree);
@@ -370,6 +373,7 @@ update_status ModuleEditor::MenuBar()
 		}
 		ImGui::EndMainMenuBar();
 	}
+	DefaultShadersEditorPopUp();
 	return ret;
 }
 
@@ -552,7 +556,6 @@ void ModuleEditor::Editor()
 				ImGui::Text("No timers initialized");
 			}
 		}
-
 
 		if (ImGui::CollapsingHeader("Tests"))
 		{
@@ -798,6 +801,53 @@ bool ModuleEditor::SaveLoadPopups()
 	}
 
 	return false;
+}
+
+void ModuleEditor::DefaultShadersEditorPopUp()
+{
+	if (openShaderEditor)
+	{
+		if (ImGui::Begin("Default Shader Editor", &openShaderEditor))
+		{
+			bool recompile = false;
+			uint len = MAX(App->resources->defaultFragmentBuf.length(), App->resources->defaultVertexBuf.length());
+			len += 10;
+			char* buf = new char[len];
+
+			if (ImGui::CollapsingHeader("Vertex shader"))
+			{
+				strcpy(buf, App->resources->defaultVertexBuf.data());
+				if (ImGui::InputTextMultiline("##vertexShaderEditor", buf, len, ImVec2(ImGui::GetWindowWidth(), 400)))
+				{
+					App->resources->defaultVertexBuf = buf;
+					recompile = true;
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Fragment shader"))
+			{
+				strcpy(buf, App->resources->defaultFragmentBuf.data());
+				if (ImGui::InputTextMultiline("##fragmentShaderEditor", buf, len, ImVec2(ImGui::GetWindowWidth(), 400)))
+				{
+					App->resources->defaultFragmentBuf = buf;
+					recompile = true;
+				}
+			}
+
+			if (recompile)
+			{
+				shadersResult = App->resources->GenerateDefaultShader();
+			}
+
+			if (shadersResult.length() > 1)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "There were errors while compiling the default shaders:");
+				ImGui::TextWrapped(shadersResult.data());
+			}
+			RELEASE_ARRAY(buf);
+			ImGui::End();
+		}
+	}
 }
 
 void ModuleEditor::SelectByViewPort()

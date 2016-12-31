@@ -137,7 +137,7 @@ public:
 
 	// --------------------------------- Shaders stuff ----------------------------------
 
-	void GenerateDefaultShader();
+	std::string GenerateDefaultShader();
 	std::string defaultVertexBuf;
 	std::string defaultFragmentBuf;
 	uint GetDefaultShader() { return defaultShader; }
