@@ -52,6 +52,9 @@ public:
 	std::vector<viewPort> viewPorts;
 	Light lights[MAX_LIGHTS];
 
+	float4 ambientLight = float4(0.3f, 0.3f, 0.3f, 1.0f);
+	float3 sunDirection = float3(1.0f, 1.0f, 1.0f);
+
 private:
 	std::multimap<float, Mesh_RenderInfo> alphaObjects;
 	viewPort* currentViewPort = nullptr;
