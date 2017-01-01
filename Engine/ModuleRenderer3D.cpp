@@ -402,7 +402,7 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	//Time
 	GLint timeLoc = glGetUniformLocation(meshInfo.shader, "time");
-	if (timeLoc != -1) { glUniform1d(timeLoc, Time.AppRuntime); }
+	if (timeLoc != -1) { glUniform1f(timeLoc, (float)Time.AppRuntime); }
 
 	//Ambient color
 	GLint ambientColorLoc = glGetUniformLocation(meshInfo.shader, "ambient_color");
