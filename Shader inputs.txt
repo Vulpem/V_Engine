@@ -14,3 +14,77 @@ uniform float time;
 
 uniform vec4 ambient_color;
 uniform vec3 global_light_direction;
+
+
+---------------------------- VERTEX ---------------------------------------------
+
+#version 330 core
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texCoord;
+
+out vec4 ourColor;
+out vec2 TexCoord;
+
+uniform mat4 model_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+uniform vec4 material_color;
+
+uniform float time;
+uniform vec3 global_light_direction;
+
+void main()
+{
+vec4 pos = model_matrix * vec4(position, 1.0f);
+
+pos.y += sin(time + pos.x) / 1.2 + cos(time * 2 + pos.z * 4 + pos.x) / 10;
+
+vec3 norm = normal;
+norm.x =  sin(time + pos.x);
+norm.z = + cos(time * 2 + pos.z) / 4;
+
+vec4 col = material_color * dot(norm, global_light_direction);
+col.w = material_color.w;
+
+	gl_Position = projection_matrix * view_matrix *  pos;
+	TexCoord = texCoord;
+ourColor = col;
+}
+
+
+---------------------------- FRAGMENT -------------------------------------------
+
+#version 330 core
+
+in vec4 ourColor;
+in vec2 TexCoord;
+
+out vec4 color;
+
+uniform sampler2D ourTexture;
+uniform int has_texture;
+
+uniform float time;
+
+uniform vec4 ambient_color;
+
+void main()
+{
+if(has_texture != 0) {
+
+vec2 coord = TexCoord * 7;
+
+coord.x += time / 6;
+
+color = ourColor * texture(ourTexture, coord);
+} else {
+color = ourColor; 
+}
+
+color.x = max(color.x, ambient_color.x);
+color.y = max(color.y, ambient_color.y);
+color.z = max(color.z, ambient_color.z);
+
+}
