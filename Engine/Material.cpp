@@ -38,9 +38,45 @@ void Material::EditorContent()
 	}
 #pragma endregion
 
+#pragma region ChangeShaderPopup
+	if (ImGui::BeginPopup("Select Shader"))
+	{
+		if (ImGui::MenuItem("Default shader"))
+		{
+			App->resources->UnlinkResource(ReadRes<R_Material>()->shader);
+			ReadRes<R_Material>()->shader = 0;
+		}
+		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->resources->GetAvaliableResources(Component::Type::C_Shader);
+		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = shadersRes.begin();
+		for (; fileIt != shadersRes.end(); fileIt++)
+		{
+			if (ImGui::MenuItem(fileIt->first.data()))
+			{
+				ReadRes<R_Material>()->AssignShader(fileIt->second.front());
+				break;
+			}
+		}
+		ImGui::EndPopup();
+	}
+#pragma endregion
+	uint64_t currentShader = ReadRes<R_Material>()->shader;
+	if (currentShader != 0)
+	{
+		ImGui::Text("Current shader: %s", App->resources->Peek(currentShader)->name.data());
+	}
+	else
+	{
+		ImGui::Text("Current shader: Default shader");
+	}
+
 	if (ImGui::Button("Add new texture##AddTextureButton"))
 	{
 		ImGui::OpenPopup("Add New Texture");
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Change Shader##ChangeShaderButton"))
+	{
+		ImGui::OpenPopup("Select Shader");
 	}
 	ImGui::Text("Blend type:");
 	int alphaType = GetAlphaType();
@@ -220,7 +256,7 @@ void Material::SetBlendType(int blendType)
 
 int Material::GetShader()
 {
-	return ReadRes<R_Material>()->shaderProgram;
+	return ReadRes<R_Material>()->GetShaderProgram();
 }
 
 void Material::RemoveTexturesNow()

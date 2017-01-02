@@ -248,7 +248,6 @@ std::vector<MetaInf> ModuleImporter::ImportImage(const char * filePath, bool ove
 std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool overWritting)
 {
 	std::vector<MetaInf> ret;
-	/*
 	std::string supportedFormats;
 	supportedFormats += std::string(SHADER_FRAGMENT_FORMAT).substr(1);
 	supportedFormats += " ";
@@ -258,22 +257,77 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 		return ret;
 	}
 
-	std::string path(filePath);
+	LOG("\nStarted importing shader %s", filePath);
 
-	for (int n = 0; n < files.size() && n < types.size(); n++)
+	std::string shaderName = FileName(filePath);
+
+	std::string vertexFile = RemoveFormat(filePath) + SHADER_VERTEX_FORMAT;
+	std::string fragmentFile = RemoveFormat(filePath) + SHADER_FRAGMENT_FORMAT;
+	
+
+	char* vertexBuffer = nullptr;
+	uint vertexSize;
+
+	char* fragmentBuffer = nullptr;
+	uint fragmentSize;
+
+	vertexSize = App->fs->Load(vertexFile.data(), &vertexBuffer) + 1;
+	fragmentSize = App->fs->Load(fragmentFile.data(), &fragmentBuffer) + 1;
+	if (vertexBuffer != nullptr) { vertexBuffer[vertexSize - 1] = '\0'; }
+	if (fragmentBuffer != nullptr) { fragmentBuffer[fragmentSize - 1] = '\0'; }
+
+	if (vertexSize > 0 || fragmentSize > 0)
 	{
-		
+		GLuint shaderProgram = 0;
+		std::string compilationResult = CompileShader(vertexBuffer, fragmentBuffer, shaderProgram);
 
-		LOG("\nStarted importing texture %s", files[n].data());
-		char* buffer = nullptr;
-		uint size;
-
-		size = App->fs->Load(files[n].data(), &buffer);
-		if (size > 0)
+		if (shaderProgram != 0 && compilationResult.length() <= 1)
 		{
+			//Getting shader program in binary form and storing it
+			GLint binaryLength = 0;
+			glGetProgramiv(shaderProgram, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+			
+			//Buffer where the program will be stored. Here at the beggining, we'll store the format
+			char* binaryProgram = new char[binaryLength + sizeof(GLenum) + sizeof(GLint)];
+			//Where we'll store the length of the program
+			char* sizeIt = binaryProgram + sizeof(GLenum);
+			//from here on, the program itself
+			char* programIt = sizeIt + sizeof(GLint);
+			GLenum binaryFormat;
+			glGetProgramBinary(shaderProgram, binaryLength, NULL, &binaryFormat, programIt);
+			memcpy(binaryProgram, &binaryFormat, sizeof(GLenum));
+			memcpy(sizeIt, &binaryLength, sizeof(GLint));
 
+			uint64_t uid = 0;
+			if (overWritting)
+			{
+				const MetaInf* inf = App->resources->GetMetaData(filePath, Component::C_Shader, FileName(filePath).data());
+				if (inf)
+				{
+					uid = inf->uid;
+				}
+			}
+
+			// Save to buffer with the ilSaveIL function
+			if (uid == 0)
+			{
+				uid = GenerateUUID();
+			}
+			char toCreate[524];
+			sprintf(toCreate, "Library/Shaders/%llu%s", uid, SHADER_PROGRAM_FORMAT);
+
+			App->fs->Save(toCreate, binaryProgram, binaryLength + sizeof(GLenum) + sizeof(GLint));
+
+			MetaInf tmp;
+			tmp.name = shaderName;
+			tmp.type = Component::C_Shader;
+			tmp.uid = uid;
+			ret.push_back(tmp);
+
+			LOG("Succesfully imported!");
 		}
-	}*/
+	}
+
 	return ret;
 }
 
@@ -1106,27 +1160,41 @@ R_Texture* ModuleImporter::LoadTexture(const char* resName)
 	}
 }
 
-R_ShaderProgram * ModuleImporter::LoadShader(const char * resName)
+R_Shader * ModuleImporter::LoadShader(const char * resName)
 {
 	char* file = nullptr;
-	R_ShaderProgram* ret = nullptr;
-	/*const MetaInf* inf = App->resources->GetMetaData(Component::C_Shader, resName);
+	R_Shader* ret = nullptr;
+
+	const MetaInf* inf = App->resources->GetMetaData(Component::C_Shader, resName);
+	LOG("Loading shader %s", inf->name.data());
 	if (inf != nullptr)
 	{
 		char filePath[526];
-		sprintf(filePath, "Library/Meshes/%llu%s", inf->uid, MESH_FORMAT);
-
-		LOG("Loading shader %s", inf->name.data());
-
+		sprintf(filePath, "Library/Shaders/%llu%s", inf->uid, SHADER_PROGRAM_FORMAT);
 		if (App->fs->Exists(filePath))
 		{
 			int size = App->fs->Load(filePath, &file);
 			if (file != nullptr && size > 0)
 			{
+				ret = new R_Shader();
+				ret->name = resName;
+				
+				char* fileIt = file;
 
+				GLenum binaryFormat;
+				memcpy(&binaryFormat, fileIt, sizeof(GLenum));
+				fileIt += sizeof(GLenum);
+
+				uint length;
+				memcpy(&length, fileIt, sizeof(GLint));
+				fileIt += sizeof(GLint);
+
+				ret->shaderProgram = glCreateProgram();
+
+				glProgramBinary(ret->shaderProgram, binaryFormat, fileIt, length);
 			}
 		}
-	}*/
+	}
 	return ret;
 }
 
@@ -1237,4 +1305,112 @@ std::string ModuleImporter::NormalizePath(const char * path)
 		n++;
 	}
 	return std::string(tmp);
+}
+
+std::string ModuleImporter::RemoveFormat(const char * file)
+{
+	char name[1024];
+	strcpy(name, file);
+	char* end = name;
+	while (*end != '\0')
+	{
+		end++;
+	}
+
+	while (*end != '.')
+	{
+		end--;
+		if (end == name) { return std::string(file); }
+	}
+	*end = '\0';
+
+	return std::string(name);
+}
+
+std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fragmentBuf, uint & shaderProgram)
+{
+	std::string ret;
+	bool error = false;
+	shaderProgram = 0;
+	GLint success;
+	if (fragmentBuf == nullptr && vertexBuf == nullptr)
+	{
+		ret = "No vertex or fragment were recieved. Not compiling the shader.";
+		return ret;
+	}
+
+	GLuint vertexShader;
+	if (vertexBuf == nullptr)
+	{
+		vertexBuf = App->resources->defaultVertexBuf._Myptr();
+	}
+
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexBuf, NULL);
+	glCompileShader(vertexShader);
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (success == 0)
+	{
+		error = true;
+		GLchar infoLog[512];
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		ret += "\n------ Vertex shader ------\n";
+		ret += infoLog;
+		ret += '\n';
+	}
+
+	GLuint fragmentShader;
+	if (fragmentBuf == nullptr)
+	{
+		fragmentBuf = App->resources->defaultFragmentBuf._Myptr();
+	}
+
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentBuf, NULL);
+	glCompileShader(fragmentShader);
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (success == 0)
+	{
+		error = true;
+		GLchar infoLog[512];
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		ret += "\n------ Fragment shader ------\n";
+		ret += infoLog;
+		ret += '\n';
+	}
+
+	GLuint program;
+	program = glCreateProgram();
+
+	glAttachShader(program, vertexShader);
+	glAttachShader(program, fragmentShader);
+
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (success == 0)
+	{
+		error = true;
+		GLchar infoLog[512];
+		glGetProgramInfoLog(program, 512, NULL, infoLog);
+		ret += "\n------ Shader Program ------\n";
+		ret += infoLog;
+		ret += '\n';
+	}
+
+	if (program != 0 && error == false)
+	{
+		shaderProgram = program;
+		LOG("Compiled shader succesfully.")
+	}
+	else
+	{
+		LOG("\nError compiling shader:\n\n%s", ret.data());
+	}
+
+	glDetachShader(shaderProgram, vertexShader);
+	glDetachShader(shaderProgram, fragmentShader);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	return ret;
 }

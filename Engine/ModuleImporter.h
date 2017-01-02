@@ -19,7 +19,7 @@ class mesh;
 class R_mesh;
 class R_Material;
 class R_Texture;
-class R_ShaderProgram;
+class R_Shader;
 
 enum ShaderTypes;
 
@@ -69,7 +69,7 @@ public:
 	R_mesh* LoadMesh(const char* resName);
 	R_Material* LoadMaterial(const char* resName);
 	R_Texture* LoadTexture(const char* resName);
-	R_ShaderProgram* LoadShader(const char* resName);
+	R_Shader* LoadShader(const char* resName);
 
 
 
@@ -86,7 +86,15 @@ public:
 	//Will change any "\\" into a "/" && will set the start of the path at "Assets", if found
 	std::string NormalizePath(const char* path);
 
+	//Remove the file format from any string, if there's one
+	std::string RemoveFormat(const char* file);
+
 private:
+
+
+	std::string CompileShader(const char* vertexBuf, const char* fragmentBuf, uint& shaderProgram);
+
+
 	template <typename type>
 	char* CopyMem(char* copyTo, const type* copyFrom, int amount = 1)
 	{

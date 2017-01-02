@@ -1,0 +1,21 @@
+#version 330 core
+
+in vec4 ourColor;
+in vec2 TexCoord;
+
+out vec4 color;
+
+uniform sampler2D ourTexture;
+uniform int has_texture;
+
+void main()
+{
+	if(has_texture != 0)
+	{
+		color = ourColor;
+	}
+	else
+	{
+		color = ourColor; 
+	}
+}

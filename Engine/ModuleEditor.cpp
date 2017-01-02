@@ -142,6 +142,8 @@ bool ModuleEditor::CleanUp()
 	return true;
 }
 
+
+// ---- Each viewPort UI -------------------------------------------------------------------
 void ModuleEditor::Render(const viewPort & port)
 {
 	if (port.withUI)
@@ -162,6 +164,8 @@ void ModuleEditor::Render(const viewPort & port)
 		}
 	}
 }
+
+
 
 void ModuleEditor::OnScreenResize(int width, int heigth)
 {
@@ -264,6 +268,10 @@ void ModuleEditor::SelectGameObject(GameObject* node)
 	}
 	selectedGameObject = node;
 }
+
+
+
+// ---- UI with IMGUI viewPort UI -------------------------------------------------------------------
 
 update_status ModuleEditor::MenuBar()
 {
@@ -455,6 +463,15 @@ void ModuleEditor::Editor()
 
 		if (ImGui::CollapsingHeader("Render"))
 		{
+			ImGui::Text("Global light direction");
+			if (ImGui::DragFloat3("##GlobalLightDirection", App->renderer3D->sunDirection.ptr(), 0.1f, -1.0f, 1.0f))
+			{
+				App->renderer3D->sunDirection.Normalize();
+			}
+
+			ImGui::Text("Ambient light intensity");
+			ImGui::DragFloat("##GlobalLightDirection", &App->renderer3D->ambientLight.x, 0.1f, -1.0f, 1.0f);
+
 			if (ImGui::TreeNode("Lights"))
 			{
 				for (int nLight = 0; nLight < MAX_LIGHTS; nLight++)
@@ -641,6 +658,8 @@ void ModuleEditor::AttributeWindow()
 		}
 		ImGui::End();
 }
+
+
 
 
 void ModuleEditor::SwitchViewPorts()

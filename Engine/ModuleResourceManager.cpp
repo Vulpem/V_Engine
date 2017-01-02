@@ -26,12 +26,6 @@ ModuleResourceManager::~ModuleResourceManager()
 // Called before render is available
 bool ModuleResourceManager::Start()
 {
-	CreateLibraryDirs();
-	LoadMetaData();
-	Refresh();
-
-
-
 	defaultVertexBuf = std::string(
 		"#version 330 core\n"
 		"\n"
@@ -82,6 +76,10 @@ bool ModuleResourceManager::Start()
 		"}\n"
 		"}\n"
 	);
+
+	CreateLibraryDirs();
+	LoadMetaData();
+	Refresh();
 	GenerateDefaultShader();
 
 	return true;
@@ -158,6 +156,7 @@ void ModuleResourceManager::CreateLibraryDirs()
 	App->fs->CreateDir("Library/vGOs");
 	App->fs->CreateDir("Library/Materials");
 	App->fs->CreateDir("Library/Meta");
+	App->fs->CreateDir("Library/Shaders");
 	App->fs->CreateDir("Assets/Scenes");
 }
 
@@ -685,7 +684,10 @@ uint64_t ModuleResourceManager::LinkResource(std::string resName, Component::Typ
 
 void ModuleResourceManager::UnlinkResource(Resource * res)
 {
-	UnlinkResource(res->uid);
+	if (res != nullptr)
+	{
+		UnlinkResource(res->uid);
+	}
 }
 
 void ModuleResourceManager::UnlinkResource(uint64_t uid)

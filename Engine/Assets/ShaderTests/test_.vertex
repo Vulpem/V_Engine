@@ -1,0 +1,27 @@
+#version 330 core
+		
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texCoord;
+
+out vec4 ourColor;
+out vec2 TexCoord;
+
+uniform mat4 model_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+uniform vec4 material_color;
+uniform vec3 global_light_direction;
+uniform vec4 ambient_color;
+
+void main()
+{
+	mat4 transform = projection_matrix * view_matrix * model_matrix;
+	gl_Position = transform * vec4(position, 1.0f);
+ 	vec3 norm = vec4(model_matrix * vec4(normal, 1.0f)).xyz;
+	float light_intensity = dot(global_light_direction, norm);
+	light_intensity = max(light_intensity,ambient_color.x);
+	ourColor = material_color * light_intensity;
+	ourColor.w = material_color.w;
+	TexCoord = texCoord;
+}
