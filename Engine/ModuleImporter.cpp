@@ -261,6 +261,12 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 
 	std::string shaderName = FileName(filePath);
 
+	//If already exists a shader with this name, this won't be imported
+	if (App->resources->GetMetaData(Component::Type::C_Shader, shaderName.data()) != nullptr)
+	{
+		return ret;
+	}
+
 	std::string vertexFile = RemoveFormat(filePath) + SHADER_VERTEX_FORMAT;
 	std::string fragmentFile = RemoveFormat(filePath) + SHADER_FRAGMENT_FORMAT;
 	
@@ -1192,6 +1198,7 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 				ret->shaderProgram = glCreateProgram();
 
 				glProgramBinary(ret->shaderProgram, binaryFormat, fileIt, length);
+				RELEASE_ARRAY(file);
 			}
 		}
 	}

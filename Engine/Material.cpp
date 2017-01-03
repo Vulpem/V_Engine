@@ -50,7 +50,7 @@ void Material::EditorContent()
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = shadersRes.begin();
 		for (; fileIt != shadersRes.end(); fileIt++)
 		{
-			if (ImGui::MenuItem(fileIt->first.data()))
+			if (ImGui::MenuItem(fileIt->second.front().data()))
 			{
 				ReadRes<R_Material>()->AssignShader(fileIt->second.front());
 				break;
