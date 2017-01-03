@@ -354,11 +354,6 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 		return;
 	}
 
-	if (meshInfo.renderNormals)
-	{
-		RenderNormals(meshInfo);
-	}
-
 	//Setting alpha&&blend
 	switch (meshInfo.alphaType)
 	{
@@ -398,7 +393,11 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 
 	//Has texture bool
 	GLint hasTextLoc = glGetUniformLocation(meshInfo.shader, "has_texture");
-	if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
+	if (hasTextLoc != -1) { glUniform1i(hasTextLoc, 0); }
+
+	//UseLight
+	GLint useLightLoc = glGetUniformLocation(meshInfo.shader, "use_light");
+	if (useLightLoc != -1) { glUniform1i(useLightLoc, 0); }
 
 	//Time
 	GLint timeLoc = glGetUniformLocation(meshInfo.shader, "time");
@@ -423,14 +422,23 @@ void ModuleRenderer3D::DrawMesh(Mesh_RenderInfo& meshInfo, bool renderBlends)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
+	if (meshInfo.renderNormals)
+	{
+		if (colorLoc != -1) { glUniform4fv(colorLoc, 1, float4(0.54f, 0.0f, 0.54f, 1.0f).ptr()); }
+		RenderNormals(meshInfo);
+	}
+
 	if (meshInfo.wired)
 	{
 		if (colorLoc != -1) { glUniform4fv(colorLoc, 1, meshInfo.wiresColor.ptr()); }
 		RenderMeshWired(meshInfo);
 	}
 
-	if (meshInfo.textureBuffer > 0)
+	if (useLightLoc != -1) { glUniform1i(useLightLoc, currentViewPort->useLighting); }
+
+	if (meshInfo.textureBuffer > 0 && currentViewPort->useMaterials)
 	{
+		if (hasTextLoc != -1) { glUniform1i(hasTextLoc, (meshInfo.textureBuffer != 0)); }
 		glBindTexture(GL_TEXTURE_2D, meshInfo.textureBuffer);
 	}
 

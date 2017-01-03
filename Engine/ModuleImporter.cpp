@@ -261,10 +261,15 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 
 	std::string shaderName = FileName(filePath);
 
-	//If already exists a shader with this name, this won't be imported
-	if (App->resources->GetMetaData(Component::Type::C_Shader, shaderName.data()) != nullptr)
+	if (overWritting == false)
 	{
-		return ret;
+		//If already exists a shader with this name, this won't be imported
+		const MetaInf* existingShader = App->resources->GetMetaData(Component::Type::C_Shader, shaderName.data());
+		if (existingShader != nullptr)
+		{
+			ret.push_back(*existingShader);
+			return ret;
+		}
 	}
 
 	std::string vertexFile = RemoveFormat(filePath) + SHADER_VERTEX_FORMAT;

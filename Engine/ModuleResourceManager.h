@@ -72,8 +72,6 @@ private:
 	//Contains the Date each file was last modified
 	std::map<std::string, Date> meta_lastMod;
 
-	//R_Folder resBaseFolder;
-
 	Resource* LoadNewResource(std::string fileName, Component::Type type);
 
 public:

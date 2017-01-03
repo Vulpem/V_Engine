@@ -464,10 +464,7 @@ void ModuleEditor::Editor()
 		if (ImGui::CollapsingHeader("Render"))
 		{
 			ImGui::Text("Global light direction");
-			if (ImGui::DragFloat3("##GlobalLightDirection", App->renderer3D->sunDirection.ptr(), 0.1f, -1.0f, 1.0f))
-			{
-				App->renderer3D->sunDirection.Normalize();
-			}
+			ImGui::DragFloat3("##GlobalLightDirection", App->renderer3D->sunDirection.ptr(), 0.1f, -1.0f, 1.0f);
 
 			ImGui::Text("Ambient light intensity");
 			ImGui::DragFloat("##GlobalLightDirection", &App->renderer3D->ambientLight.x, 0.1f, -1.0f, 1.0f);

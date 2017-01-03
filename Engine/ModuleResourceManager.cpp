@@ -42,16 +42,24 @@ bool ModuleResourceManager::Start()
 		"uniform vec4 material_color;\n"
 		"uniform vec3 global_light_direction;\n"
 		"uniform vec4 ambient_color;\n"
+		"uniform int use_light;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
 		"	mat4 transform = projection_matrix * view_matrix * model_matrix;\n"
 		"	gl_Position = transform * vec4(position, 1.0f);\n"
+		"   if (use_light != 0)\n"
+		"   {\n"
 		"   vec3 norm = vec4(model_matrix * vec4(normal, 1.0f)).xyz;\n"
 		"   float light_intensity = dot(global_light_direction, norm);\n"
 		"	light_intensity = max(light_intensity,ambient_color.x);\n"
 		"	ourColor = material_color * light_intensity;\n"
 		"	ourColor.w = material_color.w;\n"
+		"   }\n"
+		"   else\n"
+		"   {\n"
+		"   ourColor = material_color;\n"
+		"   }\n"
 		"	TexCoord = texCoord;\n"
 		"}\n"
 	);
@@ -436,7 +444,10 @@ void ModuleResourceManager::Refresh()
 		filesToCheck.pop();
 	}
 
-	LOG("Refreshed\n%u files were up to date.\n%u files were actualized.\n%u new files found.", totalFiles - filesToImport - filesToReimport, filesToReimport, filesToImport);
+	if (filesToImport != 0 || filesToReimport != 0)
+	{
+		LOG("Refreshed\n%u files were up to date.\n%u files were actualized.\n%u new files found.", totalFiles - filesToImport - filesToReimport, filesToReimport, filesToImport);
+	}
 
 	while(metaToSave.size() > 0)
 	{

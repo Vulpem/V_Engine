@@ -21,6 +21,8 @@ void Material::PreUpdate()
 
 void Material::EditorContent()
 {
+	R_Material* res = ReadRes<R_Material>();
+
 #pragma region AddTexturePopup
 	if (ImGui::BeginPopup("Add New Texture"))
 	{
@@ -30,7 +32,7 @@ void Material::EditorContent()
 		{
 			if (ImGui::MenuItem(fileIt->first.data()))
 			{
-				ReadRes<R_Material>()->textures.push_back(App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
+				res->textures.push_back(App->resources->LinkResource(fileIt->second.front(), Component::Type::C_Texture));
 				break;
 			}
 		}
@@ -43,8 +45,8 @@ void Material::EditorContent()
 	{
 		if (ImGui::MenuItem("Default shader"))
 		{
-			App->resources->UnlinkResource(ReadRes<R_Material>()->shader);
-			ReadRes<R_Material>()->shader = 0;
+			App->resources->UnlinkResource(res->shader);
+			res->shader = 0;
 		}
 		std::vector<std::pair<std::string, std::vector<std::string>>> shadersRes = App->resources->GetAvaliableResources(Component::Type::C_Shader);
 		std::vector<std::pair<std::string, std::vector<std::string>>>::iterator fileIt = shadersRes.begin();
@@ -52,14 +54,14 @@ void Material::EditorContent()
 		{
 			if (ImGui::MenuItem(fileIt->second.front().data()))
 			{
-				ReadRes<R_Material>()->AssignShader(fileIt->second.front());
+				res->AssignShader(fileIt->second.front());
 				break;
 			}
 		}
 		ImGui::EndPopup();
 	}
 #pragma endregion
-	uint64_t currentShader = ReadRes<R_Material>()->shader;
+	uint64_t currentShader = res->shader;
 	if (currentShader != 0)
 	{
 		ImGui::Text("Current shader: %s", App->resources->Peek(currentShader)->name.data());
@@ -125,14 +127,13 @@ void Material::EditorContent()
 		}
 	}
 
-	R_Material* matRes = ReadRes<R_Material>();
 
 	ImGui::NewLine();
 	ImGui::Separator();
-	ImGui::ColorEdit4("Color", matRes->color);
-	if (matRes->textures.empty() == false)
+	ImGui::ColorEdit4("Color", res->color);
+	if (res->textures.empty() == false)
 	{
-		for (uint n = 0; n < matRes->textures.size(); n++)
+		for (uint n = 0; n < res->textures.size(); n++)
 		{
 			ImGui::Separator();
 			char tmp[524];
@@ -141,14 +142,14 @@ void Material::EditorContent()
 			{
 				texturesToRemove.push_back(n);
 			}
-			Resource* resText = App->resources->Peek(matRes->textures.at(n));
+			Resource* resText = App->resources->Peek(res->textures.at(n));
 			if (resText != nullptr)
 			{
 				ImGui::SameLine();
 				sprintf(tmp, "Id: %i    %s", n, resText->name.data());
 				if (ImGui::TreeNode(tmp))
 				{
-					ImTextureID image = (void*)App->resources->Peek(matRes->textures.at(n))->Read<R_Texture>()->bufferID;
+					ImTextureID image = (void*)App->resources->Peek(res->textures.at(n))->Read<R_Texture>()->bufferID;
 					ImGui::Image(image, ImVec2(270, 270));
 
 					ImGui::TreePop();
