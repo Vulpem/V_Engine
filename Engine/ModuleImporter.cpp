@@ -1187,7 +1187,7 @@ R_Shader * ModuleImporter::LoadShader(const char * resName)
 			int size = App->fs->Load(filePath, &file);
 			if (file != nullptr && size > 0)
 			{
-				ret = new R_Shader();
+				ret = new R_Shader(inf->uid);
 				ret->name = resName;
 				
 				char* fileIt = file;
