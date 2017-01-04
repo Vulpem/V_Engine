@@ -707,7 +707,10 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 		uint realSize = sizeof(uint) + sizeof(long long);
 		uint nTextures = matsIndex.size();
 
-		uint64_t uid = GenerateUUID();
+		if (uid == 0)
+		{
+			uid = GenerateUUID();
+		}
 
 		uint* materialsSize = new uint[matsIndex.size()];
 		char** materials = new char*[matsIndex.size()];
@@ -751,11 +754,6 @@ uint64_t ModuleImporter::ImportMaterial(const aiScene * scene, std::vector<uint>
 		for (int n = 0; n < matsIndex.size(); n++)
 		{
 			realIt = CopyMem<char>(realIt, materials[n], materialsSize[n]);
-		}
-		
-		if (uid == 0)
-		{
-			uid = GenerateUUID();
 		}
 
 		char toCreate[524];
