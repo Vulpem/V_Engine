@@ -19,13 +19,26 @@ void main()
 {
 	vec4 pos = model_matrix * vec4(position, 1.0f);
 
-	pos.y += sin(time + pos.x) / 1.2 + cos(time * 2 + pos.z * 4 + pos.x) / 10;
+	//This are the "main" huge waves
+	float dif1 = sin(time * 2 + pos.x) / 3;
+	//This adds pseudo random noise to the ocean
+	float dif2 = cos(time * 4 + pos.z * 4 * sin(pos.x)) / 10;
 
+	//Modifying the mesh
+	pos.y += dif1 + dif2;
+
+	//Changing normal direction to obscure some parts
 	vec3 norm = normal;
-	norm.x =  sin(time + pos.x);
-	norm.z = + cos(time * 2 + pos.z) / 4;
+	norm.x +=  dif1;
+	norm.z = + dif2;
 
-	vec4 col = material_color * dot(norm, global_light_direction);
+	//Color intensity, depending on the global light && the normal direction
+	float intensity = dot(norm, global_light_direction);
+
+	//Avoiding black areas
+	if(intensity < 0.4f) { intensity = 0.4f; }
+
+	vec4 col = material_color * intensity;
 	col.w = material_color.w;
 
 	gl_Position = projection_matrix * view_matrix *  pos;

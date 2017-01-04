@@ -14,15 +14,15 @@ uniform vec4 ambient_color;
 
 void main()
 {
-if(has_texture != 0) {
-
-vec2 coord = TexCoord * 7;
-
-coord.x += time / 6;
-
-color = ourColor * texture(ourTexture, coord);
-} else {
-color = ourColor; 
+if(has_texture != 0)
+{
+	vec2 coord = TexCoord * 7;
+	coord.x += time / 6;
+	color = ourColor * texture(ourTexture, coord);
+}
+else
+{
+	color = ourColor; 
 }
 
 color.x = max(color.x, ambient_color.x);
