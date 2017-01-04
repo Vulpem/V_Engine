@@ -292,12 +292,12 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 		GLuint shaderProgram = 0;
 		std::string compilationResult = CompileShader(vertexBuffer, fragmentBuffer, shaderProgram);
 
-		if (shaderProgram != 0 && compilationResult.length() <= 1)
+		if (shaderProgram != 0)
 		{
 			//Getting shader program in binary form and storing it
 			GLint binaryLength = 0;
 			glGetProgramiv(shaderProgram, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-			
+
 			//Buffer where the program will be stored. Here at the beggining, we'll store the format
 			char* binaryProgram = new char[binaryLength + sizeof(GLenum) + sizeof(GLint)];
 			//Where we'll store the length of the program
@@ -337,6 +337,16 @@ std::vector<MetaInf> ModuleImporter::ImportShader(const char * filePath, bool ov
 
 			LOG("Succesfully imported!");
 		}
+
+		char* resultLog = new char[compilationResult.length() + 1];
+		strcpy(resultLog, compilationResult.data());
+		char toCreate[524];
+		sprintf(toCreate, "%s%s", App->importer->RemoveFormat(filePath).data(), "_result.txt");
+		App->fs->Save(toCreate, resultLog, compilationResult.length() + 1);
+
+		sprintf(toCreate, "%s%s%s", "Library/Shaders/", App->importer->FileName(filePath).data(), "_result.txt");
+		App->fs->Save(toCreate, resultLog, compilationResult.length() + 1);
+		RELEASE_ARRAY(resultLog);
 	}
 
 	return ret;
@@ -1350,10 +1360,11 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 		ret = "No vertex or fragment were recieved. Not compiling the shader.";
 		return ret;
 	}
-
+	ret += "\n------ Vertex shader ------\n";
 	GLuint vertexShader;
 	if (vertexBuf == nullptr)
 	{
+		ret += "- No vertex shader found. Using default vertex shader.\n";
 		vertexBuf = App->resources->defaultVertexBuf._Myptr();
 	}
 
@@ -1365,15 +1376,20 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	{
 		error = true;
 		GLchar infoLog[512];
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		ret += "\n------ Vertex shader ------\n";
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);		
 		ret += infoLog;
 		ret += '\n';
 	}
+	else
+	{
+		ret += "Compilation succesfull\n";
+	}
 
+	ret += "\n------ Fragment shader ------\n";
 	GLuint fragmentShader;
 	if (fragmentBuf == nullptr)
 	{
+		ret += "- No fragment shader found. Using default fragment shader.\n";
 		fragmentBuf = App->resources->defaultFragmentBuf._Myptr();
 	}
 
@@ -1385,10 +1401,13 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	{
 		error = true;
 		GLchar infoLog[512];
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		ret += "\n------ Fragment shader ------\n";
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);		
 		ret += infoLog;
 		ret += '\n';
+	}
+	else
+	{
+		ret += "Compilation succesfull\n";
 	}
 
 	GLuint program;
