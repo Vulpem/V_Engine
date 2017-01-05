@@ -1,0 +1,54 @@
+#version 330 core
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texCoord;
+
+out vec4 ourColor;
+out vec2 TexCoord;
+
+uniform mat4 model_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+uniform vec4 material_color;
+uniform int has_texture;
+
+uniform int use_light;
+
+uniform float time;
+uniform vec3 global_light_direction;
+
+void main()
+{
+	vec4 pos = model_matrix * vec4(position, 1.0f);
+
+	//This are the "main" huge waves
+	float dif1 = sin(time * 2 + pos.x) / 3;
+	//This adds pseudo random noise to the ocean
+	float dif2 = cos(time * 4 + pos.z * 4 * sin(pos.x)) / 10;
+
+	//Modifying the mesh
+	pos.y += dif1 + dif2;
+
+	//Changing normal direction to obscure some parts
+	vec3 norm = normal;
+	norm.x +=  dif1;
+	norm.z = + dif2 * 2;
+
+	//Color intensity, depending on the global light && the normal direction
+	float intensity = dot(norm, global_light_direction);
+	if(use_light == 0)
+	{
+		intensity = 1;
+	}
+
+	//Avoiding black areas
+	if(intensity < 0.4f) { intensity = 0.4f; }
+
+	vec4 col = material_color * intensity;
+	col.w = material_color.w;
+
+	gl_Position = projection_matrix * view_matrix *  pos;
+	TexCoord = texCoord;
+	ourColor = col;
+}

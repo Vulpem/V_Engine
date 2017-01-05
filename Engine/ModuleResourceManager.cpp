@@ -392,6 +392,7 @@ void ModuleResourceManager::Refresh()
 				//The file exists in meta
 				if (it->second != App->fs->ReadFileDate(filesToCheck.front().data()))
 				{
+					//File existed, but has been modified
 					overwrite = true;
 					wantToImport = true;
 					filesToReimport++;
