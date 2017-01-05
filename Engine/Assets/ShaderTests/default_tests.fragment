@@ -8,25 +8,14 @@ out vec4 color;
 uniform sampler2D ourTexture;
 uniform int has_texture;
 
-uniform float time;
-
-uniform vec4 ambient_color;
-
 void main()
 {
-if(has_texture != 0)
-{
-	vec2 coord = TexCoord * 7;
-	coord.x += time / 6;
-	color = ourColor * texture(ourTexture, coord);
-}
-else
-{
-	color = ourColor; 
-}
-
-color.x = max(color.x, ambient_color.x);
-color.y = max(color.y, ambient_color.y);
-color.z = max(color.z, ambient_color.z);
-
+	if(has_texture != 0)
+	{
+		color = ourColor * texture(ourTexture, TexCoord);
+	}
+	else
+	{
+		color = ourColor; 
+	}
 }

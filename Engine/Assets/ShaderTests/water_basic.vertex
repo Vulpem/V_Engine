@@ -25,15 +25,15 @@ void main()
 	//This are the "main" huge waves
 	float dif1 = sin(time * 2 + pos.x) / 3;
 	//This adds pseudo random noise to the ocean
-	float dif2 = cos(time * 4 + pos.z * 4 * sin(pos.x)) / 10;
+	float dif2 = cos(time * 4 + pos.z * 4 * sin(pos.x)) / 8;
 
 	//Modifying the mesh
-	pos.y += dif1 + dif2;
+	pos.y += dif1 - dif2;
 
 	//Changing normal direction to obscure some parts
 	vec3 norm = normal;
 	norm.x +=  dif1;
-	norm.z = + dif2 * 2;
+	norm.z = - dif2 * 2;
 
 	//Color intensity, depending on the global light && the normal direction
 	float intensity = dot(norm, global_light_direction);
