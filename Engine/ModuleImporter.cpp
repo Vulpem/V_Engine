@@ -1317,8 +1317,9 @@ std::string ModuleImporter::NormalizePath(const char * path)
 
 	while (n < len - 7)
 	{
-		if (it[0] == 'A' && it[1] == 's'&& it[2] == 's'&& it[3] == 'e'&& it[4] == 't'&& it[5] == 's'&& it[6] == '/')
+		if (it[0] == '/' && it[1] == 'A' && it[2] == 's'&& it[3] == 's'&& it[4] == 'e'&& it[5] == 't'&& it[6] == 's'&& it[7] == '/')
 		{
+			it++;
 			return std::string(it);
 		}
 		it++;
