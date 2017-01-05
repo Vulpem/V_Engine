@@ -39,13 +39,13 @@ Change Viewports:
 		Deleting a camera linked to an active viewport will cause the engine to crash.  
 
 
-Shaders:
--It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"
-(for example: "water_shader.vertex" && "water_shader.fragment")
+Shaders:    
+-It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"    
+(for example: "water_shader.vertex" && "water_shader.fragment")    
 
--Result of compilation will be shown in a txt in the same directory the shader files are.
+-Result of compilation will be shown in a txt in the same directory the shader files are.    
 
--When selecting shaders (this can be done for each material, in the material window), they are shown twice each. This is a bug, and it's being fixed.
+-When selecting shaders (this can be done for each material, in the material window), they are shown twice each. This is a bug, and it's being fixed.    
 
 
 
