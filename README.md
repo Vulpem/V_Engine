@@ -39,6 +39,15 @@ Change Viewports:
 		Deleting a camera linked to an active viewport will cause the engine to crash.  
 
 
+Shaders:
+-It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"
+(for example: "water_shader.vertex" && "water_shader.fragment")
+
+-Result of compilation will be shown in a txt in the same directory the shader files are.
+
+-When selecting shaders (this can be done for each material, in the material window), they are shown twice each. This is a bug, and it's being fixed.
+
+
 
 Notes:  
 -Avoid messing(modifying) with the library files unless you know what you're doing.  
@@ -52,10 +61,6 @@ imported other files, try to add it back and refresh.
 
 -There's a known crash that will occur occasionally when deleting all the objects in a scene(included when loading a new scene from scratch).
 
--Altough when changes are made on a shader it will reimport properly, the engine will still don't unload and reload the new shader. This can now be fixed via unassigning the shader so it unloads and reassigning it again.
-
--It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"
-(for example: "water_shader.vertex" && "water_shader.fragment")
 
 ## LICENSE
 

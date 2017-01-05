@@ -18,6 +18,8 @@ uniform vec4 ambient_color;
 uniform vec3 global_light_direction;
 
 
+// DEFAULT SHADERS
+
 ---------------------------- VERTEX ---------------------------------------------
 
 #version 330 core
