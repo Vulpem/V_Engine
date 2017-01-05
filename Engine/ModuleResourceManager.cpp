@@ -381,7 +381,7 @@ void ModuleResourceManager::Refresh()
 	while (filesToCheck.empty() == false)
 	{
 		std::string tmp("." + App->importer->FileFormat(filesToCheck.front().data()));
-		if (tmp != SCENE_FORMAT)
+		if (tmp != SCENE_FORMAT && tmp != ".txt")
 		{
 			totalFiles++;
 			bool wantToImport = false;
@@ -395,12 +395,10 @@ void ModuleResourceManager::Refresh()
 					//File existed, but has been modified
 					overwrite = true;
 					wantToImport = true;
-					filesToReimport++;
 				}
 			}
 			else
 			{
-				filesToImport++;
 				//File wasn't found in the current metaData
 				wantToImport = true;
 			}
@@ -435,6 +433,16 @@ void ModuleResourceManager::Refresh()
 
 					metaData.insert(std::pair<std::string, std::multimap<Component::Type, MetaInf>>(filesToCheck.front(), tmp));
 					meta_lastMod.insert(std::pair<std::string, Date>(filesToCheck.front(), App->fs->ReadFileDate(filesToCheck.front().data())));
+
+					if (overwrite)
+					{
+						filesToReimport++;
+					}
+					else
+					{
+						filesToImport++;
+					}
+
 				}
 			}
 			else
