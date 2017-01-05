@@ -31,7 +31,7 @@ void main()
 	pos.y += dif1 - dif2;
 
 	//Changing normal direction to obscure some parts
-	vec3 norm = normal;
+	vec3 norm = vec3(0,1,0);
 	norm.x +=  dif1;
 	norm.z = - dif2 * 2;
 
