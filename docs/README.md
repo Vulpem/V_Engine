@@ -4,6 +4,8 @@ This has been created for learning purposes, during 2016/2017 at the CITM univer
 Source code can be found at:        
 [https://github.com/Vulpem/V_Engine/](https://github.com/Vulpem/V_Engine/)   
 
+   
+   
 ## Usage
 
 Drag and drop any 3d file into the engine viewport to load it. Note that only files located inside the "Assets" folder will be handled.   
@@ -17,6 +19,8 @@ The first execution, since it's importing all the files in the assets folder, wi
 *If the video isn't displaying properly, [click here](//https://youtu.be/iydIzaGG8Yw).*   
 
 
+   
+   
 ##Keybindings:  
 
 	click and hold right mouse button over any viewport to rotate the camera.  
@@ -38,6 +42,8 @@ The first execution, since it's importing all the files in the assets folder, wi
 		it is recommended to be careful when changing them.  
 		Deleting a camera linked to an active viewport will cause the engine to **crash**.  
 
+   
+   
 
 ##Shaders:    
 -It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"    
@@ -49,6 +55,8 @@ The first execution, since it's importing all the files in the assets folder, wi
 
 
 
+   
+   
 #Notes:  
 -Avoid messing(modifying) with the library files unless you know what you're doing.  
 
@@ -62,6 +70,8 @@ imported other files, try to add it back and refresh.
 -There's a known crash that will occur occasionally when deleting all the objects in a scene(included when loading a new scene from scratch).
 
 
+   
+   
 # LICENSE
 
  Copyright 2016 David Hernandez
