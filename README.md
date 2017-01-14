@@ -17,6 +17,8 @@ for it to create all the needed files to handle the information.
 The first execution, since it's importing all the files in the assets folder, will take the longest to import.  
 
 
+Video Demo of usage:
+https://youtu.be/iydIzaGG8Yw
 
 Keybindings:  
 
