@@ -11,13 +11,13 @@ There still isn't a UI or any output when the engine is importing files, so it m
 for it to create all the needed files to handle the information.   
 The first execution, since it's importing all the files in the assets folder, will take the longest to import.   
 
-###Demo video
+##Demo video
 
 [![Alt text](https://img.youtube.com/vi/iydIzaGG8Yw/0.jpg)](https://www.youtube.com/watch?v=iydIzaGG8Yw&t)   
 *If the video isn't displaying properly, [click here](//https://youtu.be/iydIzaGG8Yw).*   
 
 
-###Keybindings:  
+##Keybindings:  
 
 	click and hold right mouse button over any viewport to rotate the camera.  
 	Note that the default orthogonal views won't rotate.  
@@ -39,7 +39,7 @@ The first execution, since it's importing all the files in the assets folder, wi
 		Deleting a camera linked to an active viewport will cause the engine to **crash**.  
 
 
-###Shaders:    
+##Shaders:    
 -It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"    
 (for example: "water_shader.vertex" && "water_shader.fragment")    
 
@@ -49,7 +49,7 @@ The first execution, since it's importing all the files in the assets folder, wi
 
 
 
-##Notes:  
+#Notes:  
 -Avoid messing(modifying) with the library files unless you know what you're doing.  
 
 -There's a known crash that will occur occasionally when importing certain images that the engine can't handle.  
