@@ -1,30 +1,29 @@
-
-# V_Engine
-
 A simple game engine developed by Vulpem.     
-This has been created for learning purposes, during 2016 at the CITM university.   
+This has been created for learning purposes, during 2016/2017 at the CITM university.   
 
 Source code can be found at:        
-https://github.com/Vulpem/V_Engine/
+[https://github.com/Vulpem/V_Engine/](https://github.com/Vulpem/V_Engine/)   
 
 ## Usage
 
-Drag and drop any 3d file into the engine viewport to load it. Note that only files located inside the "Assets" folder will be handled.
-
-
+Drag and drop any 3d file into the engine viewport to load it. Note that only files located inside the "Assets" folder will be handled.   
 There still isn't a UI or any output when the engine is importing files, so it may appear frozen. Just wait, it may take a moment
-for it to create all the needed files to handle the information.  
-The first execution, since it's importing all the files in the assets folder, will take the longest to import.  
+for it to create all the needed files to handle the information.   
+The first execution, since it's importing all the files in the assets folder, will take the longest to import.   
+
+###Demo video
+
+[![Alt text](https://img.youtube.com/vi/iydIzaGG8Yw/0.jpg)](https://www.youtube.com/watch?v=iydIzaGG8Yw&t)   
+*If the video isn't displaying properly, [click here](//https://youtu.be/iydIzaGG8Yw).*   
 
 
+###Keybindings:  
 
-Keybindings:  
-
-Camera movement  
 	click and hold right mouse button over any viewport to rotate the camera.  
 	Note that the default orthogonal views won't rotate.  
 	The keys will move the "active viewport", the last one that was interacted with.  
 
+	Left Click to select any GameObject.
 	W forward  
 	S backward  
 	A Left  
@@ -33,13 +32,14 @@ Camera movement
 	E Up  
 	Shift (Hold) Increase camera movement speed  
 	
-Change Viewports:  
-	Space Switch between a single viewport or 4 of them.  
-	-Even though you can bind any camera to any viewport through the Camera menu, it is recommended to be careful when changing them.  
-		Deleting a camera linked to an active viewport will cause the engine to crash.  
+	Change Viewports:  
+		Space Switch between a single viewport or 4 of them.  
+		-Even though you can bind any camera to any viewport through the Camera menu,   
+		it is recommended to be careful when changing them.  
+		Deleting a camera linked to an active viewport will cause the engine to **crash**.  
 
 
-Shaders:    
+###Shaders:    
 -It only accepts vertex and fragment shaders. To compile a program, simply create two files containing the shader program and name them with the same filename and extensions ".vertex" and ".fragment"    
 (for example: "water_shader.vertex" && "water_shader.fragment")    
 
@@ -49,7 +49,7 @@ Shaders:
 
 
 
-Notes:  
+##Notes:  
 -Avoid messing(modifying) with the library files unless you know what you're doing.  
 
 -There's a known crash that will occur occasionally when importing certain images that the engine can't handle.  
@@ -62,7 +62,7 @@ imported other files, try to add it back and refresh.
 -There's a known crash that will occur occasionally when deleting all the objects in a scene(included when loading a new scene from scratch).
 
 
-## LICENSE
+# LICENSE
 
  Copyright 2016 David Hernandez
 
