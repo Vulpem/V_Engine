@@ -16,7 +16,7 @@ The first execution, since it's importing all the files in the assets folder, wi
 ##Demo video
 
 [![Alt text](https://img.youtube.com/vi/iydIzaGG8Yw/0.jpg)](https://www.youtube.com/watch?v=iydIzaGG8Yw&t)   
-*If the video isn't displaying properly, [click here](//https://youtu.be/iydIzaGG8Yw).*   
+*If the video isn't displaying properly, [click here](//youtu.be/iydIzaGG8Yw).*   
 
 
    
