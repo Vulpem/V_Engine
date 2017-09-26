@@ -1364,7 +1364,7 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	if (vertexBuf == nullptr)
 	{
 		ret += "- No vertex shader found. Using default vertex shader.\n";
-		vertexBuf = App->resources->defaultVertexBuf._Myptr();
+		vertexBuf = App->resources->defaultVertexBuf.c_str();
 	}
 
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -1389,7 +1389,7 @@ std::string ModuleImporter::CompileShader(const char* vertexBuf, const char* fra
 	if (fragmentBuf == nullptr)
 	{
 		ret += "- No fragment shader found. Using default fragment shader.\n";
-		fragmentBuf = App->resources->defaultFragmentBuf._Myptr();
+		fragmentBuf = App->resources->defaultFragmentBuf.c_str();
 	}
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
